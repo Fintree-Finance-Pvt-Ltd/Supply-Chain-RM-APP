@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "400006343327",
+    "project_id": "supply-99304",
+    "storage_bucket": "supply-99304.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:400006343327:android:ea52cc784eeced4db450aa",
+        "android_client_info": {
+          "package_name": "com.rm.scf.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaL4-X7MBWI0SEd2NfQLXjZ0sAE0vYPV8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

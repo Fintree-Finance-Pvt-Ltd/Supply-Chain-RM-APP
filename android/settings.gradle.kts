@@ -16,11 +16,16 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
-    id("com.android.application") version "8.11.1" apply false
-    id("org.jetbrains.kotlin.android") version "2.2.20" apply false
+    
+    // 1. Update AGP from 8.7.0 to 8.9.1
+    id("com.android.application") version "8.9.1" apply false 
+    
+    // 2. Update Kotlin from 1.8.22 to 2.1.0 to fix the warning
+    id("org.jetbrains.kotlin.android") version "2.1.0" apply false 
+    
+    id("com.google.gms.google-services") version "4.4.2" apply false
 }
 
 include(":app")
