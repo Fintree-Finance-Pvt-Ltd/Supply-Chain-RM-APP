@@ -27,7 +27,7 @@ android {
         applicationId = "com.rm.scf.com" 
         
         // 3. Set minSdk to at least 21 for Firebase
-        minSdk = 21 
+        minSdk = flutter.minSdkVersion 
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

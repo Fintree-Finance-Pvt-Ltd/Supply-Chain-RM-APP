@@ -237,13 +237,14 @@ class DocumentsPage extends StatefulWidget {
 
 class _DocumentsPageState extends State<DocumentsPage> {
   late List<DocumentItem> documents;
+  bool isDarkMode = false;
 
   @override
   void initState() {
     print("Company Type from previous screen: ${widget.companyType}");
     print("Mandatory Map Keys: ${mandatoryDocsByCompanyType.keys}");
     super.initState();
-
+loadTheme();
     final type = widget.companyType.toLowerCase().trim();
 
     final mandatoryList = mandatoryDocsByCompanyType[type] ?? [];
@@ -277,10 +278,15 @@ class _DocumentsPageState extends State<DocumentsPage> {
   int get mandatoryDocs => documents.where((d) => d.mandatory).length;
   int get uploadedDocs => documents.where((d) => d.fileUrls.isNotEmpty).length;
 
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBg,
+      backgroundColor:
+          isDarkMode ? const Color(0xFF121212) : AppColors.scaffoldBg,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -316,16 +322,25 @@ class _DocumentsPageState extends State<DocumentsPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F7FF),
+        // color: const Color(0xFFF1F7FF),
+        color: isDarkMode ? const Color(0xFF1E293B): const Color(0xFFF1F7FF),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFB6D4FF)),
-      ),
+        border: Border.all(
+          // color: const Color(0xFFB6D4FF)
+
+          color: isDarkMode ? Colors.white24 : const Color(0xFFB6D4FF),
+      ),),
       child: Text(
         "Total: $totalDocs | Mandatory: $mandatoryDocs | Uploaded: $uploadedDocs",
-        style: const TextStyle(
+
+        style:  TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF1E3A8A),
+          // color: Color(0xFF1E3A8A),
+            color: isDarkMode
+      ? Colors.white
+      : const Color(0xFFE5E7EB),
+
         ),
       ),
     );
@@ -340,10 +355,13 @@ class _DocumentsPageState extends State<DocumentsPage> {
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            // color: Colors.white,
+            color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(blurRadius: 12, color: Colors.black.withOpacity(0.06)),
+              BoxShadow(blurRadius: 12,
+               color: Colors.black.withOpacity(0.06)
+               ),
             ],
           ),
           child: Row(
@@ -355,9 +373,12 @@ class _DocumentsPageState extends State<DocumentsPage> {
                   children: [
                     Text(
                       doc.name,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
+                        
+    color: isDarkMode ? Colors.white : Colors.black,
+
                       ),
                     ),
                     const SizedBox(height: 4),

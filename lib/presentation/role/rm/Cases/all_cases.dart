@@ -4,10 +4,10 @@
 // // import 'package:http/http.dart' as http;
 // // import 'package:shared_preferences/shared_preferences.dart';
 // // import 'package:supply_chain/core/constants/api_endpoints.dart';
- 
+
 // // ///  CASE STATUS PIPELINE
 // // /// =======================================================
- 
+
 // // enum CaseStatus {
 // //   draft,
 // //   submitted,
@@ -18,21 +18,21 @@
 // //   completed,
 // //   rejected,
 // // }
- 
+
 // // ///  ROLE DEFINITIONS
 // // /// =======================================================
- 
+
 // // enum UserRole {
 // //   rm,
 // //   credit,
 // //   ceo,
 // //   md,
 // // }
- 
+
 // // /// =======================================================
 // // ///  CASE MODEL
 // // /// =======================================================
- 
+
 // // class CaseModel {
 // //   final String id;
 // //   final String name;
@@ -40,10 +40,10 @@
 // //   final String pan;
 // //   final String lan;
 // //   final DateTime createdAt;
- 
+
 // //   CaseStatus status;
 // //   UserRole currentOwner;
- 
+
 // //   CaseModel({
 // //     required this.id,
 // //     required this.name,
@@ -55,11 +55,11 @@
 // //     required this.currentOwner,
 // //   });
 // // }
- 
+
 // // /// =======================================================
 // // /// STATUS → OWNER MAPPING
 // // /// =======================================================
- 
+
 // // UserRole ownerForStatus(CaseStatus status) {
 // //   switch (status) {
 // //     case CaseStatus.draft:
@@ -77,11 +77,11 @@
 // //       return UserRole.rm;
 // //   }
 // // }
- 
+
 // // /// =======================================================
 // // /// STATUS LABEL
 // // /// =======================================================
- 
+
 // // String statusLabel(CaseStatus s) {
 // //   switch (s) {
 // //     case CaseStatus.draft:
@@ -102,11 +102,11 @@
 // //       return "Rejected";
 // //   }
 // // }
- 
+
 // // /// =======================================================
 // // /// DEMO DATA
 // // /// =======================================================
- 
+
 // // final List<CaseModel> demoCases = [
 // //   CaseModel(
 // //     id: "1",
@@ -149,11 +149,11 @@
 // //     currentOwner: ownerForStatus(CaseStatus.completed),
 // //   ),
 // // ];
- 
+
 // // /// =======================================================
 // // ///  MODERN CASES SCREEN (ALL USERS)
 // // /// =======================================================
- 
+
 // // // class CasesScreen extends StatelessWidget {
 // // //   const CasesScreen({super.key, required UserRole role});
 // //  class CasesScreen extends StatefulWidget {
@@ -216,7 +216,7 @@
 // //   Widget build(BuildContext context) {
 // //     return Scaffold(
 // //       backgroundColor: const Color(0xFFF5F7FB),
- 
+
 // //       /// Clean AppBar
 // //       appBar: AppBar(
 // //         elevation: 0,
@@ -230,7 +230,7 @@
 // //           ),
 // //         ),
 // //       ),
- 
+
 // //       body: Column(
 // //         crossAxisAlignment: CrossAxisAlignment.start,
 // //         children: [
@@ -258,7 +258,7 @@
 // //               ],
 // //             ),
 // //           ),
- 
+
 // //           /// Case List
 // //         Expanded(
 // //   child: loading
@@ -275,11 +275,11 @@
 // //       ),
 // //     );
 // //   }
- 
+
 // //   /// =======================================================
 // //   /// MODERN CASE CARD
 // //   /// =======================================================
- 
+
 // //   Widget _caseCard(CaseModel c) {
 // //     return Container(
 // //       margin: const EdgeInsets.only(bottom: 14),
@@ -314,9 +314,9 @@
 // //               _statusChip(c.status),
 // //             ],
 // //           ),
- 
+
 // //           const SizedBox(height: 12),
- 
+
 // //           /// Phone
 // //           Row(
 // //             children: [
@@ -325,17 +325,17 @@
 // //               Text(c.mobile),
 // //             ],
 // //           ),
- 
+
 // //           const SizedBox(height: 10),
- 
+
 // //           /// PAN & LAN
 // //           Text(
 // //             "PAN: ${c.pan}  •  LAN: ${c.lan}",
 // //             style: const TextStyle(fontSize: 13),
 // //           ),
- 
+
 // //           const SizedBox(height: 12),
- 
+
 // //           /// Date
 // //           Row(
 // //             children: [
@@ -351,11 +351,10 @@
 // //       ),
 // //     );
 // //   }
- 
+
 // //   /// =======================================================
 // //   /// STATUS CHIP
 // //   /// =======================================================
- 
 
 // //  CaseStatus _statusFromString(String? status) {
 // //   switch (status) {
@@ -382,7 +381,7 @@
 // //   Widget _statusChip(CaseStatus status) {
 // //     Color bg;
 // //     Color fg;
- 
+
 // //     switch (status) {
 // //       case CaseStatus.completed:
 // //         bg = const Color(0xFFD1FAE5);
@@ -411,7 +410,7 @@
 // //         fg = const Color(0xFF3730A3);
 // //         break;
 // //     }
- 
+
 // //     return Container(
 // //       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
 // //       decoration: BoxDecoration(
@@ -429,7 +428,6 @@
 // //     );
 // //   }
 // // }
- 
 
 //  import 'package:flutter/material.dart';
 // import 'dart:convert';
@@ -437,11 +435,11 @@
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:supply_chain/core/constants/api_endpoints.dart';
 // import 'package:supply_chain/presentation/role/rm/Cases/case_details.dart';
- 
+
 // /// =======================================================
 // /// CASE STATUS PIPELINE
 // /// =======================================================
- 
+
 // enum CaseStatus {
 //   draft,
 //   submitted,
@@ -452,7 +450,7 @@
 //   completed,
 //   rejected,
 // }
- 
+
 // CaseStatus statusFromApi(String? status) {
 //   switch (status) {
 //     case "draft":
@@ -467,22 +465,22 @@
 //       return CaseStatus.draft;
 //   }
 // }
- 
+
 // /// =======================================================
 // /// ROLE DEFINITIONS
 // /// =======================================================
- 
+
 // enum UserRole {
 //   rm,
 //   credit,
 //   ceo,
 //   md,
 // }
- 
+
 // /// =======================================================
 // /// CASE MODEL
 // /// =======================================================
- 
+
 // class CaseModel {
 //   final String id;
 //   final String name;
@@ -490,10 +488,10 @@
 //   final String pan;
 //   final String lan;
 //   final DateTime createdAt;
- 
+
 //   CaseStatus status;
 //   UserRole currentOwner;
- 
+
 //   CaseModel({
 //     required this.id,
 //     required this.name,
@@ -504,10 +502,10 @@
 //     required this.status,
 //     required this.currentOwner,
 //   });
- 
+
 //   factory CaseModel.fromJson(Map<String, dynamic> json) {
 //     final status = statusFromApi(json["status"]);
- 
+
 //     return CaseModel(
 //       id: json["id"].toString(),
 //       name: json["companyName"] ?? json["name"] ?? "",
@@ -520,11 +518,11 @@
 //     );
 //   }
 // }
- 
+
 // /// =======================================================
 // /// STATUS → OWNER MAPPING
 // /// =======================================================
- 
+
 // UserRole ownerForStatus(CaseStatus status) {
 //   switch (status) {
 //     case CaseStatus.draft:
@@ -542,11 +540,11 @@
 //       return UserRole.rm;
 //   }
 // }
- 
+
 // /// =======================================================
 // /// STATUS LABEL
 // /// =======================================================
- 
+
 // String statusLabel(CaseStatus s) {
 //   switch (s) {
 //     case CaseStatus.draft:
@@ -567,24 +565,24 @@
 //       return "Rejected";
 //   }
 // }
- 
+
 // /// =======================================================
 // /// CASES SCREEN
 // /// =======================================================
- 
+
 // class CasesScreen extends StatefulWidget {
 //   const CasesScreen({super.key, required this.role});
- 
+
 //   final UserRole role;
- 
+
 //   @override
 //   State<CasesScreen> createState() => _CasesScreenState();
 // }
- 
+
 // class _CasesScreenState extends State<CasesScreen> {
 //   List<CaseModel> cases = [];
 //   bool loading = true;
- 
+
 //   @override
 //   void initState() {
 //     super.initState();
@@ -593,10 +591,10 @@
 // Future<void> fetchCustomers() async {
 //   try {
 //     final prefs = await SharedPreferences.getInstance();
- 
+
 //     /// Get token stored during login
 //     final token = prefs.getString("token");
- 
+
 //     final response = await http.get(
 //       Uri.parse("${ApiEndpoints.baseUrl}/customers"),
 //       headers: {
@@ -604,12 +602,12 @@
 //         "Authorization": "Bearer $token",
 //       },
 //     );
- 
+
 //     final data = jsonDecode(response.body);
- 
+
 //     if (data["success"]) {
 //       final List list = data["data"];
- 
+
 //       setState(() {
 //         cases = list.map((e) => CaseModel.fromJson(e)).toList();
 //         loading = false;
@@ -621,17 +619,17 @@
 //     }
 //   } catch (e) {
 //     print("Customer Fetch Error: $e");
- 
+
 //     setState(() {
 //       loading = false;
 //     });
 //   }
 // }
- 
+
 //   /// =======================================================
 //   /// UI BUILD
 //   /// =======================================================
- 
+
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
@@ -675,7 +673,7 @@
 //               ],
 //             ),
 //           ),
- 
+
 //           /// Case List
 //           loading
 //               ? const Expanded(
@@ -692,12 +690,11 @@
 //       ),
 //     );
 //   }
- 
+
 //   /// =======================================================
 //   /// CASE CARD
 //   /// =======================================================
- 
- 
+
 //   // Widget _caseCard(CaseModel c) {
 //   //   return Container(
 //   //     margin: const EdgeInsets.only(bottom: 14),
@@ -732,9 +729,9 @@
 //   //             _statusChip(c.status),
 //   //           ],
 //   //         ),
- 
+
 //   //         const SizedBox(height: 12),
- 
+
 //   //         /// Phone
 //   //         Row(
 //   //           children: [
@@ -743,17 +740,17 @@
 //   //             Text(c.mobile.isEmpty ? "-" : c.mobile),
 //   //           ],
 //   //         ),
- 
+
 //   //         const SizedBox(height: 10),
- 
+
 //   //         /// PAN & LAN
 //   //         Text(
 //   //           "PAN: ${c.pan.isEmpty ? "-" : c.pan}  •  LAN: ${c.lan.isEmpty ? "-" : c.lan}",
 //   //           style: const TextStyle(fontSize: 13),
 //   //         ),
- 
+
 //   //         const SizedBox(height: 12),
- 
+
 //   //         /// Date
 //   //         Row(
 //   //           children: [
@@ -769,7 +766,7 @@
 //   //     ),
 //   //   );
 //   // }
- 
+
 //  Widget _caseCard(CaseModel c) {
 //   return InkWell(
 //     borderRadius: BorderRadius.circular(18),
@@ -854,45 +851,45 @@
 //   /// =======================================================
 //   /// STATUS CHIP
 //   /// =======================================================
- 
+
 //   Widget _statusChip(CaseStatus status) {
 //     Color bg;
 //     Color fg;
- 
+
 //     switch (status) {
 //       case CaseStatus.completed:
 //         bg = const Color(0xFFD1FAE5);
 //         fg = const Color(0xFF065F46);
 //         break;
- 
+
 //       case CaseStatus.draft:
 //         bg = const Color(0xFFE5E7EB);
 //         fg = const Color(0xFF374151);
 //         break;
- 
+
 //       case CaseStatus.submitted:
 //       case CaseStatus.opsReview:
 //         bg = const Color(0xFFDBEAFE);
 //         fg = const Color(0xFF1D4ED8);
 //         break;
- 
+
 //       case CaseStatus.ceoApproved:
 //       case CaseStatus.mdApproved:
 //         bg = const Color(0xFFFDE68A);
 //         fg = const Color(0xFF92400E);
 //         break;
- 
+
 //       case CaseStatus.rejected:
 //         bg = const Color(0xFFFEE2E2);
 //         fg = const Color(0xFF991B1B);
 //         break;
- 
+
 //       case CaseStatus.returnedToRm:
 //         bg = const Color(0xFFE0E7FF);
 //         fg = const Color(0xFF3730A3);
 //         break;
 //     }
- 
+
 //     return Container(
 //       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
 //       decoration: BoxDecoration(
@@ -910,8 +907,6 @@
 //     );
 //   }
 // }
- 
-
 
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -919,11 +914,11 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supply_chain/core/constants/api_endpoints.dart';
 import 'package:supply_chain/presentation/role/rm/Cases/case_details.dart';
- 
+
 /// =======================================================
 /// CASE STATUS PIPELINE
 /// =======================================================
- 
+
 enum CaseStatus {
   draft,
   submitted,
@@ -931,8 +926,8 @@ enum CaseStatus {
   ceoApproved,
   mdApproved,
   credit_l1_approved,
-    credit_l2_approved,
-md_terms_submitted,
+  credit_l2_approved,
+  md_terms_submitted,
   md_pending_terms,
   ops_l1_review,
   ops_l1_approved,
@@ -940,76 +935,66 @@ md_terms_submitted,
   completed,
   rejected,
 }
- 
+
 CaseStatus statusFromApi(String? status) {
- 
   switch (status) {
- 
     case "draft":
       return CaseStatus.draft;
- 
+
     case "submitted":
       return CaseStatus.submitted;
- 
-    case "credit_l1_approved":
-    return CaseStatus.credit_l1_approved;
 
- case "credit_l2_approved":
-    return CaseStatus.credit_l2_approved;
+    case "credit_l1_approved":
+      return CaseStatus.credit_l1_approved;
+
+    case "credit_l2_approved":
+      return CaseStatus.credit_l2_approved;
 
     // case "credit_review":
-        case "ops_l2_review":
+    case "ops_l2_review":
       return CaseStatus.opsReview;
 
-case "md_terms_submitted":
+    case "md_terms_submitted":
       return CaseStatus.md_terms_submitted;
 
-         case "ops_l1_review":
-return CaseStatus.ops_l1_review;
+    case "ops_l1_review":
+      return CaseStatus.ops_l1_review;
 
- case "ops_l1_approved":
-return CaseStatus.ops_l1_approved;
+    case "ops_l1_approved":
+      return CaseStatus.ops_l1_approved;
     case "ceo_approved":
       return CaseStatus.ceoApproved;
- 
+
     case "md_approved":
       return CaseStatus.mdApproved;
- 
-     case "md_pending_terms":
+
+    case "md_pending_terms":
       return CaseStatus.md_pending_terms;
 
     case "completed":
       return CaseStatus.completed;
- 
+
     case "rejected":
       return CaseStatus.rejected;
- 
+
     case "returned_to_rm":
       return CaseStatus.returnedToRm;
 
-        
- 
     default:
       return CaseStatus.draft;
   }
 }
- 
+
 /// =======================================================
 /// ROLE DEFINITIONS
 /// =======================================================
- 
-enum UserRole {
-  rm,
-  credit,
-  ceo,
-  md,
-  operations_team_l1,
-}
- 
+
+enum UserRole { rm, credit, ceo, md, operations_team_l1 }
+
 /// =======================================================
 /// CASE MODEL
 /// =======================================================
- 
+
 class CaseModel {
   final String id;
   final String name;
@@ -1017,10 +1002,10 @@ class CaseModel {
   final String pan;
   final String lan;
   final DateTime createdAt;
- 
+
   CaseStatus status;
   UserRole currentOwner;
- 
+
   CaseModel({
     required this.id,
     required this.name,
@@ -1031,10 +1016,10 @@ class CaseModel {
     required this.status,
     required this.currentOwner,
   });
- 
+
   factory CaseModel.fromJson(Map<String, dynamic> json) {
     final status = statusFromApi(json["status"]);
- 
+
     return CaseModel(
       id: json["id"].toString(),
       name: json["companyName"] ?? json["name"] ?? "",
@@ -1047,11 +1032,11 @@ class CaseModel {
     );
   }
 }
- 
+
 /// =======================================================
 /// STATUS → OWNER MAPPING
 /// =======================================================
- 
+
 UserRole ownerForStatus(CaseStatus status) {
   switch (status) {
     case CaseStatus.draft:
@@ -1064,23 +1049,23 @@ UserRole ownerForStatus(CaseStatus status) {
       return UserRole.ceo;
     case CaseStatus.mdApproved:
       return UserRole.md;
-      
-      case  CaseStatus.md_terms_submitted:
+
+    case CaseStatus.md_terms_submitted:
       return UserRole.md;
 
-      case  CaseStatus.ops_l1_review:
+    case CaseStatus.ops_l1_review:
       return UserRole.credit;
 
-  case  CaseStatus.credit_l1_approved:
+    case CaseStatus.credit_l1_approved:
       return UserRole.credit;
 
- case  CaseStatus.credit_l2_approved:
+    case CaseStatus.credit_l2_approved:
       return UserRole.credit;
-      
- case  CaseStatus.ops_l1_approved:
+
+    case CaseStatus.ops_l1_approved:
       return UserRole.operations_team_l1;
-      case  CaseStatus.md_pending_terms:
-        return UserRole.md;
+    case CaseStatus.md_pending_terms:
+      return UserRole.md;
     case CaseStatus.ops_l1_review:
       return UserRole.credit;
     case CaseStatus.completed:
@@ -1088,11 +1073,11 @@ UserRole ownerForStatus(CaseStatus status) {
       return UserRole.rm;
   }
 }
- 
+
 /// =======================================================
 /// STATUS LABEL
 /// =======================================================
- 
+
 String statusLabel(CaseStatus s) {
   switch (s) {
     case CaseStatus.draft:
@@ -1108,22 +1093,21 @@ String statusLabel(CaseStatus s) {
     case CaseStatus.returnedToRm:
       return "Returned";
 
-  case  CaseStatus.credit_l1_approved:
+    case CaseStatus.credit_l1_approved:
       return "Credit L1 Approved";
-    
-  case  CaseStatus.credit_l2_approved:
+
+    case CaseStatus.credit_l2_approved:
       return "Credit L2 Approved";
 
-    case  CaseStatus.md_terms_submitted:
+    case CaseStatus.md_terms_submitted:
       return "MD Terms Submitted";
 
- case  CaseStatus.ops_l1_approved:
+    case CaseStatus.ops_l1_approved:
       return "Ops L1 Approved";
-      
-      case  CaseStatus.md_pending_terms:
-        return "md_pending_terms";
-    case
-      CaseStatus.ops_l1_review:
+
+    case CaseStatus.md_pending_terms:
+      return "md_pending_terms";
+    case CaseStatus.ops_l1_review:
       return "Ops L1 Review";
     case CaseStatus.completed:
       return "Completed";
@@ -1131,85 +1115,83 @@ String statusLabel(CaseStatus s) {
       return "Rejected";
   }
 }
- 
+
 /// =======================================================
 /// CASES SCREEN
 /// =======================================================
- 
+
 class CasesScreen extends StatefulWidget {
   const CasesScreen({super.key, required this.role});
- 
+
   final UserRole role;
- 
+
   @override
   State<CasesScreen> createState() => _CasesScreenState();
 }
- 
+
 class _CasesScreenState extends State<CasesScreen> {
   List<CaseModel> cases = [];
   bool loading = true;
- 
+
   @override
   void initState() {
     super.initState();
     fetchCustomers();
   }
-Future<void> fetchCustomers() async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
- 
-    /// Get token stored during login
-    final token = prefs.getString("token");
- final rmId = prefs.getInt("rmId");// Get rmId stored during login
 
-    final response = await http.get(
-      Uri.parse("${ApiEndpoints.baseUrl}/customers"),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-    );
- 
-    final data = jsonDecode(response.body);
- 
-    if (data["success"]) {
-      final List list = data["data"];
- 
+  Future<void> fetchCustomers() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      /// Get token stored during login
+      final token = prefs.getString("token");
+      final rmId = prefs.getInt("rmId"); // Get rmId stored during login
+
+      final response = await http.get(
+        Uri.parse("${ApiEndpoints.baseUrl}/customers"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (data["success"]) {
+        final List list = data["data"];
+
         /// FILTER CASES BY RM ID
-      final filteredList = list.where((e) {
-        return e["rmId"] == rmId;
-      }).toList();
+        final filteredList = list.where((e) {
+          return e["rmId"] == rmId;
+        }).toList();
 
- setState(() {
-        cases = filteredList
-            .map((e) => CaseModel.fromJson(e))
-            .toList();
-        loading = false;
-      });
+        setState(() {
+          cases = filteredList.map((e) => CaseModel.fromJson(e)).toList();
+          loading = false;
+        });
 
-      
-      // setState(() {
-      //   cases = list.map((e) => CaseModel.fromJson(e)).toList();
-      //   loading = false;
-      // });
-    } else {
+        // setState(() {
+        //   cases = list.map((e) => CaseModel.fromJson(e)).toList();
+        //   loading = false;
+        // });
+      } else {
+        setState(() {
+          loading = false;
+        });
+      }
+    } catch (e) {
+      print("Customer Fetch Error: $e");
+
       setState(() {
         loading = false;
       });
     }
-  } catch (e) {
-    print("Customer Fetch Error: $e");
- 
-    setState(() {
-      loading = false;
-    });
   }
-}
- 
+
   /// =======================================================
   /// UI BUILD
   /// =======================================================
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1237,23 +1219,17 @@ Future<void> fetchCustomers() async {
               children: [
                 Text(
                   "Customers",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
                 ),
                 SizedBox(height: 6),
                 Text(
                   "Monitor and track onboarding progress",
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ],
             ),
           ),
- 
+
           /// Case List
           loading
               ? const Expanded(
@@ -1270,91 +1246,87 @@ Future<void> fetchCustomers() async {
       ),
     );
   }
- 
+
   /// =======================================================
   /// CASE CARD
   /// =======================================================
   Widget _caseCard(CaseModel c) {
-  return InkWell(
-    borderRadius: BorderRadius.circular(18),
-    onTap: () {
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => CaseDetailsPage(
-            customerId: int.parse(c.id),
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CaseDetailsPage(customerId: int.parse(c.id)),
           ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
         ),
-      );
-
-    },
-    child: Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  c.name.isEmpty ? "No Name" : c.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    c.name.isEmpty ? "No Name" : c.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ),
-              _statusChip(c.status),
-            ],
-          ),
-          const SizedBox(height: 12),
+                _statusChip(c.status),
+              ],
+            ),
+            const SizedBox(height: 12),
 
-          Row(
-            children: [
-              const Icon(Icons.phone, size: 16, color: Colors.grey),
-              const SizedBox(width: 6),
-              Text(c.mobile.isEmpty ? "-" : c.mobile),
-            ],
-          ),
+            Row(
+              children: [
+                const Icon(Icons.phone, size: 16, color: Colors.grey),
+                const SizedBox(width: 6),
+                Text(c.mobile.isEmpty ? "-" : c.mobile),
+              ],
+            ),
 
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-          Text(
-            "PAN: ${c.pan.isEmpty ? "-" : c.pan}  •  LAN: ${c.lan.isEmpty ? "-" : c.lan}",
-            style: const TextStyle(fontSize: 13),
-          ),
+            Text(
+              "PAN: ${c.pan.isEmpty ? "-" : c.pan}  •  LAN: ${c.lan.isEmpty ? "-" : c.lan}",
+              style: const TextStyle(fontSize: 13),
+            ),
 
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          Row(
-            children: [
-              const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
-              const SizedBox(width: 6),
-              Text(
-                "${c.createdAt.day}/${c.createdAt.month}/${c.createdAt.year}",
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ],
-          ),
-        ],
+            Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                const SizedBox(width: 6),
+                Text(
+                  "${c.createdAt.day}/${c.createdAt.month}/${c.createdAt.year}",
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
   // Widget _caseCard(CaseModel c) {
   //   return Container(
   //     margin: const EdgeInsets.only(bottom: 14),
@@ -1389,9 +1361,9 @@ Future<void> fetchCustomers() async {
   //             _statusChip(c.status),
   //           ],
   //         ),
- 
+
   //         const SizedBox(height: 12),
- 
+
   //         /// Phone
   //         Row(
   //           children: [
@@ -1400,17 +1372,17 @@ Future<void> fetchCustomers() async {
   //             Text(c.mobile.isEmpty ? "-" : c.mobile),
   //           ],
   //         ),
- 
+
   //         const SizedBox(height: 10),
- 
+
   //         /// PAN & LAN
   //         Text(
   //           "PAN: ${c.pan.isEmpty ? "-" : c.pan}  •  LAN: ${c.lan.isEmpty ? "-" : c.lan}",
   //           style: const TextStyle(fontSize: 13),
   //         ),
- 
+
   //         const SizedBox(height: 12),
- 
+
   //         /// Date
   //         Row(
   //           children: [
@@ -1426,65 +1398,63 @@ Future<void> fetchCustomers() async {
   //     ),
   //   );
   // }
- 
+
   /// =======================================================
   /// STATUS CHIP
   /// =======================================================
- 
+
   Widget _statusChip(CaseStatus status) {
     Color bg;
     Color fg;
- 
+
     switch (status) {
       case CaseStatus.completed:
         bg = const Color(0xFFD1FAE5);
         fg = const Color(0xFF065F46);
         break;
- 
+
       case CaseStatus.draft:
         bg = const Color(0xFFE5E7EB);
         fg = const Color(0xFF374151);
         break;
- 
+
       case CaseStatus.submitted:
       case CaseStatus.opsReview:
         bg = const Color(0xFFDBEAFE);
         fg = const Color(0xFF1D4ED8);
         break;
- 
+
       case CaseStatus.ceoApproved:
       case CaseStatus.mdApproved:
         bg = const Color(0xFFFDE68A);
         fg = const Color(0xFF92400E);
         break;
 
-        case CaseStatus.md_terms_submitted:
+      case CaseStatus.md_terms_submitted:
         bg = const Color(0xFFFDE68A);
         fg = const Color(0xFF92400E);
         break;
 
-
-  case  CaseStatus.credit_l1_approved:
-        bg = const Color(0xFFFDE68A);
-                fg = const Color(0xFF92400E);
-        break;
-
- case  CaseStatus.credit_l2_approved:
-        bg = const Color(0xFFFDE68A);
-                fg = const Color(0xFF92400E);
-        break;
-      
-        case CaseStatus.md_pending_terms:
+      case CaseStatus.credit_l1_approved:
         bg = const Color(0xFFFDE68A);
         fg = const Color(0xFF92400E);
         break;
- case CaseStatus.ops_l1_review:
+
+      case CaseStatus.credit_l2_approved:
+        bg = const Color(0xFFFDE68A);
+        fg = const Color(0xFF92400E);
+        break;
+
+      case CaseStatus.md_pending_terms:
+        bg = const Color(0xFFFDE68A);
+        fg = const Color(0xFF92400E);
+        break;
+      case CaseStatus.ops_l1_review:
         bg = const Color(0xFFD1FAE5);
         fg = const Color(0xFF065F46);
         break;
 
-            
- case  CaseStatus.ops_l1_approved:
+      case CaseStatus.ops_l1_approved:
         bg = const Color(0xFFD1FAE5);
         fg = const Color(0xFF065F46);
         break;
@@ -1492,13 +1462,13 @@ Future<void> fetchCustomers() async {
         bg = const Color(0xFFFEE2E2);
         fg = const Color(0xFF991B1B);
         break;
- 
+
       case CaseStatus.returnedToRm:
         bg = const Color(0xFFE0E7FF);
         fg = const Color(0xFF3730A3);
         break;
     }
- 
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -1507,13 +1477,8 @@ Future<void> fetchCustomers() async {
       ),
       child: Text(
         statusLabel(status),
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: fg,
-        ),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: fg),
       ),
     );
   }
 }
- 
