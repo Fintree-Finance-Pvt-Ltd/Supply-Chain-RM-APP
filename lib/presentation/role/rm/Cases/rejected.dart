@@ -16,19 +16,29 @@ class Rejected extends StatefulWidget {
 class _RejectedState extends State<Rejected> {
   List rejectedCases = [];
   bool loading = true;
+  bool isDarkMode = false; // ✅ ADD
 
   @override
   void initState() {
     super.initState();
     fetchCompletedCases();
+    loadTheme(); // ✅ ADD
   }
 
-  /// FETCH COMPLETED CASES
+  /// LOAD DARK MODE
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = prefs.getBool("isDarkMode") ?? false;
+    });
+  }
+
+  /// FETCH REJECTED CASES
   Future<void> fetchCompletedCases() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString("token");
-    final rmId = prefs.getInt("rmId");
+      final rmId = prefs.getInt("rmId");
 
       final response = await http.get(
         Uri.parse("${ApiEndpoints.baseUrl}/customers?status=rejected"),
@@ -41,95 +51,108 @@ class _RejectedState extends State<Rejected> {
       final body = jsonDecode(response.body);
 
       if (body["success"] == true) {
-        /// Filter only completed cases
         final allCases = body["data"] ?? [];
 
-rejectedCases = allCases.where((e) {
-    return e["status"] == "rejected" && e["rmId"] == rmId;
-  }).toList();
+        rejectedCases = allCases.where((e) {
+          return e["status"] == "rejected" && e["rmId"] == rmId;
+        }).toList();
 
-  setState(() {
-    // completedCases = completed;
-    loading = false;
-  });
-        // rejectedCases = allCases.where((c) {
-        //   final status = (c["status"] ?? "").toString().toLowerCase();
-        //   return status == "ops_l1_review";
-        // }).toList();
-
-        // setState(() {
-        //   loading = false;
-        // });
+        setState(() {
+          loading = false;
+        });
       }
     } catch (e) {
-      print("Completed Cases Error: $e");
+      print("Rejected Cases Error: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Rejected Cases")),
+      backgroundColor:
+          isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF5F7FB),
 
-      backgroundColor: const Color(0xFFF5F7FB),
+      appBar: AppBar(
+        backgroundColor:
+            isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+
+        iconTheme: IconThemeData(
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
+
+        title: Text(
+          "Rejected Cases",
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+      ),
 
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : rejectedCases.isEmpty
-          ? const Center(child: Text("No Rejected cases"))
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: rejectedCases.length,
-              itemBuilder: (context, index) {
-                final caseItem = rejectedCases[index];
-
-                final applicant = caseItem["applicant"] ?? {};
-                // final company = caseItem["company"] ?? {};
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-
-                    /// Card already provides Material
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                CaseDetailsPage(customerId: caseItem["id"]),
-                          ),
-                        );
-                      },
-
-                      child: CaseCard(
-                        name:
-                            applicant["name"] ??
-                            caseItem["companyName"] ??
-                            "Unknown",
-
-                        mobile:
-                            applicant["mobile"] ??
-                            caseItem["companyMobile"] ??
-                            "",
-                        status: "Completed",
-
-                        date: caseItem["createdAt"] ?? "",
-
-                        PAN: applicant["pan"] ?? "",
-
-                        LAN: caseItem["lanId"] ?? "N/A",
-                      ),
+              ? Center(
+                  child: Text(
+                    "No Rejected cases",
+                    style: TextStyle(
+                      color:
+                          isDarkMode ? Colors.white60 : Colors.black54,
                     ),
                   ),
-                );
-              },
-            ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: rejectedCases.length,
+                  itemBuilder: (context, index) {
+                    final caseItem = rejectedCases[index];
+                    final applicant = caseItem["applicant"] ?? {};
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Card(
+                        elevation: 3,
+                        color: isDarkMode
+                            ? const Color(0xFF1E293B)
+                            : Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CaseDetailsPage(
+                                  customerId: caseItem["id"],
+                                ),
+                              ),
+                            );
+                          },
+                          child: CaseCard(
+                            name: applicant["name"] ??
+                                caseItem["companyName"] ??
+                                "Unknown",
+
+                            mobile: applicant["mobile"] ??
+                                caseItem["companyMobile"] ??
+                                "",
+
+                            status: "Rejected", // ✅ fixed label
+
+                            date: caseItem["createdAt"] ?? "",
+
+                            PAN: applicant["pan"] ?? "",
+
+                            LAN: caseItem["lanId"] ?? "N/A",
+
+                            isDarkMode: isDarkMode, // ✅ IMPORTANT
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }
