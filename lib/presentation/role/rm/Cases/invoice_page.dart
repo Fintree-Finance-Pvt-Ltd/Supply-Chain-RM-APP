@@ -14,15 +14,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 class InvoicePage extends StatefulWidget {
   final int customerId;
-   final bool loadExistingInvoice;
-     final int? invoiceId; // ✅ optional (new)
-
+  final bool loadExistingInvoice;
+  final int? invoiceId;
 
   const InvoicePage({
     super.key,
     required this.customerId,
     this.loadExistingInvoice = false,
-     this.invoiceId, //
+    this.invoiceId, //
   });
 
   // const InvoicePage({super.key, required this.customerId});
@@ -70,6 +69,8 @@ class _InvoicePageState extends State<InvoicePage> {
   String? existinglanName;
   // int? selectedLan;
 
+  bool isDarkMode = false;
+
   List<Map<String, dynamic>> suppliers = [];
   Map<String, dynamic>? selectedSupplier;
   final ScrollController _scrollController = ScrollController();
@@ -78,20 +79,13 @@ class _InvoicePageState extends State<InvoicePage> {
   @override
   void initState() {
     super.initState();
-    
-    // loadExistingInvoiceFromRM(); // load existing invoice if any
+
+    loadTheme();
+
     loadSuppliers();
     fetchCustomerName();
-    loadLan(); // 👈 fetch LAN list
-// if (widget.loadExistingInvoice) {
-//   if (widget.invoiceId != null) {
-//     loadInvoiceById(widget.invoiceId!);
-//   } else {
-//     loadExistingInvoiceFromRM();
-//   }
-// }
-    // fetchLanList();
-    // 👈 fetch suppliers
+    loadLan();
+
     tenureDays.text = "90 Days"; // default value
     _scrollController.addListener(() {
       setState(() {
@@ -100,60 +94,13 @@ class _InvoicePageState extends State<InvoicePage> {
     });
   }
 
-// Future<void> loadInvoiceById(int invoiceId) async {
-//   try {
-//     final token = await AuthService().getToken();
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = prefs.getBool("isDarkMode") ?? false;
+    });
+  }
 
-//     final response = await http.get(
-//       Uri.parse(
-//         "${ApiEndpoints.baseUrl}/workflows/invoices/dashboard/rm",
-//       ),
-//       headers: {"Authorization": "Bearer $token"},
-//     );
-
-//     final data = jsonDecode(response.body);
-
-//     if (data["success"] == true && data["data"] != null) {
-//       final invoice = data["data"];
-
-//       setState(() {
-//         invoiceNumber.text = invoice["invoiceNumber"] ?? "";
-
-//         invoiceDate.text = invoice["invoiceDate"] ?? "";
-
-//         invoiceAmount.text =
-//             invoice["invoiceAmount"]?.toString() ?? "";
-
-//         disbursementAmount.text =
-//             invoice["disbursementAmount"]?.toString() ?? "";
-
-//         if (invoice["loanAccount"] != null) {
-//           lanExists = true;
-//           existinglanName =
-//               invoice["loanAccount"]["lanId"];
-//           selectedLan =
-//               invoice["loanAccount"]["id"];
-//         }
-
-//         if (invoice["supplier"] != null) {
-//           supplierExists = true;
-//           existingSupplierName =
-//               invoice["supplier"]["supplierName"];
-//           selectedSupplier =
-//               invoice["supplier"];
-//         }
-
-//         if (invoice["document"] != null) {
-//           invoiceFileUrl =
-//               "${ApiEndpoints.fileBaseUrl}/${invoice["document"]["filePath"]}";
-//           isInvoiceUploaded = true;
-//         }
-//       });
-//     }
-//   } catch (e) {
-//     print("Load invoice error: $e");
-//   }
-// }
   Future<void> loadExistingInvoiceFromRM() async {
     try {
       final token = await AuthService().getToken();
@@ -212,52 +159,18 @@ class _InvoicePageState extends State<InvoicePage> {
               selectedLan = invoice["loanAccount"]["id"];
             }
 
-            /// Supplier
-//             if (invoice["supplier"] != null) {
-//   supplierExists = true;
+            if (invoice["supplier"] != null &&
+                invoice["supplier"]["supplierName"] != null) {
+              supplierExists = true;
 
-//   existingSupplierName =
-//       invoice["supplier"]["supplierName"];
+              existingSupplierName = invoice["supplier"]["supplierName"];
 
-//   selectedSupplier = invoice["supplier"];
+              selectedSupplier = invoice["supplier"];
 
-//   supplierName.text =
-//       invoice["supplier"]["supplierName"];
+              supplierName.text = invoice["supplier"]["supplierName"];
 
-//   loadSupplierBanks(invoice["supplier"]["id"]);
-// }
-
-if (invoice["supplier"] != null &&
-    invoice["supplier"]["supplierName"] != null) {
-
-  supplierExists = true;
-
-  existingSupplierName =
-      invoice["supplier"]["supplierName"];
-
-  selectedSupplier =
-      invoice["supplier"];
-
-  supplierName.text =
-      invoice["supplier"]["supplierName"];
-
-  loadSupplierBanks(invoice["supplier"]["id"]);
-}
-            // if (invoice["supplier"] != null) {
-            //   supplierExists = true;
-
-            //   existingSupplierName = invoice["supplier"]["supplierName"];
-
-            //   selectedSupplier = {
-            //     "id": invoice["supplier"]["id"],
-            //     "supplierName": invoice["supplier"]["supplierName"],
-            //   };
-
-            //   supplierName.text = invoice["supplier"]["supplierName"];
-
-            //   // loadSupplierBanks();
-            //   loadSupplierBanks(value["id"]);
-            // }
+              loadSupplierBanks(invoice["supplier"]["id"]);
+            }
           });
         } else {
           print("No invoice found for this customer");
@@ -267,69 +180,6 @@ if (invoice["supplier"] != null &&
       print("Load RM invoice error: $e");
     }
   }
-
-  // Future<void> loadExistingInvoiceFromRM() async {
-  //   try {
-  //     final token = await AuthService().getToken();
-
-  //     final response = await http.get(
-  //       Uri.parse("${ApiEndpoints.baseUrl}/workflows/invoices/dashboard/rm"),
-  //       headers: {"Authorization": "Bearer $token"},
-  //     );
-
-  //     final data = jsonDecode(response.body);
-
-  //     print("RM Invoice Response: $data");
-
-  //     if (data["success"] == true &&
-  //         data["data"] != null &&
-  //         data["data"]["invoices"] != null) {
-  //       final invoices = data["data"]["invoices"] as List;
-
-  //       /// match invoice by customerId
-  //       final invoice = invoices.firstWhere(
-  //         (item) => item["customerId"] == widget.customerId,
-  //         orElse: () => null,
-  //       );
-
-  //       if (invoice != null) {
-  //         setState(() {
-  //           invoiceNumber.text = invoice["invoiceNumber"] ?? "";
-  //           invoiceDate.text = invoice["invoiceDate"] ?? "";
-  //           invoiceAmount.text = invoice["invoiceAmount"]?.toString() ?? "";
-  //           tenureDays.text = "90 Days";
-  //           disbursementAmount.text =
-  //               invoice["disbursementAmount"]?.toString() ?? "";
-
-  //           // selectedSupplier = invoice["supplierName"];
-  //           if (invoice["loanAccount"] != null) {
-  //             lanExists = true;
-  //             existinglanName = invoice["loanAccount"]["lanId"];
-  //             selectedLan = invoice["loanAccount"]["id"]; // keep ID for API
-  //           }
-  //           if (invoice["supplier"] != null) {
-  //             supplierExists = true;
-  //             existingSupplierName = invoice["supplier"]["supplierName"];
-  //             selectedSupplier = invoice["supplier"]["id"]; // keep ID for API
-  //           }
-
-  //           /// load uploaded document
-  //           if (invoice["document"] != null) {
-  //             invoiceFileUrl =
-  //                 "${ApiEndpoints.fileBaseUrl}/${invoice["document"]["filePath"]}";
-
-  //             isInvoiceUploaded = true;
-  //           }
-  //         });
-  //       } else {
-  //         print("No invoice found for this customer");
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print("Load RM invoice error: $e");
-  //   }
-  // }
-  //
 
   Future<void> viewDocument(BuildContext context, String? url) async {
     print("Opening document: $url");
@@ -465,43 +315,6 @@ if (invoice["supplier"] != null &&
     }
   }
 
-  // Future<void> fetchLanList() async {
-  //   try {
-  //     setState(() {
-  //       loadingLan = true;
-  //     });
-
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString("token");
-
-  //     final response = await http.get(
-  //       Uri.parse(
-  //         "${ApiEndpoints.baseUrl}/workflows/invoices/customers/${widget.customerId}/lans",
-  //       ),
-  //       headers: {
-  //         "Authorization": "Bearer $token",
-  //         "Content-Type": "application/json",
-  //       },
-  //     );
-
-  //     final data = jsonDecode(response.body);
-
-  //     if (data["success"] == true) {
-  //       List customers = data["data"];
-
-  //       setState(() {
-  //         lanList = customers
-  //             .map<String>((e) => e["lanId"].toString())
-  //             .toList();
-
-  //         loadingLan = false;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     print("LAN fetch error: $e");
-  //   }
-  // }
-
   Future<void> loadLan() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -593,7 +406,6 @@ if (invoice["supplier"] != null &&
 
       /// invoice created → now submit case
       await submitCase(invoiceId);
-
     } else {
       print("Invoice Created Successfully");
 
@@ -622,11 +434,9 @@ if (invoice["supplier"] != null &&
 
     if (data["success"] == true) {
       showTopToast(context, "Case submitted successfully");
-            Navigator.pushAndRemoveUntil(
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(
-          builder: (_) => const RmDashboard(),
-        ),
+        MaterialPageRoute(builder: (_) => const RmDashboard()),
         (route) => false,
       );
     } else {
@@ -636,67 +446,37 @@ if (invoice["supplier"] != null &&
     }
   }
 
-  // Future<void> loadSupplierBanks() async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString("token");
-  //     final response = await http.get(
-  //       Uri.parse(
-  //         "${ApiEndpoints.baseUrl}/workflows/suppliers/${widget.customerId}/details",
-  //       ),
-  //       headers: {
-  //         "Authorization": "Bearer $token",
-  //         "Content-Type": "application/json",
-  //       },
-  //     );
+  Future<void> loadSupplierBanks(int supplierId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("token");
 
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //       print("API RESPONSE: $data"); // debug
-  //       final bank = data["data"]?["supplier"]?["bankDetail"];
+      final response = await http.get(
+        Uri.parse(
+          "${ApiEndpoints.baseUrl}/workflows/suppliers/$supplierId/details",
+        ),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
 
-  //       setState(() {
-  //         // supplierBanks = [data["data"]["supplier"]["bankDetail"]];
-  //         // supplierBanks = data["data"];   // adjust according to your API
-  //         supplierBanks = bank != null ? [bank] : [];
-  //       });
-  //     } else {
-  //       print("Failed to load banks");
-  //     }
-  //   } catch (e) {
-  //     print("API Error: $e");
-  //   }
-  // }
-Future<void> loadSupplierBanks(int supplierId) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString("token");
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
 
-    final response = await http.get(
-      Uri.parse(
-        "${ApiEndpoints.baseUrl}/workflows/suppliers/$supplierId/details",
-      ),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-    );
+        final bank = data["data"]?["supplier"]?["bankDetail"];
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-
-      final bank = data["data"]?["supplier"]?["bankDetail"];
-
-      setState(() {
-        supplierBanks = bank != null ? [bank] : [];
-      });
-    } else {
-      print("Failed to load banks");
+        setState(() {
+          supplierBanks = bank != null ? [bank] : [];
+        });
+      } else {
+        print("Failed to load banks");
+      }
+    } catch (e) {
+      print("API Error: $e");
     }
-  } catch (e) {
-    print("API Error: $e");
   }
-}
+
   Future<void> fetchCustomerName() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -723,54 +503,7 @@ Future<void> loadSupplierBanks(int supplierId) async {
       print("Customer fetch error: $e");
     }
   }
-  //   Future<void> fetchCustomer(String customerId) async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString("token");
-  //     final response = await http.get(
-  //       Uri.parse(
-  //         "https://supplychain-prod.fintreelms.com/api/customers/${widget.customerId}",
-  //       ),
-  //       headers: {
-  //         "Authorization": "Bearer $token",
-  //         "Content-Type": "application/json",
-  //       },
-  //     );
 
-  //     final data = jsonDecode(response.body);
-  //     if (data["success"] == true) {
-  //       final customer = data["data"];
-  //       setState(() {
-  //         customerName = customer["name"];
-  //       });
-  //       /// fetch LAN after customer
-  //       // fetchCustomerLan(customerId);
-  //       fetchLanList();
-  //     }
-  //   } catch (e) {
-  //     print("Customer fetch error: $e");
-  //   }
-  // }
-  // void loadSupplierBanks() {
-  //   setState(() {
-  //     supplierBanks = [
-  //       {
-  //         "bank_account_number": "1234567890",
-  //         "ifsc_code": "HDFC0001234",
-  //         "bank_name": "HDFC Bank",
-  //         "account_holder_name": "LLM Appliance Pvt Ltd",
-  //       },
-  //       {
-  //         "bank_account_number": "9876543210",
-  //         "ifsc_code": "ICIC0004567",
-  //         "bank_name": "ICICI Bank",
-  //         "account_holder_name": "LLM Appliance Pvt Ltd",
-  //       },
-  //     ];
-  //   });
-  // }
-
-  /// BUILD INPUT FIELD
   Widget inputField({
     required String label,
     required TextEditingController controller,
@@ -784,11 +517,19 @@ Future<void> loadSupplierBanks(int supplierId) async {
         controller: controller,
         readOnly: readOnly,
         onTap: onTap,
+        style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
         decoration: InputDecoration(
           hintText: label,
-          prefixIcon: icon != null ? Icon(icon) : null,
+          hintStyle: TextStyle(
+            color: isDarkMode ? Colors.white60 : Colors.grey,
+          ),
+          prefixIcon: icon != null
+              ? Icon(icon, color: isDarkMode ? Colors.white70 : Colors.black)
+              : null,
           filled: true,
-          fillColor: const Color(0xFFF8FAFC),
+          fillColor: isDarkMode
+              ? const Color(0xFF1E293B)
+              : const Color(0xFFF8FAFC),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide.none,
@@ -810,11 +551,11 @@ Future<void> loadSupplierBanks(int supplierId) async {
       padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.05),
+            color: Colors.black.withOpacity(isDarkMode ? 0.2 : .05),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -839,9 +580,10 @@ Future<void> loadSupplierBanks(int supplierId) async {
 
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 17,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
             ],
@@ -855,150 +597,136 @@ Future<void> loadSupplierBanks(int supplierId) async {
     );
   }
 
-  Widget lanDropdown() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: DropdownButtonFormField<int>(
-        hint: const Text("Select LAN"),
-        initialValue: selectedLanId,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+ Widget lanDropdown() {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: DropdownButtonFormField<int>(
+      value: selectedLanId,
+
+      hint: Text(
+        "Select LAN",
+        style: TextStyle(
+          color: isDarkMode ? Colors.white60 : Colors.grey,
         ),
-        items: lanList.map((lan) {
-          return DropdownMenuItem<int>(
-            value: lan["id"], // 👈 API ID
-            child: Text(lan["lanId"]), // 👈 shown to user
-          );
-        }).toList(),
-        onChanged: (value) {
-          setState(() {
-            selectedLanId = value;
-          });
-        },
       ),
-      // child: DropdownButtonFormField<String>(
-      //   value: selectedLan,
 
-      //   hint: const Text("Select LAN"),
+      decoration: InputDecoration(
+        prefixIcon: Icon(
+          Icons.account_tree,
+          color: isDarkMode ? Colors.white70 : Colors.black,
+        ),
 
-      //   decoration: InputDecoration(
-      //     prefixIcon: const Icon(Icons.credit_card),
-      //     filled: true,
-      //     fillColor: const Color(0xFFF8FAFC),
-      //     border: OutlineInputBorder(
-      //       borderRadius: BorderRadius.circular(14),
-      //       borderSide: BorderSide.none,
-      //     ),
-      //   ),
+        filled: true,
+        fillColor:
+            isDarkMode ? const Color(0xFF1E293B) : Colors.white,
 
-      //   items: lanList.map((lan) {
-      //     return DropdownMenuItem<String>(value: lan, child: Text(lan));
-      //   }).toList(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
 
-      //   onChanged: (value) {
-      //     setState(() {
-      //       selectedLan = value;
-      //     });
-      //   },
-      // ),
-    );
-  }
-
-  Widget supplierDropdown() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: DropdownButtonFormField<Map<String, dynamic>>(
-        initialValue: selectedSupplier,
-        hint: const Text("Select Supplier"),
-        decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.store),
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+        /// 🔥 optional premium border
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.white10 : Colors.grey.shade300,
           ),
         ),
-        items: suppliers.map<DropdownMenuItem<Map<String, dynamic>>>((
-          supplier,
-        ) {
+      ),
+
+      /// TEXT COLOR
+      style: TextStyle(
+        color: isDarkMode ? Colors.white : Colors.black,
+      ),
+
+      /// DROPDOWN POPUP COLOR
+      dropdownColor:
+          isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+
+      items: lanList.map<DropdownMenuItem<int>>((lan) {
+        return DropdownMenuItem<int>(
+          value: lan["id"],
+          child: Text(
+            lan["lanId"],
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        );
+      }).toList(),
+
+      onChanged: (value) {
+        setState(() {
+          selectedLanId = value;
+        });
+      },
+    ),
+  );
+}
+
+  Widget supplierDropdown() {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: DropdownButtonFormField<Map<String, dynamic>>(
+      value: selectedSupplier,
+      hint: Text(
+        "Select Supplier",
+        style: TextStyle(
+          color: isDarkMode ? Colors.white60 : Colors.grey,
+        ),
+      ),
+
+      decoration: InputDecoration(
+        prefixIcon: Icon(
+          Icons.store,
+          color: isDarkMode ? Colors.white70 : Colors.black,
+        ),
+        filled: true,
+        fillColor:
+            isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
+      ),
+
+      /// 🔥 IMPORTANT (text color inside field)
+      style: TextStyle(
+        color: isDarkMode ? Colors.white : Colors.black,
+      ),
+
+      /// 🔥 IMPORTANT (dropdown popup color)
+      dropdownColor:
+          isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+
+      items: suppliers.map<DropdownMenuItem<Map<String, dynamic>>>(
+        (supplier) {
           return DropdownMenuItem<Map<String, dynamic>>(
             value: supplier,
-            child: Text(supplier["supplierName"] ?? ""),
+            child: Text(
+              supplier["supplierName"] ?? "",
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
           );
-        }).toList(),
-        onChanged: (value) {
-          setState(() {
-            selectedSupplier = value;
-            supplierName.text = value?["supplierName"] ?? "";
-          });
-          if (value != null) {
-            loadSupplierBanks(value["id"]); // 👈 load banks
-          }
         },
-      ),
-    );
-  }
+      ).toList(),
 
-  //   Widget supplierDropdown() {
-  //   return Padding(
-  //     padding: const EdgeInsets.only(bottom: 14),
-  //     DropdownButtonFormField<Map<String, dynamic>>(
-  //   value: selectedSupplier,
-  //   hint: const Text("Select Supplier"),
-  //   decoration: InputDecoration(
-  //     prefixIcon: const Icon(Icons.store),
-  //     filled: true,
-  //     fillColor: const Color(0xFFF8FAFC),
-  //     border: OutlineInputBorder(
-  //       borderRadius: BorderRadius.circular(14),
-  //       borderSide: BorderSide.none,
-  //     ),
-  //   ),
-  //   items: suppliers.map<DropdownMenuItem<Map<String, dynamic>>>((supplier) {
-  //     return DropdownMenuItem<Map<String, dynamic>>(
-  //       value: supplier,
-  //       child: Text(supplier["supplierName"] ?? ""),
-  //     );
-  //   }).toList(),
-  //   onChanged: (value) {
-  //     setState(() {
-  //       selectedSupplier = value;
-  //       supplierName.text = value?["supplierName"] ?? "";
-  //     });
-  //   },
-  // )
-  // //     child: DropdownButtonFormField<Map>(
-  // //       value: selectedSupplier,
-  // //       hint: const Text("Select Supplier"),
-  // //       decoration: InputDecoration(
-  // //         prefixIcon: const Icon(Icons.store),
-  // //         filled: true,
-  // //         fillColor: const Color(0xFFF8FAFC),
-  // //         border: OutlineInputBorder(
-  // //           borderRadius: BorderRadius.circular(14),
-  // //           borderSide: BorderSide.none,
-  // //         ),
-  // //       ),
-  // //      items: suppliers.map<DropdownMenuItem<Map>>((supplier) {
-  // //   return DropdownMenuItem<Map>(
-  // //     value: supplier,
-  // //     child: Text(supplier["customer"]?["name"] ?? "Supplier"),
-  // //   );
-  // // }).toList(),
-  // //       onChanged: (value) {
-  // //         setState(() {
-  // //           selectedSupplier = value;
+      onChanged: (value) {
+        setState(() {
+          selectedSupplier = value;
+          supplierName.text = value?["supplierName"] ?? "";
+        });
 
-  // //           supplierName.text = value?["customer"]?["name"] ?? "";
-
-  // //           final bank = value?["bankDetail"];
-  // //           supplierBanks = bank != null ? [bank] : [];
-  // //         });
-  // //       },
-  // //     ),
-  //   );
-  // }
+        if (value != null) {
+          loadSupplierBanks(value["id"]);
+        }
+      },
+    ),
+  );
+}
 
   Widget bankCard(Map bank) {
     bool isSelected = selectedBank == bank;
@@ -1013,7 +741,11 @@ Future<void> loadSupplierBanks(int supplierId) async {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE8F0FE) : Colors.white,
+          color: isSelected
+              ? (isDarkMode
+                    ? Colors.blue.withOpacity(0.2)
+                    : const Color(0xFFE8F0FE))
+              : (isDarkMode ? const Color(0xFF1E293B) : Colors.white),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected ? AppColors.darkBlue : const Color(0xFFE5E7EB),
@@ -1031,9 +763,10 @@ Future<void> loadSupplierBanks(int supplierId) async {
                 Expanded(
                   child: Text(
                     bank["bank_name"] ?? "",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
                   ),
                 ),
@@ -1058,8 +791,9 @@ Future<void> loadSupplierBanks(int supplierId) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FA),
-
+      backgroundColor: isDarkMode
+          ? const Color(0xFF0F172A)
+          : const Color(0xFFF4F6FA),
       body: Column(
         children: [
           /// MODERN HEADER
@@ -1148,10 +882,10 @@ Future<void> loadSupplierBanks(int supplierId) async {
 
                       Text(
                         "Customer ID: ${widget.customerId}",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: isDarkMode ? Colors.white : const Color.fromARGB(255, 250, 253, 254),
                         ),
                       ),
 
@@ -1198,13 +932,18 @@ Future<void> loadSupplierBanks(int supplierId) async {
                                   border: Border.all(
                                     color: Colors.grey.shade300,
                                   ),
-                                  color: Colors.grey.shade100,
+                                  color: isDarkMode
+                                      ? const Color(0xFF1E293B)
+                                      : Colors.grey.shade100,
                                 ),
                                 child: Text(
                                   existinglanName ?? "",
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 5,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                 ),
                               )
@@ -1253,7 +992,9 @@ Future<void> loadSupplierBanks(int supplierId) async {
                                 width: 1.5,
                               ),
                               borderRadius: BorderRadius.circular(12),
-                              color: const Color(0xFFEFF6FF),
+                              color: isDarkMode
+                                  ? Colors.blue.withOpacity(0.15)
+                                  : const Color(0xFFEFF6FF),
                             ),
                             child: Column(
                               children: const [
@@ -1291,8 +1032,12 @@ Future<void> loadSupplierBanks(int supplierId) async {
                                 Expanded(
                                   child: Text(
                                     invoiceFile?.name ?? "",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -1316,14 +1061,6 @@ Future<void> loadSupplierBanks(int supplierId) async {
                                   },
                                 ),
 
-                                // IconButton(
-                                //   icon: const Icon(Icons.visibility, color: Colors.blue),
-                                //   onPressed: () {
-                                //     if (invoiceFileUrl != null) {
-                                //       viewDocument(context, invoiceFileUrl);
-                                //     }
-                                //   },
-                                // ),
                                 IconButton(
                                   icon: const Icon(
                                     Icons.delete,
@@ -1365,13 +1102,16 @@ Future<void> loadSupplierBanks(int supplierId) async {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.grey.shade300),
-                            color: Colors.grey.shade100,
+                            color: isDarkMode
+                                ? const Color(0xFF1E293B)
+                                : Colors.grey.shade100,
                           ),
                           child: Text(
                             existingSupplierName ?? "",
-                            style: const TextStyle(
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
                               fontSize: 15,
-                              fontWeight: FontWeight.w500,
+                              color: isDarkMode ? Colors.white : Colors.black,
                             ),
                           ),
                         )

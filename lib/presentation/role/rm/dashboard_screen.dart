@@ -42,14 +42,16 @@ class _RmDashboardState extends State<RmDashboard> {
   bool isDarkMode = false;
   bool loadingNotification = true;
  
-  @override
-  void initState() {
-    super.initState();
-    loadRMDetails();
-    fetchDashboardData();
-    loadTheme();
-  }
- 
+
+@override
+void initState() {
+  super.initState();
+  loadRMDetails();
+  fetchDashboardData();
+  loadTheme();
+//   syncFcmToken(); 
+// }
+}
   // LOGIC HANDLERS (Same as original)
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -112,6 +114,9 @@ class _RmDashboardState extends State<RmDashboard> {
     }
   }
  
+
+
+
   @override
   Widget build(BuildContext context) {
     final Color bgColor = isDarkMode
