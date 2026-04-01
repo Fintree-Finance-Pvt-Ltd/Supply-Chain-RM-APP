@@ -339,7 +339,7 @@ loadTheme();
           // color: Color(0xFF1E3A8A),
             color: isDarkMode
       ? Colors.white
-      : const Color(0xFFE5E7EB),
+      : const Color(0xFF1E3A8A),
 
         ),
       ),

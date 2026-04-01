@@ -1571,22 +1571,15 @@ Future<void> loadTheme() async {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /// LABEL
-        // const Text(
-        //   "Mobile Number",
-        //   style: TextStyle(
-        //     fontSize: 13,
-        //     fontWeight: FontWeight.w600,
-        //     color: AppColors.textSecondary,
-        //   ),
-        // ),
+      
         const SizedBox(height: 8),
 
         /// MAIN CARD
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            // color: Colors.white,
+            
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: model.mobileVerified

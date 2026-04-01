@@ -399,7 +399,7 @@ class _AddressDetailsState extends State<AddressDetails> {
   /// =======================
   Widget _header() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      margin: const EdgeInsets.fromLTRB(16, 28, 16, 8),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -420,56 +420,118 @@ class _AddressDetailsState extends State<AddressDetails> {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          /// TITLE
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "Address Details",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+  children: [
 
-                  // color: Colors.white,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                "Add one or more addresses",
-                style: TextStyle(fontSize: 13, color: Colors.white70),
-              ),
-            ],
+    /// TITLE
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            "Address Details",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
           ),
-
-          /// ADD BUTTON
-          InkWell(
-            onTap: _addAddress,
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: const [
-                  Icon(Icons.add, size: 18, color: AppColors.primary),
-                  SizedBox(width: 6),
-                  Text(
-                    "Add",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
+          SizedBox(height: 4),
+          Text(
+            "Add one or more addresses",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.white70,
             ),
           ),
         ],
       ),
+    ),
+
+    const SizedBox(width: 10),
+
+    /// ADD BUTTON
+    InkWell(
+      onTap: _addAddress,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.add, size: 18, color: AppColors.primary),
+            SizedBox(width: 6),
+            Text(
+              "Add",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ],
+),
+      // child: Row(
+      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //   children: [
+      //     /// TITLE
+      //     Column(
+      //       crossAxisAlignment: CrossAxisAlignment.start,
+      //       children: const [
+      //         Text(
+      //           "Address Details",
+      //           style: TextStyle(
+      //             fontSize: 18,
+      //             fontWeight: FontWeight.w700,
+
+      //             // color: Colors.white,
+      //           ),
+      //         ),
+      //         SizedBox(height: 4),
+      //         Text(
+      //           "Add one or more addresses",
+      //           style: TextStyle(fontSize: 13, color: Colors.white70),
+      //         ),
+      //       ],
+      //     ),
+
+      //     /// ADD BUTTON
+      //     InkWell(
+      //       onTap: _addAddress,
+      //       borderRadius: BorderRadius.circular(14),
+      //       child: Container(
+      //         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      //         decoration: BoxDecoration(
+      //           color: Colors.white,
+      //           borderRadius: BorderRadius.circular(14),
+      //         ),
+      //         child: Row(
+      //           children: const [
+      //             Icon(Icons.add, size: 18, color: AppColors.primary),
+      //             SizedBox(width: 6),
+      //             Text(
+      //               "Add",
+      //               style: TextStyle(
+      //                 fontWeight: FontWeight.w600,
+      //                 color: AppColors.primary,
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //     ),
+      //   ],
+      // ),
     );
   }
 

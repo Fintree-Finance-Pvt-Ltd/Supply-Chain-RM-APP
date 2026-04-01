@@ -509,8 +509,22 @@ backgroundColor:
   initialValue: companyTypes.contains(selectedCompanyType)
       ? selectedCompanyType
       : null,
+
+           style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        // fontSize: 14,
+                      ),
+
+                      dropdownColor: isDarkMode
+                          ? const Color(0xFF1E293B)
+                          : Colors.white,
+
   decoration: _inputDecoration(),
-  hint: const Text("Select company type"),
+  hint:  Text("Select company type",
+  style: TextStyle(fontWeight: FontWeight.w600,
+                  color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+),
+  ),
   items: companyTypes.map((type) {
     return DropdownMenuItem(
       value: type,
@@ -1670,11 +1684,15 @@ final storedCustomerId = customerId;
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade300),
                   borderRadius: BorderRadius.circular(12),
-                  color: AppColors.card,
+                  // color: AppColors.card,
+                  color: isDarkMode ? const Color(0xFF334155) : const Color(0xFFF8F9FC),
                 ),
                 child: Text(
                   selectedFile?.name ?? "Choose File",
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontWeight: FontWeight.w600,
+                  color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+),
                 ),
               ),
             ),
@@ -1703,14 +1721,17 @@ final storedCustomerId = customerId;
       hintText: hintText,
       hintStyle:  TextStyle(
         // color: Colors.black
-            color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+            // color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+  color: isDarkMode ? Colors.black54  : Colors.white54,
 
     fontSize: 14),
 
       filled: true,
       // fillColor: Colors.white,
-      fillColor: const Color(0xFFF8F9FC), // 👈 Light grey background
-
+      // fillColor: const Color(0xFFF8F9FC)
+      //, // 👈 Light grey background
+fillColor: isDarkMode
+    ? const Color(0xFF334155)  : const Color(0xFFF8F9FC),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
 
       border: OutlineInputBorder(

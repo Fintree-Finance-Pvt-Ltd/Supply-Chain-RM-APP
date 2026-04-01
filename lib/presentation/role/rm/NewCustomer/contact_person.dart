@@ -327,24 +327,51 @@ class _ContactPersonState extends State<ContactPerson> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           /// TITLE
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "Contact Person Details",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                "Add contact persons",
-                style: TextStyle(fontSize: 13, color: Colors.white70),
-              ),
-            ],
+              Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            "Contact Person Details",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
           ),
+          SizedBox(height: 4),
+          Text(
+            "Add contact persons",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.white70,
+            ),
+          ),
+        ],
+      ),
+    ),
+          // Column(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: const [
+          //     Text(
+          //       "Contact Person Details",
+          //       style: TextStyle(
+          //         fontSize: 18,
+          //         fontWeight: FontWeight.w700,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //     SizedBox(height: 4),
+          //     Text(
+          //       "Add contact persons",
+          //       style: TextStyle(fontSize: 13, color: Colors.white70),
+          //     ),
+          //   ],
+          // ),
 
           /// ADD BUTTON
           InkWell(
@@ -363,16 +390,18 @@ class _ContactPersonState extends State<ContactPerson> {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
-                children: const [
-                  Icon(Icons.add, size: 18, color: AppColors.primary),
-                  SizedBox(width: 6),
-                  Text(
-                    "Add",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                mainAxisSize: MainAxisSize.min, // ✅ prevents overflow
+              
+                  children: const [
+                    Icon(Icons.add, size: 18, color: AppColors.primary),
+                    SizedBox(width: 6),
+                    Text(
+                      "Add",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -726,7 +755,7 @@ class _ContactPersonState extends State<ContactPerson> {
               suffixIcon: suffix,
               border: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: isDarkMode ? Colors.white: const Color(0xFFE5E7EB),
+                  color: isDarkMode ? Colors.white : const Color(0xFFE5E7EB),
                 ),
                 borderRadius: BorderRadius.circular(12),
                 // borderSide: BorderSide.none,
