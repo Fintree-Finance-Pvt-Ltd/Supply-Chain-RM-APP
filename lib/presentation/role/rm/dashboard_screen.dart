@@ -252,7 +252,6 @@ class _RmDashboardState extends State<RmDashboard> {
         : "Good Evening";
 
     return SizedBox(
-      height: 240,
       child: Stack(
         children: [
           // Gradient Background
@@ -347,21 +346,22 @@ class _RmDashboardState extends State<RmDashboard> {
                         ),
                       ),
                       child: Row(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.center, // important
                         children: [
                           const Icon(
                             Icons.info_outline,
                             color: Color.fromARGB(255, 250, 240, 240),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
+                          const SizedBox(width: 10), // reduce slightly
+                          Flexible(
+                            // 🔥 change from Expanded → Flexible
                             child: Text(
                               "You have $notificationCount cases ready for final MD Approval.",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13,
-                                height: 1.2, // control line height precisely
+                                height: 1.2,
                               ),
                             ),
                           ),
@@ -650,24 +650,26 @@ class _RmDashboardState extends State<RmDashboard> {
     );
   }
 
-  Widget _navItem(IconData icon, String label, int index) {
-    bool isSelected = selectedBottomIndex == index;
-    return InkWell(
-      onTap: () {
-        setState(() => selectedBottomIndex = index);
-        if (index == 1) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const CasesScreen(role: UserRole.rm),
-            ),
-          );
-        }
-        if (index == 2) _scaffoldKey.currentState?.openEndDrawer();
-      },
+ Widget _navItem(IconData icon, String label, int index) {
+  bool isSelected = selectedBottomIndex == index;
+
+  return InkWell(
+    onTap: () {
+      setState(() => selectedBottomIndex = index);
+      if (index == 1) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const CasesScreen(role: UserRole.rm),
+          ),
+        );
+      }
+      if (index == 2) _scaffoldKey.currentState?.openEndDrawer();
+    },
+    child: Center( // 🔥 IMPORTANT
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // reduce padding
         decoration: isSelected
             ? BoxDecoration(
                 color: const Color(0xFF2563EB).withOpacity(0.1),
@@ -675,28 +677,32 @@ class _RmDashboardState extends State<RmDashboard> {
               )
             : null,
         child: Row(
+          mainAxisSize: MainAxisSize.min, // 🔥 KEY FIX
           children: [
             Icon(
               icon,
               color: isSelected ? const Color(0xFF2563EB) : Colors.grey,
-              size: 26,
+              size: 24,
             ),
-            if (isSelected) const SizedBox(width: 8),
+            if (isSelected) const SizedBox(width: 6),
             if (isSelected)
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Color(0xFF2563EB),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
+              Flexible( // 🔥 prevents text overflow
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF2563EB),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                  ),
                 ),
               ),
           ],
         ),
       ),
-    );
-  }
-
+    ),
+  );
+}
   // REUSABLE DRAWER (Refined for the new theme)
   Widget _settingsDrawer() {
     return Drawer(
