@@ -601,7 +601,7 @@ class _InvoicePageState extends State<InvoicePage> {
   return Padding(
     padding: const EdgeInsets.only(bottom: 14),
     child: DropdownButtonFormField<int>(
-      value: selectedLanId,
+      initialValue: selectedLanId,
 
       hint: Text(
         "Select LAN",
@@ -668,7 +668,7 @@ class _InvoicePageState extends State<InvoicePage> {
   return Padding(
     padding: const EdgeInsets.only(bottom: 14),
     child: DropdownButtonFormField<Map<String, dynamic>>(
-      value: selectedSupplier,
+      initialValue: selectedSupplier,
       hint: Text(
         "Select Supplier",
         style: TextStyle(
