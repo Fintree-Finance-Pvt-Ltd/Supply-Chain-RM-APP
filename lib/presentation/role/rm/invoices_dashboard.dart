@@ -82,13 +82,22 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
   Map<int, List<InvoiceModel>> groupedInvoices = {};
 
   int? expandedCustomerId;
-
+  bool isDarkMode = false;
   Map<String, dynamic>? expandedInvoiceDetails;
   Map<String, dynamic>? expandedInvoiceData;
+
   @override
   void initState() {
     super.initState();
     fetchInvoices();
+    loadTheme();
+  }
+
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = prefs.getBool("isDarkMode") ?? false;
+    });
   }
 
   /// ================= API =================
@@ -210,10 +219,10 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
-        color: const Color(0xFFF5F7FB), // ✅ soft background
+        color: isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF5F7FB),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -226,9 +235,9 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                 Text(
                   "Invoice Portfolio",
-                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                  style: TextStyle(fontSize: 13, color: isDarkMode ? Colors.white70 : Colors.black54),
                 ),
 
                 const SizedBox(height: 8),
@@ -236,10 +245,10 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                 /// 💰 AMOUNT
                 Text(
                   "₹$totalAmount",
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
+                    color: isDarkMode ? Colors.white70 : Colors.black54
                   ),
                 ),
 
@@ -247,7 +256,7 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
 
                 Text(
                   "${dashboard!.totalInvoices} invoices tracked",
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style:  TextStyle(fontSize: 12, color: isDarkMode ? Colors.white70 : Colors.black54),
                 ),
 
                 const SizedBox(height: 12),
@@ -368,9 +377,21 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: isDarkMode
+          ? const Color(0xFF0F172A)
+          : const Color(0xFFF5F7FB),
 
-      appBar: AppBar(title: const Text("My Invoices"), centerTitle: true),
+      appBar: AppBar(
+        backgroundColor: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        iconTheme: IconThemeData(
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
+        title: Text(
+          "My Invoices",
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+        ),
+        centerTitle: true,
+      ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -412,7 +433,7 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -432,8 +453,8 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
               Container(
                 height: 42,
                 width: 42,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE0E7FF),
+                decoration: BoxDecoration(
+             color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.person, color: AppColors.darkBlue),
@@ -480,10 +501,10 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                         ),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       "Create New",
                       style: TextStyle(
-                        color: Colors.white,
+                       color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

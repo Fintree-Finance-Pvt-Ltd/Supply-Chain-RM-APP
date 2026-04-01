@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Supply-Chain-RM-APP/linux"
+    "cmake.sourceDirectory": "C:/Supply-Chain-RM-APP/linux",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
