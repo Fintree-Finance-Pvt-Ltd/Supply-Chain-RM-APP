@@ -24,6 +24,7 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
   bool loading = true;
   bool submitting = false;
   bool bankDetailsCompleted = false;
+  bool isDarkMode = false;
   final TextEditingController remarksController = TextEditingController();
   PlatformFile? selectedFile;
   String? selectedDocType;
@@ -38,7 +39,14 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
   @override
   void initState() {
     super.initState();
+    loadTheme();
+
     fetchCustomerDetails();
+  }
+
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
   }
 
   /// FETCH API
@@ -366,9 +374,25 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     // if (status != "md_approved") nextStepSection();
     final documents = caseData?["documents"] ?? [];
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      // backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: isDarkMode
+          ? const Color(0xFF0F172A)
+          : const Color(0xFFF5F7FB),
 
-      appBar: AppBar(title: const Text("Case Details")),
+      appBar: AppBar(
+        title: Text(
+          "Case Details",
+          style: TextStyle(
+            color: isDarkMode ? Colors.white :  Colors.black,
+          ),
+        ),
+          iconTheme: IconThemeData(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        backgroundColor: isDarkMode
+            ? const Color(0xFF1E293B)
+            : Color(0xFFF5F7FB),
+      ),
 
       body: SingleChildScrollView(
         child: Padding(
@@ -747,12 +771,17 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// Header
-          const Row(
+          Row(
             children: [
               Expanded(
                 child: Text(
                   "Final Sanction Terms",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               Icon(Icons.send, size: 18, color: Color(0xFF4F46E5)),
@@ -1014,7 +1043,8 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // color: Colors.white,
+        color: isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF4F6FA),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -1045,7 +1075,12 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
 
           title: Text(
             title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isDarkMode ? Colors.white :  Colors.black,
+
+              fontSize: 15,
+            ),
           ),
 
           trailing: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
@@ -1066,7 +1101,8 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // color: Colors.white,
+        color: isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF4F6FA),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -1080,108 +1116,147 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// TITLE
-          const Text(
+          Text(
             "Bank Related Documents",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 20,
+              color: isDarkMode ? Colors.white : Colors.black,
+
+              fontWeight: FontWeight.w600,
+            ),
           ),
 
           const SizedBox(height: 18),
 
-LayoutBuilder(
-  builder: (context, constraints) {
-    final isSmall = constraints.maxWidth < 400;
+          /// UPLOAD ROW
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              /// DOCUMENT TYPE
+              SizedBox(
+                width: 200,
+                child: DropdownButtonFormField<String>(
+                  initialValue: selectedDocType,
 
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: [
-        SizedBox(
-          width: isSmall
-              ? double.infinity // 🔥 full width on small screens
-              : constraints.maxWidth * 0.45,
-          child: DropdownButtonFormField<String>(
-            initialValue: selectedDocType,
-            decoration: InputDecoration(
-              labelText: "Document Type",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    fontSize: 14,
+                  ),
+
+                  dropdownColor: isDarkMode
+                      ? const Color(0xFF1E293B)
+                      : Colors.white,
+                  decoration: InputDecoration(
+                    labelText: "Document Type",
+                    labelStyle: TextStyle(
+                      color: isDarkMode
+                          ? Colors.white
+                          : const Color(0xFF1F3C88),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: "CHEQUE", child: Text("Cheque")),
+                    DropdownMenuItem(
+                      value: "LIVE PHOTO",
+                      child: Text("Live Photo"),
+                    ),
+                    DropdownMenuItem(
+                      value: "SHOP PHOTO",
+                      child: Text("Shop Photo"),
+                    ),
+                    DropdownMenuItem(
+                      value: "BANK STATEMENT",
+                      child: Text("Bank Statement"),
+                    ),
+                    DropdownMenuItem(
+                      value: "OTHER DOCUMENT",
+                      child: Text("Other Document"),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedDocType = value;
+                    });
+                  },
+                ),
               ),
-            ),
-            items: const [
-              DropdownMenuItem(value: "CHEQUE", child: Text("Cheque")),
-              DropdownMenuItem(value: "LIVE PHOTO", child: Text("Live Photo")),
-              DropdownMenuItem(value: "SHOP PHOTO", child: Text("Shop Photo")),
-              DropdownMenuItem(value: "BANK STATEMENT", child: Text("Bank Statement")),
-              DropdownMenuItem(value: "OTHER DOCUMENT", child: Text("Other Document")),
+
+              /// CHOOSE FILE
+              OutlinedButton.icon(
+                icon: const Icon(Icons.upload_file),
+                label: Text(
+                  selectedFile == null ? "Choose Files" : selectedFile!.name,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 18,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () async {
+                  final result = await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+                  );
+
+                  if (result != null) {
+                    setState(() {
+                      selectedFile = result.files.first;
+                    });
+                  }
+                },
+              ),
+
+              /// UPLOAD BUTTON
+              ElevatedButton(
+                onPressed: () async {
+                  if (selectedFile == null || selectedDocType == null) {
+                    showTopToast(
+                      context,
+                      "Select document type and file",
+                      success: false,
+                    );
+                    return;
+                  }
+
+                  await _uploadDocument(
+                    file: selectedFile!,
+                    documentType: selectedDocType!,
+                  );
+
+                  setState(() {
+                    selectedFile = null;
+                    selectedDocType = null;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF8EA2D9),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 26,
+                    vertical: 18,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "Upload",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             ],
-            onChanged: (value) {
-              setState(() => selectedDocType = value);
-            },
           ),
-        ),
-
-        SizedBox(
-          width: isSmall ? double.infinity : constraints.maxWidth * 0.45,
-          child: OutlinedButton.icon(
-            icon: const Icon(Icons.upload_file),
-            label: Text(
-              selectedFile == null ? "Choose Files" : selectedFile!.name,
-              overflow: TextOverflow.ellipsis,
-            ),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: () async {
-              final result = await FilePicker.platform.pickFiles(
-                type: FileType.custom,
-                allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-              );
-
-              if (result != null) {
-                setState(() {
-                  selectedFile = result.files.first;
-                });
-              }
-            },
-          ),
-        ),
-
-        SizedBox(
-          width: isSmall ? double.infinity : 150,
-          child: ElevatedButton(
-            onPressed: () async {
-              if (selectedFile == null || selectedDocType == null) {
-                showTopToast(context, "Select document type and file", success: false);
-                return;
-              }
-
-              await _uploadDocument(
-                file: selectedFile!,
-                documentType: selectedDocType!,
-              );
-
-              setState(() {
-                selectedFile = null;
-                selectedDocType = null;
-              });
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8EA2D9),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text("Upload"),
-          ),
-        ),
-      ],
-    );
-  },
-),
 
           const SizedBox(height: 20),
 
@@ -1216,7 +1291,159 @@ LayoutBuilder(
                   ...documents.map((doc) => _documentItem(doc)),
               ],
             ),
-          
+          // Column(
+          //   children: documents.map((doc) {
+          //     final String fileName = doc["fileName"] ?? "-";
+          //     final String docType = doc["documentType"] ?? "-";
+          //     final String date = doc["createdAt"] != null
+          //         ? "${DateTime.parse(doc["createdAt"]).day}/${DateTime.parse(doc["createdAt"]).month}/${DateTime.parse(doc["createdAt"]).year}"
+          //         : "-";
+
+          //     return Container(
+          //       margin: const EdgeInsets.only(bottom: 14),
+          //       padding: const EdgeInsets.all(16),
+          //       decoration: BoxDecoration(
+          //         color: Colors.white,
+          //         borderRadius: BorderRadius.circular(16),
+          //         border: Border.all(color: Colors.grey.shade200),
+          //         boxShadow: [
+          //           BoxShadow(
+          //             color: Colors.black.withOpacity(0.04),
+          //             blurRadius: 14,
+          //             offset: const Offset(0, 6),
+          //           ),
+          //         ],
+          //       ),
+          //       child: Row(
+          //         children: [
+          //           /// FILE ICON BOX
+          //           Container(
+          //             height: 46,
+          //             width: 46,
+          //             decoration: BoxDecoration(
+          //               color: const Color(0xFFE8ECF8),
+          //               borderRadius: BorderRadius.circular(12),
+          //             ),
+          //             child: const Icon(
+          //               Icons.insert_drive_file_rounded,
+          //               color: Color(0xFF3B5EDB),
+          //             ),
+          //           ),
+
+          //           const SizedBox(width: 14),
+
+          //           /// FILE DETAILS
+          //           Expanded(
+          //             child: Column(
+          //               crossAxisAlignment: CrossAxisAlignment.start,
+          //               children: [
+          //                 /// FILE NAME
+          //                 Text(
+          //                   fileName,
+          //                   style: const TextStyle(
+          //                     fontWeight: FontWeight.w600,
+          //                     fontSize: 14,
+          //                   ),
+          //                   overflow: TextOverflow.ellipsis,
+          //                 ),
+
+          //                 const SizedBox(height: 8),
+
+          //                 /// TAGS
+          //                 Wrap(
+          //                   spacing: 8,
+          //                   runSpacing: 6,
+          //                   children: [
+          //                     /// DOCUMENT TYPE
+          //                     Container(
+          //                       padding: const EdgeInsets.symmetric(
+          //                         horizontal: 10,
+          //                         vertical: 4,
+          //                       ),
+          //                       decoration: BoxDecoration(
+          //                         color: const Color(0xFFE0E7FF),
+          //                         borderRadius: BorderRadius.circular(20),
+          //                       ),
+          //                       child: Text(
+          //                         docType.replaceAll("_", " "),
+          //                         style: const TextStyle(
+          //                           fontSize: 11,
+          //                           fontWeight: FontWeight.w600,
+          //                           color: Color(0xFF3730A3),
+          //                         ),
+          //                       ),
+          //                     ),
+
+          //                     /// APPLICANT TAG
+          //                     Container(
+          //                       padding: const EdgeInsets.symmetric(
+          //                         horizontal: 10,
+          //                         vertical: 4,
+          //                       ),
+          //                       decoration: BoxDecoration(
+          //                         color: Colors.grey.shade200,
+          //                         borderRadius: BorderRadius.circular(20),
+          //                       ),
+          //                       child: const Text(
+          //                         "COMPANY",
+          //                         style: TextStyle(
+          //                           fontSize: 11,
+          //                           fontWeight: FontWeight.w600,
+          //                         ),
+          //                       ),
+          //                     ),
+
+          //                     /// STATUS TAG
+          //                     Container(
+          //                       padding: const EdgeInsets.symmetric(
+          //                         horizontal: 10,
+          //                         vertical: 4,
+          //                       ),
+          //                       decoration: BoxDecoration(
+          //                         color: const Color(0xFFFFF3CD),
+          //                         borderRadius: BorderRadius.circular(20),
+          //                       ),
+          //                       child: Text(
+          //                         doc["status"] ?? "pending",
+          //                         style: const TextStyle(
+          //                           fontSize: 11,
+          //                           fontWeight: FontWeight.w600,
+          //                           color: Colors.orange,
+          //                         ),
+          //                       ),
+          //                     ),
+          //                   ],
+          //                 ),
+
+          //                 const SizedBox(height: 6),
+
+          //                 /// DATE
+          //                 Text(
+          //                   date,
+          //                   style: const TextStyle(
+          //                     fontSize: 11,
+          //                     color: Colors.grey,
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+
+          //           /// VIEW BUTTON
+          //           IconButton(
+          //             icon: const Icon(
+          //               Icons.remove_red_eye_rounded,
+          //               color: Color(0xFF2563EB),
+          //             ),
+          //             onPressed: () {
+          //               /// open document viewer
+          //             },
+          //           ),
+          //         ],
+          //       ),
+          //     );
+          //   }).toList(),
+          // ),
         ],
       ),
     );
@@ -1231,11 +1458,17 @@ LayoutBuilder(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          // color: Colors.grey.shade200
+        color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade200,
+        ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.insert_drive_file_rounded),
+          Icon(
+            Icons.insert_drive_file_rounded,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
 
           const SizedBox(width: 14),
 
@@ -1245,10 +1478,18 @@ LayoutBuilder(
               children: [
                 Text(
                   fileName,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
                 ),
                 const SizedBox(height: 6),
-                Text(docType.replaceAll("_", " ")),
+                Text(
+                  docType.replaceAll("_", " "),
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1271,7 +1512,12 @@ LayoutBuilder(
             },
           ),
 
-         
+          // IconButton(
+          //   icon: const Icon(Icons.remove_red_eye),
+          //   onPressed: () {
+          //     /// open document viewer
+          //   },
+          // ),
         ],
       ),
     );
@@ -1365,13 +1611,23 @@ LayoutBuilder(
         children: [
           Expanded(
             flex: 4,
-            child: Text(label, style: const TextStyle(color: Colors.grey)),
+            child: Text(
+              label,
+              style: TextStyle(
+                // color: Colors.grey
+                color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+              ),
+            ),
           ),
           Expanded(
             flex: 6,
             child: Text(
               value?.toString() ?? "N/A",
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -1380,7 +1636,291 @@ LayoutBuilder(
   }
 }
 
+// class FinalSanctionTermsSection extends StatefulWidget {
+//   final int customerId;
+//   const FinalSanctionTermsSection({super.key, required this.customerId});
+//   // const FinalSanctionTermsSection({super.key});
 
+//   @override
+//   State<FinalSanctionTermsSection> createState() =>
+//       _FinalSanctionTermsSectionState();
+// }
+
+// class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
+//   // Map<String, dynamic>? sanctionData;
+//   List<dynamic> sanctionList = [];
+
+//   bool loading = true;
+//   bool isEditable = true;
+//   final TextEditingController sanctionAmountController =
+//       TextEditingController();
+//   final TextEditingController tenureController = TextEditingController();
+//   final TextEditingController interestRateController = TextEditingController();
+//   final TextEditingController penalChargesController = TextEditingController();
+//   final TextEditingController processingFeesController =
+//       TextEditingController();
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchSanctionTerms();
+//   }
+
+//   @override
+//   void dispose() {
+//     sanctionAmountController.dispose();
+//     tenureController.dispose();
+//     interestRateController.dispose();
+//     penalChargesController.dispose();
+//     processingFeesController.dispose();
+//     super.dispose();
+//   }
+
+//   // Future<void> fetchSanctionTerms() async {
+//   //   try {
+//   //     final prefs = await SharedPreferences.getInstance();
+//   //     final token = prefs.getString("token");
+//   //     // final int? customerId = prefs.getInt("customerId");
+//   //     final customerId = widget.customerId;
+
+//   //     final response = await http.get(
+//   //       Uri.parse("${ApiEndpoints.baseUrl}/customers/$customerId"),
+//   //       headers: {
+//   //         "Authorization": "Bearer $token",
+//   //         "Content-Type": "application/json",
+//   //       },
+//   //     );
+
+//   //     final body = jsonDecode(response.body);
+
+//   //     final sanctions = body["data"]?["creditSanctions"];
+
+//   //     if (sanctions != null) {
+//   //       sanctionList = sanctions;
+//   //     }
+//   //     setState(() {
+//   //       loading = false;
+//   //     });
+//   //   } catch (e) {
+//   //     loading = false;
+//   //   }
+//   // }
+
+//   // Future<void> fetchSanctionTerms() async {
+//   //   try {
+//   //     final prefs = await SharedPreferences.getInstance();
+//   //     final token = prefs.getString("token");
+//   //     // final int? customerId = prefs.getInt("customerId");
+//   //     final customerId = widget.customerId;
+//   //     final response = await http.get(
+//   //       // Uri.parse("${ApiEndpoints.baseUrl}/customers/$customerId"),
+//   //             Uri.parse("${ApiEndpoints.baseUrl}/sanctions/customer/$customerId"),
+
+//   //       headers: {
+//   //         "Authorization": "Bearer $token",
+//   //         "Content-Type": "application/json",
+//   //       },
+//   //     );
+
+//   //     final body = jsonDecode(response.body);
+//   //     final sanctions = body["data"]?["creditSanctions"];
+//   //   final status = body["data"]?["status"];
+
+//   //     if (sanctions != null) {
+//   //       sanctionList = sanctions;
+//   //     }
+//   //     if (status == "md_pending_terms") {
+//   //     isEditable = true;
+//   //   }
+//   //     setState(() {
+//   //        sanctionList = sanctions;
+//   //       loading = false;
+//   //     });
+//   //   } catch (e) {
+//   //     loading = false;
+//   //   }
+//   // }
+
+//   Future<void> fetchSanctionTerms() async {
+//     try {
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString("token");
+//       final customerId = widget.customerId;
+
+//       final response = await http.get(
+//         Uri.parse("${ApiEndpoints.baseUrl}/sanctions/customer/$customerId"),
+//         headers: {
+//           "Authorization": "Bearer $token",
+//           "Content-Type": "application/json",
+//         },
+//       );
+
+//       if (response.statusCode == 200) {
+//         final List body = jsonDecode(response.body);
+
+//         setState(() {
+//           sanctionList = body;
+//           loading = false;
+//         });
+//       } else {
+//         setState(() {
+//           loading = false;
+//         });
+//       }
+//     } catch (e) {
+//       setState(() {
+//         loading = false;
+//       });
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     if (loading) {
+//       return const Center(child: CircularProgressIndicator());
+//     }
+
+//     return Container(
+//       padding: const EdgeInsets.all(20),
+//       decoration: BoxDecoration(
+//         color: const Color(0xFFF3F4F6),
+//         borderRadius: BorderRadius.circular(18),
+//         border: Border.all(color: const Color(0xFF4F46E5), width: 1.5),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           const Row(
+//             children: [
+//               Expanded(
+//                 child: Text(
+//                   "Final Sanction Terms",
+//                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+//                 ),
+//               ),
+//               Icon(Icons.send, size: 18, color: Color(0xFF4F46E5)),
+//             ],
+//           ),
+//           const SizedBox(height: 20),
+
+//           ListView.builder(
+//             itemCount: sanctionList.length,
+//             shrinkWrap: true,
+//             physics: const NeverScrollableScrollPhysics(),
+//             itemBuilder: (context, i) {
+//               final sanction = sanctionList[i];
+
+//               final titles = [
+//                 "SANCTION AMOUNT",
+//                 "TENURE (MONTHS)",
+//                 "INTEREST RATE (%)",
+//                 "PENAL CHARGES (%)",
+//                 "PROCESSING FEES (%)",
+//               ];
+
+//               final values = [
+//                 sanction["sanctionAmount"] ?? "",
+//                 sanction["tenure"] ?? "",
+//                 sanction["interestRate"] ?? "",
+//                 sanction["penalCharges"] ?? "",
+//                 sanction["processingFees"] ?? "",
+//               ];
+
+//               return Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   const SizedBox(height: 10),
+
+//                   /// Partner Title
+//                   Text(
+//                     sanction["partner"] == "Fintree"
+//                         ? "Fintree Finance Pvt Ltd (FFPL)"
+//                         : sanction["partner"] == "Kite"
+//                         ? "KITE FINANCE (KF)"
+//                         : "Muthoot Finance (MF)",
+//                     style: const TextStyle(
+//                       fontSize: 16,
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+
+//                   const SizedBox(height: 14),
+
+//                   GridView.builder(
+//                     itemCount: titles.length,
+//                     shrinkWrap: true,
+//                     physics: const NeverScrollableScrollPhysics(),
+//                     gridDelegate:
+//                         const SliverGridDelegateWithFixedCrossAxisCount(
+//                           crossAxisCount: 3,
+//                           crossAxisSpacing: 10,
+//                           mainAxisSpacing: 10,
+//                           childAspectRatio: 1.2,
+//                         ),
+//                     itemBuilder: (context, index) {
+//                       return Container(
+//                         padding: const EdgeInsets.symmetric(
+//                           horizontal: 10,
+//                           vertical: 10,
+//                         ),
+//                         decoration: BoxDecoration(
+//                           color: const Color(0xFFDDE2F1),
+//                           borderRadius: BorderRadius.circular(12),
+//                         ),
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                               titles[index],
+//                               style: const TextStyle(
+//                                 fontSize: 10,
+//                                 fontWeight: FontWeight.w700,
+//                                 color: Color(0xFF4F46E5),
+//                               ),
+//                             ),
+//                             const SizedBox(height: 6),
+//                             isEditable
+//                                 ? TextFormField(
+//                                     initialValue: values[index].toString(),
+//                                     decoration: const InputDecoration(
+//                                       border: InputBorder.none,
+//                                       isDense: true,
+//                                     ),
+//                                     style: const TextStyle(
+//                                       fontSize: 14,
+//                                       fontWeight: FontWeight.w600,
+//                                     ),
+//                                   )
+//                                 : Text(
+//                                     values[index].toString(),
+//                                     style: const TextStyle(
+//                                       fontSize: 14,
+//                                       fontWeight: FontWeight.w600,
+//                                     ),
+//                                   ),
+//                             // Text(
+//                             //   values[index].toString(),
+//                             //   style: const TextStyle(
+//                             //     fontSize: 14,
+//                             //     fontWeight: FontWeight.w600,
+//                             //   ),
+//                             // ),
+//                           ],
+//                         ),
+//                       );
+//                     },
+//                   ),
+
+//                   const SizedBox(height: 25),
+//                   const Divider(),
+//                 ],
+//               );
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 class FinalSanctionTermsSection extends StatefulWidget {
   final int customerId;
   final Function(List<dynamic>) onSanctionChange;
@@ -1400,11 +1940,19 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
   List<dynamic> sanctionList = [];
   bool loading = true;
   bool isEditable = true;
+  bool isDarkMode = false;
 
   @override
   void initState() {
     super.initState();
+    loadTheme();
+
     fetchSanctionTerms();
+  }
+
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
   }
 
   Future<void> fetchSanctionTerms() async {
@@ -1452,19 +2000,27 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
+        // color: const Color(0xFFF3F4F6),
+        color: isDarkMode ? const Color(0xFF1E293B): const Color(0xFFF3F4F6),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF4F46E5), width: 1.5),
+        border: Border.all(
+color: isDarkMode ? Colors.grey.shade700 : const Color(0xFF4F46E5),
+          width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Expanded(
                 child: Text(
                   "Final Sanction Terms",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: isDarkMode ? Colors.white : Colors.black ,
+
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               Icon(Icons.send, size: 18, color: Color(0xFF4F46E5)),
@@ -1506,105 +2062,100 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
                         : sanction["partner"] == "Kite"
                         ? "KITE FINANCE (KF)"
                         : "Muthoot Finance (MF)",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
+                      color: isDarkMode
+                          ? Colors.white
+                          : Colors.black,
+
                       fontWeight: FontWeight.w600,
                     ),
                   ),
 
                   const SizedBox(height: 14),
-                  Builder(
-                    builder: (context) {
-                      final width = MediaQuery.of(context).size.width;
-
-                      int crossAxisCount = width > 600
-                          ? 4
-                          : width > 300
-                          ? 3
-                          : 2;
-                      return GridView.builder(
-                        itemCount: titles.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
+ 
+                  GridView.builder(
+                    itemCount: titles.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
                           crossAxisSpacing: 10,
                           mainAxisSpacing: 10,
-                          mainAxisExtent: 110,
+                          childAspectRatio: 1.2,
                         ),
-                        itemBuilder: (context, index) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 10,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          // color: const Color(0xFFDDE2F1),
+                          color: isDarkMode
+                              ? const Color(0xFF0F172A)
+                              : const Color(0xFFF4F6FA),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              titles[index],
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF4F46E5),
+                              ),
                             ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFDDE2F1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize:
-                                  MainAxisSize.min, // 🔥 prevents overflow
-                              children: [
-                                Text(
-                                  titles[index],
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF4F46E5),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              initialValue: values[index].toString(),
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                isDense: true,
+                              ),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isDarkMode
+                                    ? const Color(0xFFF4F6FA)
+                                    : const Color(0xFF0F172A),
+                                fontWeight: FontWeight.w600,
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  switch (index) {
+                                    case 0:
+                                      sanctionList[i]["sanctionAmount"] =
+                                          num.tryParse(value) ?? 0;
+                                      break;
+                                    case 1:
+                                      sanctionList[i]["tenure"] =
+                                          num.tryParse(value) ?? 0;
+                                      break;
+                                    case 2:
+                                      sanctionList[i]["interestRate"] =
+                                          num.tryParse(value) ?? 0;
+                                      break;
+                                    case 3:
+                                      sanctionList[i]["penalCharges"] =
+                                          num.tryParse(value) ?? 0;
+                                      break;
+                                    case 4:
+                                      sanctionList[i]["processingFees"] =
+                                          num.tryParse(value) ?? 0;
+                                      break;
+                                  }
+                                });
 
-                                Expanded(
-                                  // 🔥 ensures proper spacing
-                                  child: TextFormField(
-                                    initialValue: values[index].toString(),
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                    ),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        switch (index) {
-                                          case 0:
-                                            sanctionList[i]["sanctionAmount"] =
-                                                num.tryParse(value) ?? 0;
-                                            break;
-                                          case 1:
-                                            sanctionList[i]["tenure"] =
-                                                num.tryParse(value) ?? 0;
-                                            break;
-                                          case 2:
-                                            sanctionList[i]["interestRate"] =
-                                                num.tryParse(value) ?? 0;
-                                            break;
-                                          case 3:
-                                            sanctionList[i]["penalCharges"] =
-                                                num.tryParse(value) ?? 0;
-                                            break;
-                                          case 4:
-                                            sanctionList[i]["processingFees"] =
-                                                num.tryParse(value) ?? 0;
-                                            break;
-                                        }
-                                      });
-
-                                      widget.onSanctionChange(sanctionList);
-                                    },
-                                  ),
-                                ),
-                              ],
+                                widget.onSanctionChange(
+                                  sanctionList,
+                                ); // ✅ update parent
+                              },
                             ),
-                          );
-                        },
+                          ],
+                        ),
                       );
                     },
                   ),
