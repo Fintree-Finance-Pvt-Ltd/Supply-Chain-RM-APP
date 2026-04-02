@@ -1,13 +1,6 @@
 class ApiEndpoints {
   static const String baseUrl = "https://supplychain-prod.fintreelms.com/api";
   //  static const String baseUrl = "http://localhost:4000/api";
-<<<<<<< HEAD
-// 
-=======
-
->>>>>>> c4aff8f247c1dbdfeb7a5b8ddd6dfe0e4cddd3b8
-
-
 
 
   static const String login = "/auth/login";

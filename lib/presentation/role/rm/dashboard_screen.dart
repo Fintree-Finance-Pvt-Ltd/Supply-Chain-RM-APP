@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+ 
 // Your existing imports
 import 'package:supply_chain/core/constants/api_endpoints.dart';
 import 'package:supply_chain/core/services/auth_service.dart';
@@ -17,30 +17,30 @@ import 'package:supply_chain/presentation/role/rm/Cases/rejected.dart';
 import 'package:supply_chain/presentation/role/rm/Cases/submitted.dart';
 import 'package:supply_chain/presentation/role/rm/NewCustomer/company_details.dart';
 import 'package:supply_chain/presentation/role/rm/invoices_dashboard.dart';
-
+ 
 class RmDashboard extends StatefulWidget {
   const RmDashboard({super.key});
-
+ 
   @override
   State<RmDashboard> createState() => _RmDashboardState();
 }
-
+ 
 class _RmDashboardState extends State<RmDashboard> {
   int selectedBottomIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+ 
   int totalCustomers = 0;
   int draftCount = 0;
   int submittedCount = 0;
   int approvedCount = 0;
   int rejectedCount = 0;
-
+ 
   String rmName = "";
   String rmEmail = "";
   int notificationCount = 0;
   bool isDarkMode = false;
   bool loadingNotification = true;
-
+ 
   @override
   void initState() {
     super.initState();
@@ -50,19 +50,19 @@ class _RmDashboardState extends State<RmDashboard> {
     //   syncFcmToken();
     // }
   }
-
+ 
   // LOGIC HANDLERS (Same as original)
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
   }
-
+ 
   Future<void> toggleTheme(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() => isDarkMode = value);
     await prefs.setBool("isDarkMode", value);
   }
-
+ 
   Future<void> loadRMDetails() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -70,11 +70,11 @@ class _RmDashboardState extends State<RmDashboard> {
       rmEmail = prefs.getString("rmEmail") ?? "";
     });
   }
-
+ 
   Future<void> fetchDashboardData() async {
     try {
       final token = await AuthService().getToken();
-
+ 
       final response = await http.get(
         Uri.parse("${ApiEndpoints.baseUrl}/workflows/customers/dashboard/rm"),
         headers: {
@@ -82,19 +82,19 @@ class _RmDashboardState extends State<RmDashboard> {
           "Content-Type": "application/json",
         },
       );
-
+ 
       final body = jsonDecode(response.body);
-
+ 
       if (body["success"] == true) {
         final data = body["data"];
-
+ 
         final customers = data["customers"] ?? [];
-
+ 
         // Existing logic (notification)
         final approvedForMD = customers.where((c) {
           return (c["status"] ?? "").toString().toLowerCase() == "md_approved";
         }).toList();
-
+ 
         setState(() {
           // 🔴 NEW DATA
           totalCustomers = data["totalCustomers"] ?? 0;
@@ -102,7 +102,7 @@ class _RmDashboardState extends State<RmDashboard> {
           submittedCount = data["submitted"] ?? 0;
           approvedCount = data["approved"] ?? 0;
           rejectedCount = data["rejected"] ?? 0;
-
+ 
           // 🔔 OLD LOGIC
           notificationCount = approvedForMD.length;
           loadingNotification = false;
@@ -112,14 +112,14 @@ class _RmDashboardState extends State<RmDashboard> {
       debugPrint("Dashboard error: $e");
     }
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     final Color bgColor = isDarkMode
         ? const Color(0xFF0F172A)
         : const Color.fromARGB(255, 215, 225, 235);
     final Color cardColor = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
-
+ 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: bgColor,
@@ -129,17 +129,17 @@ class _RmDashboardState extends State<RmDashboard> {
         slivers: [
           // 1. MODERN HEADER
           SliverToBoxAdapter(child: _buildSuperHeader()),
-
+ 
           SliverToBoxAdapter(child: _buildDashboardCards(cardColor)),
-
+ 
           // 2. QUICK ACTIONS SECTION
           SliverToBoxAdapter(child: _buildSectionTitle("Quick Actions")),
           SliverToBoxAdapter(child: _buildQuickActions(cardColor)),
-
+ 
           // 3. SERVICES GRID SECTION
           SliverToBoxAdapter(child: _buildSectionTitle("Case Management")),
           _buildServicesGrid(cardColor),
-
+ 
           const SliverToBoxAdapter(
             child: SizedBox(height: 120),
           ), // Bottom spacing
@@ -148,7 +148,7 @@ class _RmDashboardState extends State<RmDashboard> {
       bottomNavigationBar: _buildBottomNav(),
     );
   }
-
+ 
   Widget _buildDashboardCards(Color cardColor) {
     return SizedBox(
       height: 90, // 🔥 compact height
@@ -165,7 +165,7 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
+ 
   Widget _dashboardCard(String title, int count, Color color) {
     return Container(
       width: 100, // 🔥 fixed width for row layout
@@ -198,9 +198,9 @@ class _RmDashboardState extends State<RmDashboard> {
               color: color, // 🔥 colored number
             ),
           ),
-
+ 
           const SizedBox(height: 4),
-
+ 
           // 🏷 TITLE
           Text(
             title,
@@ -215,13 +215,13 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
+ 
   /* ================= UI COMPONENTS ================= */
   String _getDayName(int day) {
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     return days[day - 1];
   }
-
+ 
   String _getMonthName(int month) {
     const months = [
       "Jan",
@@ -239,7 +239,7 @@ class _RmDashboardState extends State<RmDashboard> {
     ];
     return months[month - 1];
   }
-
+ 
   Widget _buildSuperHeader() {
     final hour = DateTime.now().hour;
     final now = DateTime.now();
@@ -250,8 +250,9 @@ class _RmDashboardState extends State<RmDashboard> {
         : hour < 17
         ? "Good Afternoon"
         : "Good Evening";
-
+ 
     return SizedBox(
+      height: 260,
       child: Stack(
         children: [
           // Gradient Background
@@ -310,7 +311,7 @@ class _RmDashboardState extends State<RmDashboard> {
                               fontSize: 14,
                             ),
                           ),
-
+ 
                           Text(
                             formattedDate,
                             style: const TextStyle(
@@ -318,7 +319,7 @@ class _RmDashboardState extends State<RmDashboard> {
                               fontSize: 12,
                             ),
                           ),
-
+ 
                           Text(
                             rmName,
                             style: const TextStyle(
@@ -334,41 +335,40 @@ class _RmDashboardState extends State<RmDashboard> {
                   ),
                   const Spacer(),
                   // Glassmorphic Info Card
-                  Align(
-                    alignment: Alignment.topCenter, // keeps it within bounds
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.info_outline,
-                            color: Color.fromARGB(255, 250, 240, 240),
-                          ),
-                          const SizedBox(width: 10), // reduce slightly
-                          Flexible(
-                            // 🔥 change from Expanded → Flexible
-                            child: Text(
-                              "You have $notificationCount cases ready for final MD Approval.",
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                height: 1.2,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Align(
+                  //   alignment: Alignment.topCenter, // keeps it within bounds
+                  //   child: Container(
+                  //     padding: const EdgeInsets.all(16),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.white.withOpacity(0.15),
+                  //       borderRadius: BorderRadius.circular(24),
+                  //       border: Border.all(
+                  //         color: Colors.white.withOpacity(0.2),
+                  //       ),
+                  //     ),
+                  //     child: Row(
+                  //       crossAxisAlignment:
+                  //           CrossAxisAlignment.center, // important
+                  //       children: [
+                  //         const Icon(
+                  //           Icons.info_outline,
+                  //           color: Color.fromARGB(255, 250, 240, 240),
+                  //         ),
+                  //         const SizedBox(width: 12),
+                  //         Expanded(
+                  //           child: Text(
+                  //             "You have $notificationCount cases ready for final MD Approval.",
+                  //             style: const TextStyle(
+                  //               color: Colors.white,
+                  //               fontSize: 13,
+                  //               height: 1.2, // control line height precisely
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -377,7 +377,7 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
+ 
   Widget _buildNotificationBadge() {
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -421,7 +421,7 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
+ 
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
@@ -435,7 +435,7 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
+ 
   Widget _buildQuickActions(Color cardColor) {
     return SizedBox(
       height: 110,
@@ -463,13 +463,13 @@ class _RmDashboardState extends State<RmDashboard> {
               MaterialPageRoute(builder: (_) => const InvoiceDashboardPage()),
             );
           }),
-
+ 
           _quickActionItem("Support", Icons.help_outline, Colors.purple, () {}),
         ],
       ),
     );
   }
-
+ 
   Widget _quickActionItem(
     String title,
     IconData icon,
@@ -517,7 +517,7 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
+ 
   Widget _buildServicesGrid(Color cardColor) {
     final items = [
       (
@@ -542,7 +542,7 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
       ("Rejected", Icons.cancel_outlined, Colors.red, const Rejected()),
     ];
-
+ 
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       sliver: SliverGrid(
@@ -569,7 +569,7 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
+ 
   Widget _menuItem(
     String title,
     IconData icon,
@@ -623,7 +623,7 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
+ 
   Widget _buildBottomNav() {
     return Container(
       margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
@@ -649,27 +649,25 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
- Widget _navItem(IconData icon, String label, int index) {
-  bool isSelected = selectedBottomIndex == index;
-
-  return InkWell(
-    onTap: () {
-      setState(() => selectedBottomIndex = index);
-      if (index == 1) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const CasesScreen(role: UserRole.rm),
-          ),
-        );
-      }
-      if (index == 2) _scaffoldKey.currentState?.openEndDrawer();
-    },
-    child: Center( // 🔥 IMPORTANT
+ 
+  Widget _navItem(IconData icon, String label, int index) {
+    bool isSelected = selectedBottomIndex == index;
+    return InkWell(
+      onTap: () {
+        setState(() => selectedBottomIndex = index);
+        if (index == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const CasesScreen(role: UserRole.rm),
+            ),
+          );
+        }
+        if (index == 2) _scaffoldKey.currentState?.openEndDrawer();
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // reduce padding
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: isSelected
             ? BoxDecoration(
                 color: const Color(0xFF2563EB).withOpacity(0.1),
@@ -677,32 +675,28 @@ class _RmDashboardState extends State<RmDashboard> {
               )
             : null,
         child: Row(
-          mainAxisSize: MainAxisSize.min, // 🔥 KEY FIX
           children: [
             Icon(
               icon,
               color: isSelected ? const Color(0xFF2563EB) : Colors.grey,
-              size: 24,
+              size: 26,
             ),
-            if (isSelected) const SizedBox(width: 6),
+            if (isSelected) const SizedBox(width: 8),
             if (isSelected)
-              Flexible( // 🔥 prevents text overflow
-                child: Text(
-                  label,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF2563EB),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 11,
-                  ),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Color(0xFF2563EB),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
                 ),
               ),
           ],
         ),
       ),
-    ),
-  );
-}
+    );
+  }
+ 
   // REUSABLE DRAWER (Refined for the new theme)
   Widget _settingsDrawer() {
     return Drawer(
@@ -731,9 +725,9 @@ class _RmDashboardState extends State<RmDashboard> {
                     radius: 36,
                     backgroundImage: NetworkImage("assets/images/logo.png"),
                   ),
-
+ 
                   const SizedBox(height: 12),
-
+ 
                   Text(
                     rmName.isEmpty ? "Relationship Manager" : rmName,
                     style: const TextStyle(
@@ -742,9 +736,9 @@ class _RmDashboardState extends State<RmDashboard> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
+ 
                   const SizedBox(height: 4),
-
+ 
                   const Text(
                     "Relationship Manager",
                     style: TextStyle(color: Colors.white70, fontSize: 13),
@@ -752,9 +746,9 @@ class _RmDashboardState extends State<RmDashboard> {
                 ],
               ),
             ),
-
+ 
             const SizedBox(height: 12),
-
+ 
             /// 🔹 MENU ITEMS
             _drawerItem(
               icon: Icons.person_add,
@@ -768,9 +762,9 @@ class _RmDashboardState extends State<RmDashboard> {
                 );
               },
             ),
-
+ 
             const SizedBox(height: 10),
-
+ 
             _drawerItem(
               icon: Icons.receipt_long,
               title: "Invoices",
@@ -785,15 +779,15 @@ class _RmDashboardState extends State<RmDashboard> {
                 );
               },
             ),
-
+ 
             const SizedBox(height: 10),
-
+ 
             Divider(
               color: isDarkMode
                   ? Colors.white.withOpacity(0.08)
                   : Colors.grey.shade300,
             ),
-
+ 
             /// 🌙 DARK MODE TOGGLE
             SwitchListTile(
               value: isDarkMode,
@@ -812,13 +806,13 @@ class _RmDashboardState extends State<RmDashboard> {
                 ),
               ),
             ),
-
+ 
             Divider(
               color: isDarkMode
                   ? Colors.white.withOpacity(0.08)
                   : Colors.grey.shade300,
             ),
-
+ 
             /// LOGOUT
             _drawerItem(
               icon: Icons.logout,
@@ -826,7 +820,7 @@ class _RmDashboardState extends State<RmDashboard> {
               color: Colors.red,
               onTap: () async {
                 Navigator.pop(context);
-
+ 
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
@@ -860,18 +854,18 @@ class _RmDashboardState extends State<RmDashboard> {
                     ],
                   ),
                 );
-
+ 
                 if (confirm != true) return;
-
+ 
                 await AuthService().logout(context);
-
+ 
                 showTopToast(
                   context,
                   "Logged out successfully",
                   success: true,
                   icon: Icons.logout_rounded,
                 );
-
+ 
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -879,9 +873,9 @@ class _RmDashboardState extends State<RmDashboard> {
                 );
               },
             ),
-
+ 
             const Spacer(),
-
+ 
             /// 🔹 FOOTER
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -907,7 +901,7 @@ class _RmDashboardState extends State<RmDashboard> {
       ),
     );
   }
-
+ 
   Widget _drawerItem({
     required IconData icon,
     required String title,
@@ -934,7 +928,7 @@ class _RmDashboardState extends State<RmDashboard> {
       onTap: onTap,
     );
   }
-
+ 
   Future<void> _handleLogout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -946,3 +940,5 @@ class _RmDashboardState extends State<RmDashboard> {
     );
   }
 }
+ 
+ 

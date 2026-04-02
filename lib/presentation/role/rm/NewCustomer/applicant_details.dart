@@ -1667,6 +1667,9 @@ Future<void> loadTheme() async {
       setState(() => isApiLoading = false);
     }
   }
+
+
+  
   // Future<void> _hitPanOcr() async {
   //   if (panFile == null) {
   //     showTopToast(context, "Please upload PAN image first", success: false);

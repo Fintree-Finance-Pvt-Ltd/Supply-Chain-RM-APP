@@ -235,9 +235,12 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 Text(
+                Text(
                   "Invoice Portfolio",
-                  style: TextStyle(fontSize: 13, color: isDarkMode ? Colors.white70 : Colors.black54),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDarkMode ? Colors.white70 : Colors.black54,
+                  ),
                 ),
 
                 const SizedBox(height: 8),
@@ -245,10 +248,10 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                 /// 💰 AMOUNT
                 Text(
                   "₹$totalAmount",
-                  style:  TextStyle(
+                  style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white70 : Colors.black54
+                    color: isDarkMode ? Colors.white70 : Colors.black54,
                   ),
                 ),
 
@@ -256,7 +259,10 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
 
                 Text(
                   "${dashboard!.totalInvoices} invoices tracked",
-                  style:  TextStyle(fontSize: 12, color: isDarkMode ? Colors.white70 : Colors.black54),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDarkMode ? Colors.white70 : Colors.black54,
+                  ),
                 ),
 
                 const SizedBox(height: 12),
@@ -437,7 +443,9 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.04),
             blurRadius: 10,
             offset: const Offset(0, 6),
           ),
@@ -454,10 +462,15 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                 height: 42,
                 width: 42,
                 decoration: BoxDecoration(
-             color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                  color: isDarkMode
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF1F5F9),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.person, color: AppColors.darkBlue),
+                child: Icon(
+                  Icons.person,
+                  color: isDarkMode ? Colors.white : AppColors.darkBlue,
+                ),
               ),
 
               const SizedBox(width: 10),
@@ -471,7 +484,10 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                       firstInvoice.customerName.isNotEmpty
                           ? "Company name: ${firstInvoice.customerName}"
                           : "Customer ID: $customerId",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
                     ),
                   ],
                 ),
@@ -501,27 +517,27 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                         ),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       "Create New",
                       style: TextStyle(
-                       color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                        color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
 
-              /// SEND EMAIL 📧
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
 
               /// VIEW BUTTON (EXPAND)
               Expanded(
                 child: Container(
                   height: 42,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE0E7FF),
+                    color: isDarkMode
+                        ? const Color(0xFF334155)
+                        : const Color(0xFFE0E7FF),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextButton(
@@ -532,8 +548,8 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                     },
                     child: Text(
                       isExpanded ? "Hide" : "View",
-                      style: const TextStyle(
-                        color: AppColors.darkBlue,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : AppColors.darkBlue,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -571,14 +587,25 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
     return Container(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(14),
+
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode
+            ? const Color(0xFF1E293B) // 🔥 DARK CARD
+            : Colors.white,
+
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+
+        border: Border.all(
+          color: isDarkMode
+              ? Colors.white.withOpacity(0.05)
+              : const Color(0xFFE5E7EB),
+        ),
 
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.25)
+                : Colors.black.withOpacity(0.03),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -587,7 +614,6 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
           /// 🔝 HEADER ROW
           InkWell(
@@ -601,6 +627,7 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                 await loadInvoiceById(invoice.invoiceId!);
               }
             },
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -610,13 +637,17 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE0E7FF),
+                        color: isDarkMode
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFE0E7FF),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.receipt_long,
                         size: 16,
-                        color: Color(0xFF4F46E5),
+                        color: isDarkMode
+                            ? Colors.white
+                            : const Color(0xFF4F46E5),
                       ),
                     ),
 
@@ -627,9 +658,10 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                         "Invoice #${invoice.invoiceNumber}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
+                          color: isDarkMode ? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -637,7 +669,7 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                     Icon(
                       isExpanded ? Icons.expand_less : Icons.expand_more,
                       size: 18,
-                      color: Colors.grey,
+                      color: isDarkMode ? Colors.white70 : Colors.grey,
                     ),
                   ],
                 ),
@@ -652,9 +684,9 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                         invoice.supplierName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
                         ),
                       ),
                     ),
@@ -701,7 +733,9 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.1),
+                          color: statusColor.withOpacity(
+                            isDarkMode ? 0.2 : 0.1,
+                          ),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -726,13 +760,10 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
 
           Text(
             "₹${invoice.amount}",
-
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
-
               fontSize: 16,
-
-              color: Color(0xFF111827),
+              color: isDarkMode ? Colors.white : const Color(0xFF111827),
             ),
           ),
 
@@ -740,13 +771,30 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
           if (isExpanded && expandedInvoiceDetails != null)
             Container(
               margin: const EdgeInsets.only(top: 12),
-
               padding: const EdgeInsets.all(12),
 
               decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
+                color: isDarkMode
+                    ? const Color.fromARGB(255, 18, 22, 39)
+                    : const Color(0xFFF9FAFB),
 
                 borderRadius: BorderRadius.circular(12),
+
+                border: Border.all(
+                  color: isDarkMode
+                      ? Colors.white.withOpacity(0.05) // subtle border
+                      : Colors.black.withOpacity(0.05),
+                ),
+
+                boxShadow: [
+                  BoxShadow(
+                    color: isDarkMode
+                        ? const Color.fromARGB(255, 18, 22, 39) // deeper shadow
+                        : Colors.black.withOpacity(0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
 
               child: _expandedInvoiceDetails(),
@@ -759,33 +807,57 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
   Widget _expandedInvoiceDetails() {
     final invoice = expandedInvoiceDetails!;
 
+    // ✅ USE THIS
+    final dark = isDarkMode;
+
     return Padding(
       padding: const EdgeInsets.only(top: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _row("Invoice Number", invoice["invoiceNumber"]),
-          _row("Invoice Date", invoice["invoiceDate"]),
-          _row("Amount", invoice["invoiceAmount"]),
-          _row("Disbursement", invoice["disbursementAmount"]),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: dark
+              ? const Color.fromARGB(255, 18, 22, 39)
+              : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _row("Invoice Number", invoice["invoiceNumber"], dark),
+            _row("Invoice Date", invoice["invoiceDate"], dark),
+            _row("Amount", invoice["invoiceAmount"], dark),
+            _row("Disbursement", invoice["disbursementAmount"], dark),
 
-          if (invoice["supplier"] != null)
-            _row("Supplier", invoice["supplier"]["supplierName"]),
+            if (invoice["supplier"] != null)
+              _row("Supplier", invoice["supplier"]["supplierName"], dark),
 
-          if (invoice["loanAccount"] != null)
-            _row("LAN", invoice["loanAccount"]["lanId"]),
-        ],
+            if (invoice["loanAccount"] != null)
+              _row("LAN", invoice["loanAccount"]["lanId"], dark),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _row(String title, dynamic value) {
+  Widget _row(String title, dynamic value, bool isDarkMode) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("$title: ", style: const TextStyle(fontWeight: FontWeight.w600)),
-          Expanded(child: Text(value?.toString() ?? "-")),
+          Text(
+            "$title: ",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isDarkMode ? Colors.grey[300] : Colors.black87,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value?.toString() ?? "-",
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+            ),
+          ),
         ],
       ),
     );
