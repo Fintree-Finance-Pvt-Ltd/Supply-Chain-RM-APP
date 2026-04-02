@@ -1129,135 +1129,143 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
           const SizedBox(height: 18),
 
           /// UPLOAD ROW
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              /// DOCUMENT TYPE
-              SizedBox(
-                width: 200,
-                child: DropdownButtonFormField<String>(
-                  initialValue: selectedDocType,
-
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    fontSize: 14,
-                  ),
-
-                  dropdownColor: isDarkMode
-                      ? const Color(0xFF1E293B)
-                      : Colors.white,
-                  decoration: InputDecoration(
-                    labelText: "Document Type",
-                    labelStyle: TextStyle(
-                      color: isDarkMode
-                          ? Colors.white
-                          : const Color(0xFF1F3C88),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  items: const [
-                    DropdownMenuItem(value: "CHEQUE", child: Text("Cheque")),
-                    DropdownMenuItem(
-                      value: "LIVE PHOTO",
-                      child: Text("Live Photo"),
-                    ),
-                    DropdownMenuItem(
-                      value: "SHOP PHOTO",
-                      child: Text("Shop Photo"),
-                    ),
-                    DropdownMenuItem(
-                      value: "BANK STATEMENT",
-                      child: Text("Bank Statement"),
-                    ),
-                    DropdownMenuItem(
-                      value: "OTHER DOCUMENT",
-                      child: Text("Other Document"),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedDocType = value;
-                    });
-                  },
-                ),
-              ),
-
-              /// CHOOSE FILE
-              OutlinedButton.icon(
-                icon: const Icon(Icons.upload_file),
-                label: Text(
-                  selectedFile == null ? "Choose Files" : selectedFile!.name,
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 18,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () async {
-                  final result = await FilePicker.platform.pickFiles(
-                    type: FileType.custom,
-                    allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-                  );
-
-                  if (result != null) {
-                    setState(() {
-                      selectedFile = result.files.first;
-                    });
-                  }
-                },
-              ),
-
-              /// UPLOAD BUTTON
-              ElevatedButton(
-                onPressed: () async {
-                  if (selectedFile == null || selectedDocType == null) {
-                    showTopToast(
-                      context,
-                      "Select document type and file",
-                      success: false,
-                    );
-                    return;
-                  }
-
-                  await _uploadDocument(
-                    file: selectedFile!,
-                    documentType: selectedDocType!,
-                  );
-
-                  setState(() {
-                    selectedFile = null;
-                    selectedDocType = null;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8EA2D9),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 26,
-                    vertical: 18,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  "Upload",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+     
+LayoutBuilder(
+  builder: (context, constraints) {
+    final isSmall = constraints.maxWidth < 400;
+ 
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        SizedBox(
+          width: isSmall
+              ? double.infinity // 🔥 full width on small screens
+              : constraints.maxWidth * 0.45,
+          child: DropdownButtonFormField<String>(
+            initialValue: selectedDocType,
+            style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+            fontSize: 14,
           ),
 
+          dropdownColor: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+            decoration: InputDecoration(
+              labelText: "Document Type",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            items: const [
+              DropdownMenuItem(value: "CHEQUE", child: Text("Cheque")),
+              DropdownMenuItem(value: "LIVE PHOTO", child: Text("Live Photo")),
+              DropdownMenuItem(value: "SHOP PHOTO", child: Text("Shop Photo")),
+              DropdownMenuItem(value: "BANK STATEMENT", child: Text("Bank Statement")),
+              DropdownMenuItem(value: "OTHER DOCUMENT", child: Text("Other Document")),
+            ],
+            onChanged: (value) {
+              setState(() => selectedDocType = value);
+            },
+          ),
+        ),
+ 
+        SizedBox(
+          width: isSmall ? double.infinity : constraints.maxWidth * 0.45,
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.upload_file),
+            label: Text(
+              selectedFile == null ? "Choose Files" : selectedFile!.name,
+              overflow: TextOverflow.ellipsis,
+            ),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () async {
+              final result = await FilePicker.platform.pickFiles(
+                type: FileType.custom,
+                allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+              );
+ 
+              if (result != null) {
+                setState(() {
+                  selectedFile = result.files.first;
+                });
+              }
+            },
+          ),
+        ),
+ 
+        SizedBox(
+          width: isSmall ? double.infinity : 150,
+          child: ElevatedButton(
+            onPressed: () async {
+              if (selectedFile == null || selectedDocType == null) {
+                showTopToast(context, "Select document type and file", success: false);
+                return;
+              }
+ 
+              await _uploadDocument(
+                file: selectedFile!,
+                documentType: selectedDocType!,
+              );
+ 
+              setState(() {
+                selectedFile = null;
+                selectedDocType = null;
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8EA2D9),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text("Upload"),
+          ),
+        ),
+      ],
+    );
+  },
+),
+ 
+          const SizedBox(height: 20),
+ 
+          /// DOCUMENT LIST
+          if (documents.isEmpty)
+            const Text(
+              "No documents uploaded",
+              style: TextStyle(color: Colors.grey),
+            )
+          else
+            Column(
+              children: [
+                /// SHOW FIRST DOCUMENT
+                if (documents.isNotEmpty) _documentItem(documents.first),
+ 
+                /// VIEW ALL BUTTON
+                if (documents.length > 1 && !showAllDocuments)
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        showAllDocuments = true;
+                      });
+                    },
+                    child: Text(
+                      "View All Documents (${documents.length})",
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+ 
+                /// SHOW ALL DOCUMENTS
+                if (showAllDocuments)
+                  ...documents.map((doc) => _documentItem(doc)),
+              ],
+            ),
+ 
           const SizedBox(height: 20),
 
           /// DOCUMENT LIST
@@ -1921,6 +1929,261 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
 //     );
 //   }
 // }
+
+
+// class FinalSanctionTermsSection extends StatefulWidget {
+//   final int customerId;
+//   final Function(List<dynamic>) onSanctionChange;
+
+//   const FinalSanctionTermsSection({
+//     super.key,
+//     required this.customerId,
+//     required this.onSanctionChange,
+//   });
+
+//   @override
+//   State<FinalSanctionTermsSection> createState() =>
+//       _FinalSanctionTermsSectionState();
+// }
+
+// class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
+//   List<dynamic> sanctionList = [];
+//   bool loading = true;
+//   bool isEditable = true;
+//   bool isDarkMode = false;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     loadTheme();
+
+//     fetchSanctionTerms();
+//   }
+
+//   Future<void> loadTheme() async {
+//     final prefs = await SharedPreferences.getInstance();
+//     setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
+//   }
+
+//   Future<void> fetchSanctionTerms() async {
+//     try {
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString("token");
+//       final customerId = widget.customerId;
+
+//       final response = await http.get(
+//         Uri.parse("${ApiEndpoints.baseUrl}/sanctions/customer/$customerId"),
+//         headers: {
+//           "Authorization": "Bearer $token",
+//           "Content-Type": "application/json",
+//         },
+//       );
+
+//       if (response.statusCode == 200) {
+//         final List body = jsonDecode(response.body);
+
+//         setState(() {
+//           sanctionList = List<Map<String, dynamic>>.from(body);
+//           loading = false;
+//         });
+
+//         widget.onSanctionChange(sanctionList); // ✅ pass to parent
+//       } else {
+//         setState(() {
+//           loading = false;
+//         });
+//       }
+//     } catch (e) {
+//       setState(() {
+//         loading = false;
+//       });
+//       print("fetchSanctionTerms error: $e");
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     if (loading) {
+//       return const Center(child: CircularProgressIndicator());
+//     }
+
+//     return Container(
+//       padding: const EdgeInsets.all(20),
+//       decoration: BoxDecoration(
+//         // color: const Color(0xFFF3F4F6),
+//         color: isDarkMode ? const Color(0xFF1E293B): const Color(0xFFF3F4F6),
+//         borderRadius: BorderRadius.circular(18),
+//         border: Border.all(
+// color: isDarkMode ? Colors.grey.shade700 : const Color(0xFF4F46E5),
+//           width: 1.5),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Row(
+//             children: [
+//               Expanded(
+//                 child: Text(
+//                   "Final Sanction Terms",
+//                   style: TextStyle(
+//                     fontSize: 20,
+//                     color: isDarkMode ? Colors.white : Colors.black ,
+
+//                     fontWeight: FontWeight.w600,
+//                   ),
+//                 ),
+//               ),
+//               Icon(Icons.send, size: 18, color: Color(0xFF4F46E5)),
+//             ],
+//           ),
+//           const SizedBox(height: 20),
+
+//           ListView.builder(
+//             itemCount: sanctionList.length,
+//             shrinkWrap: true,
+//             physics: const NeverScrollableScrollPhysics(),
+//             itemBuilder: (context, i) {
+//               final sanction = sanctionList[i];
+
+//               final titles = [
+//                 "SANCTION AMOUNT",
+//                 "TENURE (MONTHS)",
+//                 "INTEREST RATE (%)",
+//                 "PENAL CHARGES (%)",
+//                 "PROCESSING FEES (%)",
+//               ];
+
+//               final values = [
+//                 sanction["sanctionAmount"] ?? "",
+//                 sanction["tenure"] ?? "",
+//                 sanction["interestRate"] ?? "",
+//                 sanction["penalCharges"] ?? "",
+//                 sanction["processingFees"] ?? "",
+//               ];
+
+//               return Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   const SizedBox(height: 10),
+
+//                   Text(
+//                     sanction["partner"] == "Fintree"
+//                         ? "Fintree Finance Pvt Ltd (FFPL)"
+//                         : sanction["partner"] == "Kite"
+//                         ? "KITE FINANCE (KF)"
+//                         : "Muthoot Finance (MF)",
+//                     style: TextStyle(
+//                       fontSize: 16,
+//                       color: isDarkMode
+//                           ? Colors.white
+//                           : Colors.black,
+
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+
+//                   const SizedBox(height: 14),
+ 
+//                   GridView.builder(
+//                     itemCount: titles.length,
+//                     shrinkWrap: true,
+//                     physics: const NeverScrollableScrollPhysics(),
+//                     gridDelegate:
+//                         const SliverGridDelegateWithFixedCrossAxisCount(
+//                           crossAxisCount: 3,
+//                           crossAxisSpacing: 10,
+//                           mainAxisSpacing: 10,
+//                           childAspectRatio: 1.2,
+//                         ),
+//                     itemBuilder: (context, index) {
+//                       return Container(
+//                         padding: const EdgeInsets.symmetric(
+//                           horizontal: 10,
+//                           vertical: 10,
+//                         ),
+//                         decoration: BoxDecoration(
+//                           // color: const Color(0xFFDDE2F1),
+//                           color: isDarkMode
+//                               ? const Color(0xFF0F172A)
+//                               : const Color(0xFFF4F6FA),
+//                           borderRadius: BorderRadius.circular(12),
+//                         ),
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                               titles[index],
+//                               style: const TextStyle(
+//                                 fontSize: 10,
+//                                 fontWeight: FontWeight.w700,
+//                                 color: Color(0xFF4F46E5),
+//                               ),
+//                             ),
+//                             const SizedBox(height: 6),
+                            
+//                             TextFormField(
+//                               initialValue: values[index].toString(),
+//                               decoration: const InputDecoration(
+//                                 border: InputBorder.none,
+//                                 isDense: true,
+//                               ),
+//                               style: TextStyle(
+//                                 fontSize: 14,
+//                                 color: isDarkMode
+//                                     ? const Color(0xFFF4F6FA)
+//                                     : const Color(0xFF0F172A),
+//                                 fontWeight: FontWeight.w600,
+//                               ),
+//                               onChanged: (value) {
+//                                 setState(() {
+//                                   switch (index) {
+//                                     case 0:
+//                                       sanctionList[i]["sanctionAmount"] =
+//                                           num.tryParse(value) ?? 0;
+//                                       break;
+//                                     case 1:
+//                                       sanctionList[i]["tenure"] =
+//                                           num.tryParse(value) ?? 0;
+//                                       break;
+//                                     case 2:
+//                                       sanctionList[i]["interestRate"] =
+//                                           num.tryParse(value) ?? 0;
+//                                       break;
+//                                     case 3:
+//                                       sanctionList[i]["penalCharges"] =
+//                                           num.tryParse(value) ?? 0;
+//                                       break;
+//                                     case 4:
+//                                       sanctionList[i]["processingFees"] =
+//                                           num.tryParse(value) ?? 0;
+//                                       break;
+//                                   }
+//                                 });
+
+//                                 widget.onSanctionChange(
+//                                   sanctionList,
+//                                 ); // ✅ update parent
+//                               },
+//                             ),
+//                           ],
+//                         ),
+//                       );
+//                     },
+//                   ),
+
+//                   const SizedBox(height: 25),
+//                   const Divider(),
+//                 ],
+//               );
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
 class FinalSanctionTermsSection extends StatefulWidget {
   final int customerId;
   final Function(List<dynamic>) onSanctionChange;
@@ -1940,13 +2203,11 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
   List<dynamic> sanctionList = [];
   bool loading = true;
   bool isEditable = true;
-  bool isDarkMode = false;
-
+bool isDarkMode = false;
   @override
   void initState() {
     super.initState();
     loadTheme();
-
     fetchSanctionTerms();
   }
 
@@ -1954,6 +2215,7 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
     final prefs = await SharedPreferences.getInstance();
     setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
   }
+
 
   Future<void> fetchSanctionTerms() async {
     try {
@@ -2001,11 +2263,9 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         // color: const Color(0xFFF3F4F6),
-        color: isDarkMode ? const Color(0xFF1E293B): const Color(0xFFF3F4F6),
+        color: isDarkMode? const Color(0XFF1E293B): const Color(0XFFF3F4F6),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-color: isDarkMode ? Colors.grey.shade700 : const Color(0xFF4F46E5),
-          width: 1.5),
+        border: Border.all(color: const Color(0xFF4F46E5), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2015,15 +2275,12 @@ color: isDarkMode ? Colors.grey.shade700 : const Color(0xFF4F46E5),
               Expanded(
                 child: Text(
                   "Final Sanction Terms",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: isDarkMode ? Colors.white : Colors.black ,
-
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 20,
+        color: isDarkMode? const Color(0XFFF3F4F6) : const  Color(0XFF1E293B),
+                   fontWeight: FontWeight.w600),
                 ),
               ),
-              Icon(Icons.send, size: 18, color: Color(0xFF4F46E5)),
+              const Icon(Icons.send, size: 18, color: Color(0xFF4F46E5)),
             ],
           ),
           const SizedBox(height: 20),
@@ -2064,98 +2321,105 @@ color: isDarkMode ? Colors.grey.shade700 : const Color(0xFF4F46E5),
                         : "Muthoot Finance (MF)",
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDarkMode
-                          ? Colors.white
-                          : Colors.black,
-
+                      color: isDarkMode? const Color(0XFFF3F4F6) : const  Color(0XFF1E293B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
 
                   const SizedBox(height: 14),
- 
-                  GridView.builder(
-                    itemCount: titles.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
+                  Builder(
+                    builder: (context) {
+                      final width = MediaQuery.of(context).size.width;
+
+                      int crossAxisCount = width > 600
+                          ? 4
+                          : width > 300
+                          ? 3
+                          : 2;
+                      return GridView.builder(
+                        itemCount: titles.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
                           crossAxisSpacing: 10,
                           mainAxisSpacing: 10,
-                          childAspectRatio: 1.2,
+                          mainAxisExtent: 110,
                         ),
-                    itemBuilder: (context, index) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          // color: const Color(0xFFDDE2F1),
-                          color: isDarkMode
-                              ? const Color(0xFF0F172A)
-                              : const Color(0xFFF4F6FA),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              titles[index],
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF4F46E5),
-                              ),
+                        itemBuilder: (context, index) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 10,
                             ),
-                            const SizedBox(height: 6),
-                            TextFormField(
-                              initialValue: values[index].toString(),
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                isDense: true,
-                              ),
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: isDarkMode
-                                    ? const Color(0xFFF4F6FA)
-                                    : const Color(0xFF0F172A),
-                                fontWeight: FontWeight.w600,
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  switch (index) {
-                                    case 0:
-                                      sanctionList[i]["sanctionAmount"] =
-                                          num.tryParse(value) ?? 0;
-                                      break;
-                                    case 1:
-                                      sanctionList[i]["tenure"] =
-                                          num.tryParse(value) ?? 0;
-                                      break;
-                                    case 2:
-                                      sanctionList[i]["interestRate"] =
-                                          num.tryParse(value) ?? 0;
-                                      break;
-                                    case 3:
-                                      sanctionList[i]["penalCharges"] =
-                                          num.tryParse(value) ?? 0;
-                                      break;
-                                    case 4:
-                                      sanctionList[i]["processingFees"] =
-                                          num.tryParse(value) ?? 0;
-                                      break;
-                                  }
-                                });
+                            decoration: BoxDecoration(
+                                  color: isDarkMode? const Color(0XFF0F172A) :const Color.fromARGB(255, 189, 209, 250),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize:
+                                  MainAxisSize.min, // 🔥 prevents overflow
+                              children: [
+                                Text(
+                                  titles[index],
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF4F46E5),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
 
-                                widget.onSanctionChange(
-                                  sanctionList,
-                                ); // ✅ update parent
-                              },
+                                Expanded(
+                                  // 🔥 ensures proper spacing
+                                  child: TextFormField(
+                                    initialValue: values[index].toString(),
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      isDense: true,
+                                    ),
+                                    style:  TextStyle(
+                                      fontSize: 14,
+                                      color: isDarkMode? const Color(0XFFF4F6FA):const Color(0XFF0F172A),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        switch (index) {
+                                          case 0:
+                                            sanctionList[i]["sanctionAmount"] =
+                                                num.tryParse(value) ?? 0;
+                                            break;
+                                          case 1:
+                                            sanctionList[i]["tenure"] =
+                                                num.tryParse(value) ?? 0;
+                                            break;
+                                          case 2:
+                                            sanctionList[i]["interestRate"] =
+                                                num.tryParse(value) ?? 0;
+                                            break;
+                                          case 3:
+                                            sanctionList[i]["penalCharges"] =
+                                                num.tryParse(value) ?? 0;
+                                            break;
+                                          case 4:
+                                            sanctionList[i]["processingFees"] =
+                                                num.tryParse(value) ?? 0;
+                                            break;
+                                        }
+                                      });
+
+                                      widget.onSanctionChange(sanctionList);
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     },
                   ),

@@ -399,7 +399,7 @@ class _AddressDetailsState extends State<AddressDetails> {
   /// =======================
   Widget _header() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 28, 16, 8),
+      margin: const EdgeInsets.fromLTRB(16, 40, 16, 8),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
