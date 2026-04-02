@@ -622,100 +622,207 @@ Future<void> loadTheme() async {
 
   // ================= HEADER =================
   Widget _header() {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.white,
-        gradient: LinearGradient(
-          colors: [
-            AppColors.darkBlue.withOpacity(0.9),
-            const Color.fromARGB(255, 169, 167, 193),
-          ],
+    // return Container(
+    //   padding: const EdgeInsets.all(18),
+    //   decoration: BoxDecoration(
+    //     borderRadius: BorderRadius.circular(20),
+    //     color: Colors.white,
+    //     gradient: LinearGradient(
+    //       colors: [
+    //         AppColors.darkBlue.withOpacity(0.9),
+    //         const Color.fromARGB(255, 169, 167, 193),
+    //       ],
 
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
+    //       begin: Alignment.topLeft,
+    //       end: Alignment.bottomRight,
+    //     ),
+    //     boxShadow: [
+    //       BoxShadow(
+    //         color: Colors.black.withOpacity(0.08),
+    //         blurRadius: 18,
+    //         offset: const Offset(0, 10),
+    //       ),
+    //     ],
+    //   ),
+    //   child: Row(
+    //     crossAxisAlignment: CrossAxisAlignment.start,
+    //     children: [
+    //       /// LEFT TEXT
+    //       Expanded(
+    //         child: Column(
+    //           crossAxisAlignment: CrossAxisAlignment.start,
+    //           children: const [
+    //             Text(
+    //               "Co-Applicants",
+    //               style: TextStyle(
+    //                 fontSize: 20,
+    //                 fontWeight: FontWeight.w800,
+    //                 color: Colors.white,
+    //               ),
+    //             ),
+    //             SizedBox(height: 2),
+    //             Text(
+    //               "/ Co-Borrowers",
+    //               style: TextStyle(
+    //                 fontSize: 18,
+    //                 fontWeight: FontWeight.w600,
+    //                 color: Colors.white,
+    //               ),
+    //             ),
+    //             SizedBox(height: 6),
+    //             Text(
+    //               "Add co-applicants for loan processing",
+    //               style: TextStyle(fontSize: 13, color: Colors.white),
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+
+    //       const SizedBox(width: 12),
+
+    //       /// ADD BUTTON
+    //       InkWell(
+    //         onTap: _addCoApplicant,
+    //         borderRadius: BorderRadius.circular(14),
+    //         child: Container(
+    //           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+    //           decoration: BoxDecoration(
+    //             color: AppColors.darkBlue,
+    //             borderRadius: BorderRadius.circular(14),
+    //             boxShadow: [
+    //               BoxShadow(
+    //                 color: AppColors.primary.withOpacity(0.35),
+    //                 blurRadius: 10,
+    //                 offset: const Offset(0, 6),
+    //               ),
+    //             ],
+    //           ),
+    //           child: Row(
+    //             children: const [
+    //               Icon(Icons.add, size: 18, color: Colors.white),
+    //               SizedBox(width: 6),
+    //               Text(
+    //                 "Add Apllicant",
+    //                 style: TextStyle(
+    //                   fontSize: 14,
+    //                   fontWeight: FontWeight.w600,
+    //                   color: Colors.white,
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+    // );
+    return Container(
+  padding: const EdgeInsets.all(18),
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(20),
+    gradient: LinearGradient(
+      colors: [
+        AppColors.darkBlue.withOpacity(0.9),
+        const Color.fromARGB(255, 169, 167, 193),
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.08),
+        blurRadius: 18,
+        offset: const Offset(0, 10),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// LEFT TEXT
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "Co-Applicants",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
+    ],
+  ),
+  child: Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+
+      /// LEFT TEXT
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              "Co-Applicants",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 2),
+            Text(
+              "/ Co-Borrowers",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 6),
+            Text(
+              "Add co-applicants for loan processing",
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      const SizedBox(width: 10),
+
+      /// ADD BUTTON
+      Align(
+        alignment: Alignment.topRight,
+        child: InkWell(
+          onTap: _addCoApplicant,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.darkBlue,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.35),
+                  blurRadius: 10,
+                  offset: const Offset(0, 6),
                 ),
-                SizedBox(height: 2),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.add, size: 18, color: Colors.white),
+                SizedBox(width: 6),
                 Text(
-                  "/ Co-Borrowers",
+                  "Add Applicant",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 6),
-                Text(
-                  "Add co-applicants for loan processing",
-                  style: TextStyle(fontSize: 13, color: Colors.white),
-                ),
               ],
             ),
           ),
-
-          const SizedBox(width: 12),
-
-          /// ADD BUTTON
-          InkWell(
-            onTap: _addCoApplicant,
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.darkBlue,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.35),
-                    blurRadius: 10,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: const [
-                  Icon(Icons.add, size: 18, color: Colors.white),
-                  SizedBox(width: 6),
-                  Text(
-                    "Add Apllicant",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
-    );
+    ],
+  ),
+);
   }
 
   void _addCoApplicant() {
@@ -905,7 +1012,8 @@ Future<void> loadTheme() async {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    // color: Colors.white,
+                      color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: AppColors.primary.withOpacity(0.2),
@@ -921,10 +1029,12 @@ Future<void> loadTheme() async {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                             Text(
                               "Upload PAN Card",
                               style: TextStyle(
                                 fontSize: 14,
+                                              color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -1612,12 +1722,14 @@ Future<void> loadTheme() async {
               const SizedBox(width: 12),
 
               /// +91 PREFIX
-              const Text(
+               Text(
                 "+91",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  // color: AppColors.textPrimary,
+                                        color: isDarkMode ? Colors.white : AppColors.textPrimary,
+
                 ),
               ),
 
@@ -1629,11 +1741,19 @@ Future<void> loadTheme() async {
                   controller: model.mobileCtrl,
                   readOnly: model.mobileVerified,
                   keyboardType: TextInputType.phone,
+                  style: TextStyle(
+                    // color: AppColors.textPrimary,
+                                        color: isDarkMode ? Colors.white : AppColors.textPrimary,
+
+                  ),
                   maxLength: 10,
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
                     counterText: "",
                     hintText: "XXXXXXXXXX",
+                    hintStyle: TextStyle(color: isDarkMode ? Colors.white : AppColors.textPrimary,
+),
+
                     isDense: true,
                     border: InputBorder.none,
                     errorText:
@@ -1744,7 +1864,10 @@ Future<void> loadTheme() async {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            // color: Colors.white,
+            color: model.emailVerified
+                ? AppColors.success.withOpacity(0.06)
+                : AppColors.inputFill,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: model.emailVerified
@@ -1783,8 +1906,14 @@ Future<void> loadTheme() async {
                   readOnly: model.emailVerified,
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (_) => setState(() {}),
+                  style: TextStyle(
+                    // color: AppColors.textPrimary,
+                                        color: isDarkMode ? Colors.white : AppColors.textPrimary,
+
+                  ),  
                   decoration: InputDecoration(
                     hintText: "name@gmail.com",
+                      hintStyle: TextStyle(color: isDarkMode ? Colors.white : AppColors.textPrimary,),
                     isDense: true,
                     border: InputBorder.none,
                     errorText:
@@ -2065,7 +2194,7 @@ Future<void> loadTheme() async {
     switch (model.aadhaarStatus) {
       case AadhaarKycStatus.notStarted:
         label = "Complete Aadhaar KYC";
-        bgColor = AppColors.primary;
+        bgColor = AppColors.darkBlue;
         onTap = () => _initiateCoApplicantAadhaarKyc(model);
         break;
 

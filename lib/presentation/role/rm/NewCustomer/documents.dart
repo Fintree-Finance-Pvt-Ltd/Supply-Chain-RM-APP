@@ -287,14 +287,22 @@ loadTheme();
     return Scaffold(
       backgroundColor:
           isDarkMode ? const Color(0xFF121212) : AppColors.scaffoldBg,
+
+          
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
+           backgroundColor: isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF4F6FA),
+ iconTheme: IconThemeData(
+    color: isDarkMode ? Colors.white : Colors.black,
+  ),
+ 
         elevation: 0,
         title: Text(
           "Documents - ${widget.companyType}",
-          style: const TextStyle(
+          style:  TextStyle(
             fontWeight: FontWeight.w700,
-            color: Colors.black87,
+            // color: Colors.black87,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
       ),
@@ -710,7 +718,9 @@ loadTheme();
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, size: 20),
+                      icon:  Icon(Icons.arrow_back_ios,
+
+                       size: 20),
                       onPressed: () {
                         Navigator.pop(context);
                         _showFilesBottomSheet(doc); // Go back to menu
