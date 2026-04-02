@@ -509,19 +509,21 @@ backgroundColor:
   initialValue: companyTypes.contains(selectedCompanyType)
       ? selectedCompanyType
       : null,
-       style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontSize: 14,
-          ),
-          dropdownColor: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+
+           style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        // fontSize: 14,
+                      ),
+
+                      dropdownColor: isDarkMode
+                          ? const Color(0xFF1E293B)
+                          : Colors.white,
+
   decoration: _inputDecoration(),
-  hint: Text("Select company type",
-   style: TextStyle(
-            color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-            fontSize: 14,
-          ),
-
-
+  hint:  Text("Select company type",
+  style: TextStyle(fontWeight: FontWeight.w600,
+                  color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+),
   ),
   items: companyTypes.map((type) {
     return DropdownMenuItem(
