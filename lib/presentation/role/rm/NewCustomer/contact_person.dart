@@ -629,7 +629,10 @@ class _ContactPersonState extends State<ContactPerson> {
                       const SizedBox(height: 12),
 
                       /// GENDER
-                      const Text("Gender *"),
+                      Text("Gender *" , style: TextStyle( color: isDarkMode ? Colors.white : AppColors.textPrimary, fontWeight: FontWeight.w600),),
+                      const SizedBox(height: 6),
+
+
                       const SizedBox(height: 6),
 
                       Wrap(

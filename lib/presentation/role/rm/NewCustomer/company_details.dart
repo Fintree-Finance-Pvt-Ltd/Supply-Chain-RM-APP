@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
 
@@ -25,10 +24,9 @@ import 'package:supply_chain/presentation/role/rm/NewCustomer/applicant_details.
 // ''';
 
 class CompanyDetails extends StatefulWidget {
-
   final bool isResume;
   final int? customerId;
-  final Map<String,dynamic>? draftData;
+  final Map<String, dynamic>? draftData;
 
   const CompanyDetails({
     super.key,
@@ -191,22 +189,20 @@ class _CompanyDetailsState extends State<CompanyDetails> {
       "isGstVerified": isGstVerified,
       "gstFileName": selectedGstFile?.name,
     };
-await DraftService.saveDraft(
-  customerId ?? 0,
-  {
-    "company": companyData,
-    "lastStep": "applicantDetails",
-  },
-);
+    await DraftService.saveDraft(customerId ?? 0, {
+      "company": companyData,
+      "lastStep": "applicantDetails",
+    });
 
     Navigator.push(
       context,
 
       // MaterialPageRoute(builder: (_) => const AddressDetails()),
-        MaterialPageRoute(builder: (_) => ApplicantDetails(customerId: customerId ?? 0)),
+      MaterialPageRoute(
+        builder: (_) => ApplicantDetails(customerId: customerId ?? 0),
+      ),
     );
   }
-  
 
   void _resetForm() {
     setState(() {
@@ -242,83 +238,68 @@ await DraftService.saveDraft(
       panNumberVerified = false;
     });
   }
-  
 
-Future<void> _loadDraft() async {
+  Future<void> _loadDraft() async {
+    /// API draft passed from Resume page
+    if (widget.draftData != null) {
+      final data = widget.draftData!;
 
-  /// API draft passed from Resume page
-  if (widget.draftData != null) {
+      setState(() {
+        selectedCompanyType =
+            (data["companyType"] == null || data["companyType"] == "")
+            ? "Select company type"
+            : data["companyType"];
 
-    final data = widget.draftData!;
+        companyNameController.text = data["companyName"] ?? "";
+
+        mobileController.text = data["companyMobile"] ?? "";
+
+        emailController.text = data["companyEmail"] ?? "";
+
+        gstController.text = data["gstNumber"] ?? "";
+
+        isMobileVerified = data["companyMobile"] != null;
+        isEmailVerified = data["companyEmail"] != null;
+        isGstVerified = data["gstNumber"] != null;
+
+        /// load GST file
+        if (data["documents"] != null && data["documents"].isNotEmpty) {
+          final gstDoc = data["documents"].firstWhere(
+            (doc) => doc["documentType"] == "GST_CERTIFICATE",
+            orElse: () => null,
+          );
+
+          if (gstDoc != null) {
+            selectedGstFile = PlatformFile(name: gstDoc["fileName"], size: 0);
+          }
+        }
+      });
+
+      return;
+    }
+
+    /// fallback → local draft
+    if (customerId == null) return;
+
+    final draft = await DraftService.loadDraft(customerId!);
+
+    if (draft == null) return;
+
+    final company = draft["company"];
 
     setState(() {
+      selectedCompanyType = company["companyType"];
+      companyNameController.text = company["companyName"] ?? "";
+      mobileController.text = company["mobile"] ?? "";
+      emailController.text = company["email"] ?? "";
+      gstController.text = company["gst"] ?? "";
 
-      selectedCompanyType =
-    (data["companyType"] == null || data["companyType"] == "")
-        ? "Select company type"
-        : data["companyType"];
-
-      companyNameController.text =
-          data["companyName"] ?? "";
-
-      mobileController.text =
-          data["companyMobile"] ?? "";
-
-      emailController.text =
-          data["companyEmail"] ?? "";
-
-      gstController.text =
-          data["gstNumber"] ?? "";
-
-      isMobileVerified = data["companyMobile"] != null;
-      isEmailVerified = data["companyEmail"] != null;
-      isGstVerified = data["gstNumber"] != null;
-
-      /// load GST file
-      if (data["documents"] != null && data["documents"].isNotEmpty) {
-
-        final gstDoc = data["documents"].firstWhere(
-          (doc) => doc["documentType"] == "GST_CERTIFICATE",
-          orElse: () => null,
-        );
-
-        if (gstDoc != null) {
-          selectedGstFile = PlatformFile(
-            name: gstDoc["fileName"],
-            size: 0,
-          );
-        }
-      }
-
+      isMobileVerified = company["isMobileVerified"] == true;
+      isEmailVerified = company["isEmailVerified"] == true;
+      isPanVerified = company["isPanVerified"] == true;
+      isGstVerified = company["isGstVerified"] == true;
     });
-
-    return;
   }
-
-  /// fallback → local draft
-  if (customerId == null) return;
-
-  final draft = await DraftService.loadDraft(customerId!);
-
-  if (draft == null) return;
-
-  final company = draft["company"];
-
-  setState(() {
-
-    selectedCompanyType = company["companyType"];
-    companyNameController.text = company["companyName"] ?? "";
-    mobileController.text = company["mobile"] ?? "";
-    emailController.text = company["email"] ?? "";
-    gstController.text = company["gst"] ?? "";
-
-    isMobileVerified = company["isMobileVerified"] == true;
-    isEmailVerified = company["isEmailVerified"] == true;
-    isPanVerified = company["isPanVerified"] == true;
-    isGstVerified = company["isGstVerified"] == true;
-
-  });
-}
 
   Future<void> _captureLivePhoto() async {
     final XFile? img = await Navigator.push(
@@ -352,29 +333,28 @@ Future<void> _loadDraft() async {
     }
   }
 
-//   Future<int?> _loadCustomerId() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   customerId = prefs.getInt("customerId");
-//   return customerId;
-// }
+  //   Future<int?> _loadCustomerId() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   customerId = prefs.getInt("customerId");
+  //   return customerId;
+  // }
 
   @override
   void initState() {
-     super.initState();
+    super.initState();
     loadTheme();
 
-  customerId = widget.customerId;
+    customerId = widget.customerId;
 
-  //  _loadcustomerId().then((_) {
+    //  _loadcustomerId().then((_) {
 
     if (widget.isResume) {
-     
-     _loadDraft();
+      _loadDraft();
     } else {
       _resetForm();
     }
 
-  // });
+    // });
 
     mobileController.addListener(() {
       final text = mobileController.text;
@@ -399,9 +379,6 @@ Future<void> _loadDraft() async {
       });
     });
 
-
-
-
     gstController.addListener(() {
       final text = gstController.text.toUpperCase();
 
@@ -418,10 +395,11 @@ Future<void> _loadDraft() async {
     });
   }
 
-Future<void> loadTheme() async {
-  final prefs = await SharedPreferences.getInstance();
-  setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
-}
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
+  }
+
   @override
   void dispose() {
     for (var f in otpFocusNodes) {
@@ -437,8 +415,9 @@ Future<void> loadTheme() async {
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: const Color(0xFFF4F6FA),
-backgroundColor:
-    isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF4F6FA),
+      backgroundColor: isDarkMode
+          ? const Color(0xFF0F172A)
+          : const Color(0xFFF4F6FA),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.darkBlue,
@@ -484,7 +463,7 @@ backgroundColor:
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// Section Title
-           Text(
+          Text(
             "Company Information",
             style: TextStyle(
               fontSize: 18,
@@ -497,46 +476,44 @@ backgroundColor:
           const SizedBox(height: 24),
 
           /// Company Type
-           Text(
+          Text(
             "Company Type *",
-            style: TextStyle(fontWeight: FontWeight.w600,
-                color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+            ),
           ),
           const SizedBox(height: 8),
 
           DropdownButtonFormField<String>(
-  initialValue: companyTypes.contains(selectedCompanyType)
-      ? selectedCompanyType
-      : null,
+            initialValue: companyTypes.contains(selectedCompanyType)
+                ? selectedCompanyType
+                : null,
 
-           style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        // fontSize: 14,
-                      ),
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black,
+              // fontSize: 14,
+            ),
 
-                      dropdownColor: isDarkMode
-                          ? const Color(0xFF1E293B)
-                          : Colors.white,
+            dropdownColor: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
 
-  decoration: _inputDecoration(),
-  hint:  Text("Select company type",
-  style: TextStyle(fontWeight: FontWeight.w600,
-                  color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-),
-  ),
-  items: companyTypes.map((type) {
-    return DropdownMenuItem(
-      value: type,
-      child: Text(type),
-    );
-  }).toList(),
-  onChanged: (value) {
-    setState(() {
-      selectedCompanyType = value;
-    });
-  },
-),
+            decoration: _inputDecoration(),
+            hint: Text(
+              "Select company type",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+              ),
+            ),
+            items: companyTypes.map((type) {
+              return DropdownMenuItem(value: type, child: Text(type));
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedCompanyType = value;
+              });
+            },
+          ),
 
           const SizedBox(height: 20),
 
@@ -582,9 +559,7 @@ backgroundColor:
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(12),
         // color: AppColors.card,
-color: isDarkMode
-    ? const Color(0xFF1E293B)
-    : AppColors.card,
+        color: isDarkMode ? const Color(0xFF1E293B) : AppColors.card,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -597,7 +572,6 @@ color: isDarkMode
     );
   }
 
-  
   Future<void> _pickPanFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       withData: true,
@@ -614,7 +588,7 @@ color: isDarkMode
 
       // 🔥 Run OCR only
       await _runPanOcr();
-          }
+    }
   }
 
   Widget _panUploadCard() {
@@ -641,21 +615,20 @@ color: isDarkMode
 
         IconButton(
           tooltip: "Capture PAN",
-          icon:  Icon(Icons.camera_alt, 
-          // color: Color(0xFF1A237E)
-              color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-
-
+          icon: Icon(
+            Icons.camera_alt,
+            // color: Color(0xFF1A237E)
+            color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
           ),
           onPressed: _capturePan,
         ),
 
         IconButton(
           tooltip: "Upload from device",
-          icon:  Icon(Icons.upload_file,
-          //  color: Color(0xFF1A237E)
-              color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-
+          icon: Icon(
+            Icons.upload_file,
+            //  color: Color(0xFF1A237E)
+            color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
           ),
           onPressed: _pickPanFile,
         ),
@@ -711,12 +684,12 @@ color: isDarkMode
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Text(
+            Text(
               "Company PAN Card *",
-              style: TextStyle(fontWeight: FontWeight.w600,
-                  color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-),
-              
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+              ),
             ),
             const SizedBox(height: 8),
             _panUploadCard(),
@@ -741,7 +714,7 @@ color: isDarkMode
 
         const SizedBox(height: 20),
 
-                _fileUploadField(
+        _fileUploadField(
           label: "GST Certificate Upload *",
           selectedFile: selectedGstFile,
           onPressed: _pickGstFile,
@@ -751,11 +724,12 @@ color: isDarkMode
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Text(
+            Text(
               "GST Number *",
-              style: TextStyle(fontWeight: FontWeight.w600,
-                  color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+              ),
             ),
             const SizedBox(height: 8),
 
@@ -777,8 +751,8 @@ color: isDarkMode
                     ),
                     child: TextField(
                       style: TextStyle(
-  color: isDarkMode ? Colors.white : Colors.black,
-),
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
                       controller: gstController,
                       maxLength: 15,
                       textCapitalization: TextCapitalization.characters,
@@ -786,8 +760,8 @@ color: isDarkMode
                         hintText: "Enter GST Number",
                         counterText: "",
                         hintStyle: TextStyle(
-  color: isDarkMode ? Colors.white54 : Colors.black54,
-),
+                          color: isDarkMode ? Colors.white54 : Colors.black54,
+                        ),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 14,
@@ -847,8 +821,7 @@ color: isDarkMode
                 padding: EdgeInsets.only(top: 6),
                 child: Text(
                   "Invalid GST Number",
-                  style: TextStyle(color: Colors.red, fontSize: 12
-                  ),
+                  style: TextStyle(color: Colors.red, fontSize: 12),
                 ),
               ),
 
@@ -863,9 +836,7 @@ color: isDarkMode
           ],
         ),
 
-        
         const SizedBox(height: 16),
-      
       ],
     );
   }
@@ -874,11 +845,12 @@ color: isDarkMode
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-         Text(
+        Text(
           "Company Mobile Number *",
-          style: TextStyle(fontWeight: FontWeight.w600,
-              color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+          ),
         ),
         const SizedBox(height: 8),
 
@@ -887,19 +859,17 @@ color: isDarkMode
             Expanded(
               child: TextField(
                 style: TextStyle(
-  color: isDarkMode ? Colors.white : Colors.black,
-),
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
                 controller: mobileController,
                 keyboardType: TextInputType.number,
                 maxLength: 10, // 👈 LIMIT LENGTH
                 inputFormatters: [
-                  
                   FilteringTextInputFormatter.digitsOnly, // 👈 ONLY NUMBERS
                   LengthLimitingTextInputFormatter(10), // 👈 HARD LIMIT
                 ],
                 decoration: _modernInputDecoration("Enter mobile number")
                     .copyWith(
-                      
                       errorText:
                           mobileController.text.isNotEmpty &&
                               mobileController.text.length < 10
@@ -910,7 +880,6 @@ color: isDarkMode
             ),
             const SizedBox(width: 10),
 
-            
             /// 🟢 If Verified → Show ONLY Icon (NOT inside button)
             if (!isMobileVerified && isMobileValid)
               AnimatedSwitcher(
@@ -928,7 +897,7 @@ color: isDarkMode
                       MobileConsentPopup.show(
                         context: context,
                         onVerified: (otp) async {
-                         return await _verifyMobileOtp(otp); // ✅ THEN VERIFY
+                          return await _verifyMobileOtp(otp); // ✅ THEN VERIFY
                         },
                       );
                     }
@@ -954,7 +923,6 @@ color: isDarkMode
     );
   }
 
-  
   Widget _verifyField({
     required String label,
     required String hint,
@@ -967,9 +935,13 @@ color: isDarkMode
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style:  TextStyle(fontWeight: FontWeight.w600,
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
             color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-)),
+          ),
+        ),
         const SizedBox(height: 8),
 
         Row(
@@ -977,8 +949,8 @@ color: isDarkMode
             Expanded(
               child: TextField(
                 style: TextStyle(
-  color: isDarkMode ? Colors.white : Colors.black,
-),
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
                 controller: controller,
                 keyboardType: keyboardType,
                 decoration: _modernInputDecoration(hint),
@@ -1009,33 +981,31 @@ color: isDarkMode
             //     ),
             //     child: const Text("Send OTP"),
             //   ),
-
             if (!isEmailVerified && isValid)
-  AnimatedSwitcher(
-    duration: const Duration(milliseconds: 300),
-    child: ElevatedButton(
-      key: const ValueKey("emailOtp"),
-      onPressed: () async {
-        bool sent = await _sendEmailOtp();
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: ElevatedButton(
+                  key: const ValueKey("emailOtp"),
+                  onPressed: () async {
+                    bool sent = await _sendEmailOtp();
 
-        if (sent) {
-          EmailVerifyPopup.show(
-            context: context,
-            onVerify: (otp) async {
-             return await _verifyEmailOtp(otp);
-            },
-          );
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.darkBlue,
-        foregroundColor: Colors.white,
-        minimumSize: const Size(110, 48),
-      ),
-      child: const Text("Send OTP"),
-    ),
-  ),
-            
+                    if (sent) {
+                      EmailVerifyPopup.show(
+                        context: context,
+                        onVerify: (otp) async {
+                          return await _verifyEmailOtp(otp);
+                        },
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.darkBlue,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(110, 48),
+                  ),
+                  child: const Text("Send OTP"),
+                ),
+              ),
 
             /// 🟢 If Verified → Show ONLY Icon (NOT inside button)
             if (isEmailVerified)
@@ -1054,7 +1024,7 @@ color: isDarkMode
   InputDecoration _modernInputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle:  TextStyle(
+      hintStyle: TextStyle(
         // color: Color.fromARGB(255, 16, 16, 16),
         color: isDarkMode ? Colors.white70 : Colors.black87,
         fontSize: 14,
@@ -1062,39 +1032,31 @@ color: isDarkMode
 
       filled: true,
       // fillColor: const Color(0xFFF8F9FC), // 👈 Light grey background
-fillColor: isDarkMode
-    ? const Color(0xFF334155)
-    : const Color(0xFFF8F9FC),
+      fillColor: isDarkMode ? const Color(0xFF334155) : const Color(0xFFF8F9FC),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
 
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         // borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
         borderSide: BorderSide(
-  color: isDarkMode
-      ? Colors.white24
-      : const Color(0xFFE5E7EB),
-)
+          color: isDarkMode ? Colors.white24 : const Color(0xFFE5E7EB),
+        ),
       ),
 
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         // borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
         borderSide: BorderSide(
-  color: isDarkMode
-      ? Colors.white24
-      : const Color(0xFFE5E7EB),
-)
+          color: isDarkMode ? Colors.white24 : const Color(0xFFE5E7EB),
+        ),
       ),
 
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         // borderSide: BorderSide(color: AppColors.darkBlue, width: 1.5),
         borderSide: BorderSide(
-  color: isDarkMode
-      ? Colors.white24
-      : const Color(0xFFE5E7EB),
-)
+          color: isDarkMode ? Colors.white24 : const Color(0xFFE5E7EB),
+        ),
       ),
     );
   }
@@ -1118,7 +1080,7 @@ fillColor: isDarkMode
   Widget _buildDynamicFields() {
     return Column(
       children: [
-          Visibility(
+        Visibility(
           visible: selectedCompanyType == "Proprietorship",
           child: Column(
             children: [
@@ -1126,15 +1088,17 @@ fillColor: isDarkMode
                 label: "Company Name *",
                 hint: "Company name will auto-fill",
                 controller: companyNameController,
-                enabled: isPanVerified || true,     //during testing, we can allow editing company name even before PAN verification. Change it back to `
+                enabled:
+                    isPanVerified ||
+                    true, //during testing, we can allow editing company name even before PAN verification. Change it back to `
               ),
 
               const SizedBox(height: 16),
             ],
           ),
         ),
+
         /// ===== PRIVATE LIMITED FIELDS =====
-       
         Visibility(
           visible: selectedCompanyType == "Pvt Ltd /Ltd",
           child: Column(
@@ -1143,7 +1107,9 @@ fillColor: isDarkMode
                 label: "Company Name *",
                 hint: "Company name will auto-fill",
                 controller: companyNameController,
-                enabled: isPanVerified || true,     //during testing, we can allow editing company name even before PAN verification. Change it back to `
+                enabled:
+                    isPanVerified ||
+                    true, //during testing, we can allow editing company name even before PAN verification. Change it back to `
               ),
 
               const SizedBox(height: 16),
@@ -1241,8 +1207,7 @@ fillColor: isDarkMode
         // await prefs.setInt("customerId", newCustomerId);
 
         // print("Saved customerId: ${prefs.getInt("customerId")}");
-// final int? newCustomerId = data["customerId"];
-
+        // final int? newCustomerId = data["customerId"];
 
         setState(() {
           customerId = newCustomerId;
@@ -1257,7 +1222,6 @@ fillColor: isDarkMode
           await _uploadDocument(file: panFile!, documentType: "PAN_CARD");
         }
         return true;
-
       } else {
         showTopToast(context, data["message"] ?? "Invalid OTP", success: false);
         return false;
@@ -1315,8 +1279,7 @@ fillColor: isDarkMode
       print("OTP ERROR: $e");
       showTopToast(context, "OTP Send Failed", success: false);
       return false;
-    }
-    finally {
+    } finally {
       setState(() {
         isApiLoading = false;
       });
@@ -1346,8 +1309,6 @@ fillColor: isDarkMode
           "email": emailController.text.trim(),
           "ownerType": "COMPANY",
         }),
-
-        
       );
 
       final data = jsonDecode(response.body);
@@ -1419,8 +1380,7 @@ fillColor: isDarkMode
       showTopToast(context, "Email OTP Send Failed", success: false);
 
       return false;
-    }
-    finally {
+    } finally {
       setState(() {
         isApiLoading = false;
       });
@@ -1500,7 +1460,7 @@ fillColor: isDarkMode
         actions: [
           TextButton(
             onPressed: () async {
-             if (customerId != null) {
+              if (customerId != null) {
                 await DraftService.clearDraft(customerId!);
               }
               Navigator.pop(context);
@@ -1518,8 +1478,6 @@ fillColor: isDarkMode
       ),
     );
   }
-
- 
 
   Future<void> _verifyGst() async {
     final gstNumber = gstController.text.trim();
@@ -1542,7 +1500,7 @@ fillColor: isDarkMode
       // // final int? storedCustomerId = prefs.getInt("customerId");
       //           final storedCustomerId = await _loadCustomerId();
 
-final storedCustomerId = customerId;
+      final storedCustomerId = customerId;
       if (storedCustomerId == null) {
         throw Exception("Customer ID not found. Verify mobile first.");
       }
@@ -1616,13 +1574,18 @@ final storedCustomerId = customerId;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style:  TextStyle(fontWeight: FontWeight.w600,
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
             color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-)),
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           enabled: enabled,
+               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
           decoration: _inputDecoration(hintText: hint),
         ),
       ],
@@ -1668,9 +1631,13 @@ final storedCustomerId = customerId;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style:  TextStyle(fontWeight: FontWeight.w600,
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
             color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-)),
+          ),
+        ),
         const SizedBox(height: 8),
 
         Row(
@@ -1685,14 +1652,17 @@ final storedCustomerId = customerId;
                   border: Border.all(color: Colors.grey.shade300),
                   borderRadius: BorderRadius.circular(12),
                   // color: AppColors.card,
-                  color: isDarkMode ? const Color(0xFF334155) : const Color(0xFFF8F9FC),
+                  color: isDarkMode
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF8F9FC),
                 ),
                 child: Text(
                   selectedFile?.name ?? "Choose File",
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontWeight: FontWeight.w600,
-                  color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+                  ),
                 ),
               ),
             ),
@@ -1719,19 +1689,19 @@ final storedCustomerId = customerId;
   InputDecoration _inputDecoration({String? hintText}) {
     return InputDecoration(
       hintText: hintText,
-      hintStyle:  TextStyle(
+      hintStyle: TextStyle(
         // color: Colors.black
-            // color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
-  color: isDarkMode ? Colors. white54 : Colors. black54,
+        // color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+        color: isDarkMode ? Colors.white54 : Colors.black54,
 
-    fontSize: 14),
+        fontSize: 14,
+      ),
 
       filled: true,
       // fillColor: Colors.white,
-      // fillColor: const Color(0xFFF8F9FC) 
+      // fillColor: const Color(0xFFF8F9FC)
       //, // 👈 Light grey background
-fillColor: isDarkMode
-    ? const Color(0xFF334155)  : const Color(0xFFF8F9FC),
+      fillColor: isDarkMode ? const Color(0xFF334155) : const Color(0xFFF8F9FC),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
 
       border: OutlineInputBorder(
@@ -1754,6 +1724,7 @@ fillColor: isDarkMode
   Future<int?> _loadcustomerId() async {
     return widget.customerId;
   }
+
   Future<void> _uploadDocument({
     required PlatformFile file,
     required String documentType,
@@ -1777,7 +1748,7 @@ fillColor: isDarkMode
       //     final storedCustomerId = await _loadCustomerId();
       //               // final storedCustomerId = await _loadcustomerId();
 
-final storedCustomerId = customerId;
+      final storedCustomerId = customerId;
 
       if (storedCustomerId == null) {
         throw Exception("Customer ID not found. Verify mobile first.");

@@ -1,6 +1,7 @@
+ 
 import 'dart:convert';
 import 'dart:typed_data';
-
+ 
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,7 @@ import 'package:supply_chain/core/services/web_camera_capture.dart';
 import 'package:supply_chain/core/utils/toast_helper.dart';
 import 'package:supply_chain/presentation/role/rm/dashboard_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+ 
 /// =======================
 /// COLORS (Mock AppColors)
 /// =======================
@@ -21,7 +22,7 @@ class AppColors {
   static const scaffoldBg = Color(0xFFF5F7FB);
   static const primary = Color(0xFF2563EB);
 }
-
+ 
 /// =======================
 /// DOCUMENT MODEL
 /// =======================
@@ -29,9 +30,9 @@ class DocumentItem {
   final String name;
   final String type;
   final bool mandatory;
-
+ 
   List<String> fileUrls; // ✅ MULTIPLE FILES
-
+ 
   DocumentItem({
     required this.name,
     required this.type,
@@ -39,7 +40,7 @@ class DocumentItem {
     this.fileUrls = const [],
   });
 }
-
+ 
 final List<DocumentItem> allDocuments = [
   DocumentItem(
     name: "GST Certificate",
@@ -129,7 +130,7 @@ final List<DocumentItem> allDocuments = [
     mandatory: false,
   ),
 ];
-
+ 
 /// =======================
 /// DOCUMENT CONFIG
 /// =======================
@@ -144,7 +145,7 @@ Map<String, List<String>> optionalDocsByCompanyType = {
     "Obligation Sheet",
     "Sales & Purchase (Monthwise, Tally)",
   ],
-
+ 
   "partnership": [
     "GST Certificate",
     "MSME Certificate",
@@ -153,7 +154,7 @@ Map<String, List<String>> optionalDocsByCompanyType = {
     "Obligation Sheet",
     "Sales & Purchase (Monthwise, Tally)",
   ],
-
+ 
   "pvt ltd /ltd": [
     "GST Certificate",
     "MSME Certificate",
@@ -171,7 +172,7 @@ Map<String, List<String>> optionalDocsByCompanyType = {
     "debtor Ageing",
   ],
 };
-
+ 
 final Map<String, List<String>> mandatoryDocsByCompanyType = {
   "proprietorship": [
     "PAN & Aadhaar of Applicant",
@@ -179,7 +180,7 @@ final Map<String, List<String>> mandatoryDocsByCompanyType = {
     "GSTR-3B (Latest 2 – Required)",
     "Bank Statement (Last 12 months)",
   ],
-
+ 
   "partnership": [
     "PAN & Aadhaar of ALL Partners",
     "Audited Financials (Last 3 Years)",
@@ -188,7 +189,7 @@ final Map<String, List<String>> mandatoryDocsByCompanyType = {
     "GSTR-3B (Latest 2 – Required)",
     "Company PAN",
   ],
-
+ 
   "llp": [
     "PAN & Aadhaar of ALL Partners",
     "Partnership Deed / LLP Deed",
@@ -197,14 +198,14 @@ final Map<String, List<String>> mandatoryDocsByCompanyType = {
     "Bank Statement (Last 12 months)",
     "Company PAN",
   ],
-
+ 
   "huf": [
     "PAN & Aadhaar of Applicant",
     "Audited Financials (Last 3 Years)",
     "GSTR-3B (Latest 2 – Required)",
     "Bank Statement (Last 12 months)",
   ],
-
+ 
   "pvt ltd /ltd": [
     "PAN & Aadhaar of ALL Directors",
     "Audited Financials (Last 3 Years)",
@@ -217,28 +218,28 @@ final Map<String, List<String>> mandatoryDocsByCompanyType = {
     "COI (Certificate of Incorporation)",
   ],
 };
-
+ 
 /// =======================
 /// DOCUMENTS PAGE
 /// =======================
 class DocumentsPage extends StatefulWidget {
   final String companyType;
   final int customerId;
-
+ 
   const DocumentsPage({
     super.key,
     required this.companyType,
     required this.customerId,
   });
-
+ 
   @override
   State<DocumentsPage> createState() => _DocumentsPageState();
 }
-
+ 
 class _DocumentsPageState extends State<DocumentsPage> {
   late List<DocumentItem> documents;
   bool isDarkMode = false;
-
+ 
   @override
   void initState() {
     print("Company Type from previous screen: ${widget.companyType}");
@@ -246,13 +247,13 @@ class _DocumentsPageState extends State<DocumentsPage> {
     super.initState();
 loadTheme();
     final type = widget.companyType.toLowerCase().trim();
-
+ 
     final mandatoryList = mandatoryDocsByCompanyType[type] ?? [];
     final optionalList = optionalDocsByCompanyType[type] ?? [];
-
+ 
     List<DocumentItem> mandatoryDocs = [];
     List<DocumentItem> optionalDocs = [];
-
+ 
     /// ✅ Step 1: Separate docs
     for (var doc in allDocuments) {
       if (mandatoryList.contains(doc.name)) {
@@ -265,19 +266,19 @@ loadTheme();
         );
       }
     }
-
+ 
     /// ✅ Step 2: Final merge
     documents = [...mandatoryDocs, ...optionalDocs];
-
+ 
     print("Final Docs: ${documents.map((e) => e.name).toList()}");
-
+ 
     _fetchUploadedDocuments();
   }
-
+ 
   int get totalDocs => documents.length;
   int get mandatoryDocs => documents.where((d) => d.mandatory).length;
   int get uploadedDocs => documents.where((d) => d.fileUrls.isNotEmpty).length;
-
+ 
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
@@ -287,8 +288,8 @@ loadTheme();
     return Scaffold(
       backgroundColor:
           isDarkMode ? const Color(0xFF121212) : AppColors.scaffoldBg,
-
-          
+ 
+         
       appBar: AppBar(
         // backgroundColor: Colors.white,
            backgroundColor: isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF4F6FA),
@@ -320,11 +321,11 @@ loadTheme();
       ),
     );
   }
-
+ 
   Future<int> _loadCustomerId() async {
     return widget.customerId;
   }
-
+ 
   Widget _uploadSummaryCard() {
     return Container(
       width: double.infinity,
@@ -335,12 +336,12 @@ loadTheme();
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           // color: const Color(0xFFB6D4FF)
-
+ 
           color: isDarkMode ? Colors.white24 : const Color(0xFFB6D4FF),
       ),),
       child: Text(
         "Total: $totalDocs | Mandatory: $mandatoryDocs | Uploaded: $uploadedDocs",
-
+ 
         style:  TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
@@ -348,12 +349,12 @@ loadTheme();
             color: isDarkMode
       ? Colors.white
       : const Color(0xFF1E3A8A),
-
+ 
         ),
       ),
     );
   }
-
+ 
   Widget _documentList() {
     return ListView.builder(
       itemCount: documents.length,
@@ -384,9 +385,9 @@ loadTheme();
                       style:  TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        
+                       
     color: isDarkMode ? Colors.white : Colors.black,
-
+ 
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -398,7 +399,7 @@ loadTheme();
                         color: doc.mandatory ? Colors.red : Colors.grey,
                       ),
                     ),
-
+ 
                     /// FILE COUNT
                     if (doc.fileUrls.isNotEmpty)
                       Padding(
@@ -414,7 +415,7 @@ loadTheme();
                   ],
                 ),
               ),
-
+ 
               /// 📤 ACTIONS
               Column(
                 children: [
@@ -423,7 +424,7 @@ loadTheme();
                     icon: const Icon(Icons.upload_file, color: Colors.blue),
                     onPressed: () => _pickFromDevice(doc),
                   ),
-
+ 
                   /// View
                   if (doc.fileUrls.isNotEmpty)
                     IconButton(
@@ -443,7 +444,7 @@ loadTheme();
       },
     );
   }
-
+ 
   void _showFilesBottomSheet(DocumentItem doc) {
     showModalBottomSheet(
       context: context,
@@ -452,8 +453,9 @@ loadTheme();
           Colors.transparent, // Required for custom rounded corners
       builder: (_) {
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration:  BoxDecoration(
+            // color: Colors.white,
+            color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24),
               topRight: Radius.circular(24),
@@ -469,11 +471,12 @@ loadTheme();
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  // color: Colors.grey[300],
+                  color: isDarkMode ? Colors.white24 : Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-
+ 
               // 1. Top Header Card (Matches the "Prostarm" card in your image)
               Container(
                 width: double.infinity,
@@ -491,10 +494,11 @@ loadTheme();
                     Expanded(
                       child: Text(
                         doc.name,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF334155),
+                          // color: Color(0xFF334155),
+                          color: isDarkMode ? Colors.white : const Color(0xFF334155),
                         ),
                       ),
                     ),
@@ -503,10 +507,11 @@ loadTheme();
                       children: [
                         Text(
                           "${doc.fileUrls.length} Files",
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            // color: Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
                         const Text(
@@ -523,11 +528,14 @@ loadTheme();
                 ),
               ),
               const SizedBox(height: 16),
-
+ 
               // 2. Action List (Matches "Set trigger order", etc.)
               _buildActionItem(
                 icon: Icons.folder_open_outlined,
                 title: "View All Documents",
+             
+                  // color: isDarkMode ? Colors.white : Colors.black87,
+               
                 onTap: () {
                   Navigator.pop(context); // Close the current menu
                   _showAllFilesGallery(doc); // Open the gallery
@@ -542,9 +550,9 @@ loadTheme();
                   _pickFromDevice(doc);
                 },
               ),
-
+ 
               const SizedBox(height: 24),
-
+ 
               // 3. Bottom Action Buttons (Matches Sell/Buy)
               Row(
                 children: [
@@ -601,7 +609,7 @@ loadTheme();
       },
     );
   }
-
+ 
   // Helper to build list items in the bottom sheet
   Widget _buildActionItem({
     required IconData icon,
@@ -610,30 +618,34 @@ loadTheme();
   }) {
     return ListTile(
       onTap: onTap,
-      leading: Icon(icon, color: Colors.black87, size: 22),
+      leading: Icon(icon,
+      color: isDarkMode ? Colors.white : Colors.black87
+      , size: 22),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        style:  TextStyle(fontSize: 14, fontWeight: FontWeight.w500,
+        color: isDarkMode ? Colors.white : Colors.black87
+        ),
       ),
       contentPadding: EdgeInsets.zero,
     );
   }
-
+ 
   Future<void> _viewDocument(String? url) async {
     if (url == null || url.trim().isEmpty) {
       showTopToast(context, "Document URL not found", success: false);
       return;
     }
-
+ 
     try {
       final uri = Uri.parse(url);
-
+ 
       final ok = await launchUrl(
         uri,
-
+ 
         mode: LaunchMode.inAppBrowserView, // 🔥 better than external
       );
-
+ 
       if (!ok) {
         showTopToast(context, "Unable to open document", success: false);
       }
@@ -641,37 +653,37 @@ loadTheme();
       showTopToast(context, "Invalid document url", success: false);
     }
   }
-
+ 
   Future<void> _fetchUploadedDocuments() async {
     try {
       final customerId = await _loadCustomerId();
-
+ 
       final token = await AuthService().getToken();
-
+ 
       final response = await http.get(
         Uri.parse("${ApiEndpoints.baseUrl}/documents/customer/$customerId"),
-
+ 
         headers: {"Authorization": "Bearer $token"},
       );
-
+ 
       print("FETCH STATUS: ${response.statusCode}");
       print("FETCH BODY: ${response.body}");
-
+ 
       final data = jsonDecode(response.body);
-
+ 
       if (response.statusCode == 200 && data["success"] == true) {
         final List uploadedDocs = data["data"];
-
+ 
         setState(() {
           for (var doc in documents) {
             final backendType = doc.type; // ✅ FIXED
-
+ 
             final matches = uploadedDocs
                 .where((d) => d["documentType"] == backendType)
                 .toList();
-
+ 
             final base = ApiEndpoints.baseUrl.replaceAll("/api", "");
-
+ 
             doc.fileUrls = matches.map<String>((m) {
               return "$base/${m["filePath"]}";
             }).toList();
@@ -682,17 +694,19 @@ loadTheme();
       print("FETCH ERROR: $e");
     }
   }
-
+ 
   void _showAllFilesGallery(DocumentItem doc) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
+      backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.transparent,
       builder: (_) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.7,
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration:  BoxDecoration(
+            // color: Colors.white,
+            color:isDarkMode ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24),
               topRight: Radius.circular(24),
@@ -719,7 +733,7 @@ loadTheme();
                   children: [
                     IconButton(
                       icon:  Icon(Icons.arrow_back_ios,
-
+color: isDarkMode ? Colors.white : const Color(0xFF334155),
                        size: 20),
                       onPressed: () {
                         Navigator.pop(context);
@@ -729,16 +743,17 @@ loadTheme();
                     Expanded(
                       child: Text(
                         "${doc.name} Files",
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontSize: 18,
+                          color: isDarkMode ? Colors.white : const Color(0xFF334155),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Text(
                       "${doc.fileUrls.length}",
-                      style: const TextStyle(
-                        color: Colors.blue,
+                      style:  TextStyle(
+                          color: isDarkMode ? Colors.white : const Color(0xFF334155),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -746,7 +761,7 @@ loadTheme();
                 ),
               ),
               const Divider(),
-
+ 
               // List of Files
               Expanded(
                 child: ListView.separated(
@@ -757,7 +772,7 @@ loadTheme();
                     final url = doc.fileUrls[index];
                     // Extracting a simple filename or using index
                     final fileName = "Document Part ${index + 1}";
-
+ 
                     return Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -784,7 +799,9 @@ loadTheme();
                               children: [
                                 Text(
                                   fileName,
-                                  style: const TextStyle(
+                                  style:  TextStyle(
+                                                              color: isDarkMode ? Colors.white : const Color(0xFF334155),
+ 
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -792,7 +809,8 @@ loadTheme();
                                   "Tap to view full document",
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey.shade600,
+                                    // color: Colors.grey.shade600,
+                                    color: isDarkMode ? Colors.white70 : Colors.grey.shade600,
                                   ),
                                 ),
                               ],
@@ -818,11 +836,11 @@ loadTheme();
       },
     );
   }
-
+ 
   Future<Map<String, String>?> _showDocumentMetaDialog() async {
     final issueController = TextEditingController();
     final expiryController = TextEditingController();
-
+ 
     Future<void> pickDate(TextEditingController controller) async {
       final date = await showDatePicker(
         context: context,
@@ -830,12 +848,12 @@ loadTheme();
         lastDate: DateTime(2100),
         initialDate: DateTime.now(),
       );
-
+ 
       if (date != null) {
         controller.text = date.toIso8601String().split("T")[0];
       }
     }
-
+ 
     return await showDialog<Map<String, String>>(
       context: context,
       builder: (context) {
@@ -892,7 +910,7 @@ loadTheme();
       },
     );
   }
-
+ 
   Future<void> _uploadDocument({
     required PlatformFile file,
     required String documentType,
@@ -910,35 +928,35 @@ loadTheme();
     try {
       // setState(() => isApiLoading = true);
       final token = await AuthService().getToken();
-
+ 
       // final int? storedCustomerId = prefs.getInt("customerId");
       final storedCustomerId = await _loadCustomerId();
-
+ 
       var request = http.MultipartRequest(
         'POST',
         Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.uploadDocument),
       );
-
+ 
       // ✅ Headers
       request.headers.addAll({"Authorization": "Bearer $token"});
-
+ 
       // ✅ Required Fields
       request.fields['customerId'] = storedCustomerId.toString();
       request.fields['documentType'] = documentType;
       request.fields['applicantType'] = "COMPANY";
       request.fields['applicantIndex'] = "0";
-
+ 
       request.fields['issueDate'] = meta['issueDate'] ?? '';
       request.fields['expiryDate'] = meta['expiryDate'] ?? '';
       request.fields['remarks'] = meta['remarks'] ?? '';
       request.fields['rmRemarks'] = meta['rmRemarks'] ?? '';
-
+ 
       // ✅ File Upload (Web + Mobile Safe)
       if (file.bytes != null) {
         final ext = file.extension?.toLowerCase();
-
+ 
         MediaType contentType;
-
+ 
         if (ext == 'pdf') {
           contentType = MediaType('application', 'pdf');
         } else if (ext == 'jpg' || ext == 'jpeg') {
@@ -950,7 +968,7 @@ loadTheme();
             "Invalid file type selected. Only PDF & images allowed.",
           );
         }
-
+ 
         request.files.add(
           http.MultipartFile.fromBytes(
             'file',
@@ -966,15 +984,15 @@ loadTheme();
       } else {
         throw Exception("Unable to read file");
       }
-
+ 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-
+ 
       print("UPLOAD STATUS: ${response.statusCode}");
       print("UPLOAD BODY: ${response.body}");
-
+ 
       final data = jsonDecode(response.body);
-
+ 
       if (response.statusCode >= 200 &&
           response.statusCode < 300 &&
           data["success"] == true) {
@@ -995,20 +1013,20 @@ loadTheme();
       // }
     }
   }
-
+ 
   Future<void> _pickFromDevice(DocumentItem doc) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
       withData: true,
     );
-
+ 
     if (result != null && result.files.isNotEmpty) {
       final file = result.files.first;
-
+ 
       final meta = await _showDocumentMetaDialog();
       if (meta == null) return;
-
+ 
       /// ✅ Upload file
       await _uploadDocument(
         file: file,
@@ -1018,31 +1036,31 @@ loadTheme();
           "expiryDate": meta["expiryDate"],
         },
       );
-
+ 
       /// ✅ Refresh documents from backend
       await _fetchUploadedDocuments();
     }
   }
-
+ 
   Future<void> _takePhoto(DocumentItem doc) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const WebCameraCapture()),
     );
-
+ 
     if (result != null) {
       await _fetchUploadedDocuments(); // ✅ refresh instead
-
+ 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("${doc.name} captured successfully")),
       );
     }
   }
-
+ 
   static Future<void> submitCustomer(int customerId) async {
     try {
       final token = await AuthService().getToken();
-
+ 
       final response = await http.post(
         Uri.parse(
           ApiEndpoints.baseUrl + ApiEndpoints.submitCustomer(customerId),
@@ -1052,9 +1070,9 @@ loadTheme();
           "Authorization": "Bearer $token",
         },
       );
-
+ 
       final data = jsonDecode(response.body);
-
+ 
       if (response.statusCode != 200 || data["success"] != true) {
         throw Exception(data["message"] ?? "Failed to submit customer");
       }
@@ -1062,31 +1080,31 @@ loadTheme();
       rethrow;
     }
   }
-
+ 
   Widget _bottomButtons(BuildContext context) {
     return ElevatedButton(
       onPressed: uploadedDocs >= mandatoryDocs
           ? () async {
               try {
                 // setState(() => isApiLoading = true);
-
+ 
                 final prefs = await SharedPreferences.getInstance();
                 // final customerId = prefs.getInt("customerId");
-
+ 
                 final customerId = await _loadCustomerId();
-
+ 
                 // ✅ CALL SUBMIT API
                 await submitCustomer(customerId);
-
+ 
                 // ✅ MOVE DRAFT
                 await DraftService.moveDraftToSubmitted(customerId);
-
+ 
                 showTopToast(
                   context,
                   "Case Submitted Successfully",
                   success: true,
                 );
-
+ 
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const RmDashboard()),
@@ -1111,3 +1129,5 @@ loadTheme();
     );
   }
 }
+ 
+ 
