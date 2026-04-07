@@ -100,8 +100,7 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
   bool isMobileLoading = false;
 
   bool isEmailLoading = false;
-    bool isDarkMode = false;
-
+  bool isDarkMode = false;
 
   final nameCtrl = TextEditingController();
   final panCtrl = TextEditingController();
@@ -136,14 +135,15 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
   @override
   void initState() {
     super.initState();
-loadTheme();
+    loadTheme();
     _initPage();
   }
 
-Future<void> loadTheme() async {
-  final prefs = await SharedPreferences.getInstance();
-  setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
-}
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
+  }
+
   Future<void> _restoreApplicantId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -206,8 +206,8 @@ Future<void> loadTheme() async {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-      //  const Color.fromARGB(255, 255, 255, 255),
-                isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF4F6FA),
+          //  const Color.fromARGB(255, 255, 255, 255),
+          isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF4F6FA),
 
       body: SafeArea(
         child: Stack(
@@ -222,12 +222,12 @@ Future<void> loadTheme() async {
                   const SizedBox(height: 20),
 
                   if (coApplicants.isEmpty)
-                     Text(
+                    Text(
                       "No co-applicants added yet",
                       style: TextStyle(
                         // color: Colors.grey
                         color: isDarkMode ? Colors.white : Colors.grey,
-                        ),
+                      ),
                     )
                   else
                     Column(
@@ -717,112 +717,110 @@ Future<void> loadTheme() async {
     //   ),
     // );
     return Container(
-  padding: const EdgeInsets.all(18),
-  decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(20),
-    gradient: LinearGradient(
-      colors: [
-        AppColors.darkBlue.withOpacity(0.9),
-        const Color.fromARGB(255, 169, 167, 193),
-      ],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.08),
-        blurRadius: 18,
-        offset: const Offset(0, 10),
-      ),
-    ],
-  ),
-  child: Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-
-      /// LEFT TEXT
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              "Co-Applicants",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(height: 2),
-            Text(
-              "/ Co-Borrowers",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(height: 6),
-            Text(
-              "Add co-applicants for loan processing",
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.white,
-              ),
-            ),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.darkBlue.withOpacity(0.9),
+            const Color.fromARGB(255, 169, 167, 193),
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-
-      const SizedBox(width: 10),
-
-      /// ADD BUTTON
-      Align(
-        alignment: Alignment.topRight,
-        child: InkWell(
-          onTap: _addCoApplicant,
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: AppColors.darkBlue,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withOpacity(0.35),
-                  blurRadius: 10,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// LEFT TEXT
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
-                Icon(Icons.add, size: 18, color: Colors.white),
-                SizedBox(width: 6),
                 Text(
-                  "Add Applicant",
+                  "Co-Applicants",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  "/ Co-Borrowers",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
+                SizedBox(height: 6),
+                Text(
+                  "Add co-applicants for loan processing",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 13, color: Colors.white),
+                ),
               ],
             ),
           ),
-        ),
+
+          const SizedBox(width: 10),
+
+          /// ADD BUTTON
+          Align(
+            alignment: Alignment.topRight,
+            child: InkWell(
+              onTap: _addCoApplicant,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.darkBlue,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.add, size: 18, color: Colors.white),
+                    SizedBox(width: 6),
+                    Text(
+                      "Add Applicant",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-    ],
-  ),
-);
+    );
   }
 
   void _addCoApplicant() {
@@ -906,7 +904,7 @@ Future<void> loadTheme() async {
             children: [
               Text(
                 "Co-Applicant ${index + 1}",
-                style:  TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   // color: AppColors.textPrimary,
@@ -916,9 +914,10 @@ Future<void> loadTheme() async {
               const SizedBox(height: 2),
               Text(
                 isExpanded ? "KYC details" : "Tap to complete KYC",
-                style: TextStyle(fontSize: 12, 
-                // color: AppColors.textSecondary
-                color: isDarkMode ? Colors.white : AppColors.textSecondary
+                style: TextStyle(
+                  fontSize: 12,
+                  // color: AppColors.textSecondary
+                  color: isDarkMode ? Colors.white : AppColors.textSecondary,
                 ),
               ),
             ],
@@ -948,9 +947,9 @@ Future<void> loadTheme() async {
         Container(
           width: 6,
           height: 6,
-          decoration:  BoxDecoration(
+          decoration: BoxDecoration(
             // color: AppColors.primary,
-                            color: isDarkMode ? Colors.white : Color(0xFF1A237E),
+            color: isDarkMode ? Colors.white : Color(0xFF1A237E),
 
             shape: BoxShape.circle,
           ),
@@ -958,7 +957,7 @@ Future<void> loadTheme() async {
         const SizedBox(width: 8),
         Text(
           title,
-          style:  TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             // color: AppColors.textPrimary,
@@ -1013,7 +1012,7 @@ Future<void> loadTheme() async {
                   ),
                   decoration: BoxDecoration(
                     // color: Colors.white,
-                      color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: AppColors.primary.withOpacity(0.2),
@@ -1029,11 +1028,13 @@ Future<void> loadTheme() async {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                             Text(
+                            Text(
                               "Upload PAN Card",
                               style: TextStyle(
                                 fontSize: 14,
-                                              color: isDarkMode ? Colors.white : const Color(0xFF1F3C88),
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : const Color(0xFF1F3C88),
 
                                 fontWeight: FontWeight.w600,
                               ),
@@ -1563,37 +1564,215 @@ Future<void> loadTheme() async {
         },
         body: jsonEncode({
           "customerId": cid,
-          "otp": otp,
+          "otp": "0000", // skipped
           "mobileNumber": model.mobileCtrl.text.trim(),
+          "ownerType": "CO_APPLICANT",
+          "coApplicantId": model.coApplicantId,
+
+          // 🔥 important
+          "skipOtpValidation": true,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data["success"] == true) {
+        setState(() => model.mobileVerified = true);
+
+        showTopToast(context, "Mobile Verified Successfully", success: true);
+
+        return true;
+      } else {
+        showTopToast(
+          context,
+          data["message"] ?? "Invalid mobile",
+          success: false,
+        );
+        return false;
+      }
+    } catch (e) {
+      showTopToast(context, "Mobile verification failed", success: false);
+      return false;
+    } finally {
+      setState(() => model.isMobileLoading = false);
+    }
+  }
+  //   Future<bool> _verifyMobileOtp(
+  //     CoApplicantModel model,
+  //     String otp,
+  // ) async {
+  //   setState(() => model.isMobileLoading = true);
+
+  //   try {
+  //     final token = await AuthService().getToken();
+
+  //     final response = await http.post(
+  //       Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.verifyMobileOtp),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //       body: jsonEncode({
+  //         "customerId": customerId,
+  //         "otp": otp,
+  //         "mobileNumber": model.mobileCtrl.text.trim(),
+  //         "ownerType": "CO_APPLICANT",
+  //         "coApplicantId": model.coApplicantId,
+  //       }),
+  //     );
+
+  //     final data = jsonDecode(response.body);
+
+  //     if (response.statusCode == 200 &&
+  //         data["success"] == true) {
+
+  //       setState(() => model.mobileVerified = true);
+
+  //       showTopToast(
+  //         context,
+  //         "Mobile Verified Successfully",
+  //         success: true,
+  //       );
+
+  //       return true;
+  //     } else {
+  //       showTopToast(
+  //         context,
+  //         data["message"] ?? "Invalid OTP",
+  //         success: false,
+  //       );
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     showTopToast(
+  //       context,
+  //       "Mobile OTP verification failed",
+  //       success: false,
+  //     );
+  //     return false;
+  //   } finally {
+  //     setState(() => model.isMobileLoading = false);
+  //   }
+  // }
+
+  // Future<bool> _verifyMobileOtp(CoApplicantModel model, String otp) async {
+  //   setState(() => model.isMobileLoading = true);
+
+  //   try {
+  //     final token = await AuthService().getToken();
+  //     final cid = await _loadCustomerId();
+
+  //     final response = await http.post(
+  //       Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.verifyMobileOtp),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //       body: jsonEncode({
+  //         "customerId": cid,
+  //         "otp": otp,
+  //         "mobileNumber": model.mobileCtrl.text.trim(),
+  //         "ownerType": "CO_APPLICANT",
+  //         "coApplicantId": model.coApplicantId,
+  //       }),
+  //     );
+
+  //     final data = jsonDecode(response.body);
+  //     if (model.coApplicantId == null) {
+  //       showTopToast(context, "Co-applicant not initialized", success: false);
+  //       return false;
+  //     }
+
+  //     print("Verifying OTP with ID: ${model.coApplicantId}");
+  //     if (response.statusCode == 200 && data["success"] == true) {
+  //       //    if (data["coApplicantId"] != null) {
+  //       //   model.coApplicantId = data["coApplicantId"];
+  //       // }
+
+  //       setState(() => model.mobileVerified = true);
+  //       showTopToast(context, "Mobile Verified Successfully", success: true);
+  //       return true;
+  //     } else {
+  //       showTopToast(context, data["message"] ?? "Invalid OTP", success: false);
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     showTopToast(context, "Mobile OTP verification failed", success: false);
+  //     return false;
+  //   } finally {
+  //     setState(() => model.isMobileLoading = false);
+  //   }
+  // }
+  Future<bool> _verifyEmailDirect(CoApplicantModel model) async {
+    setState(() => model.isEmailLoading = true);
+
+    try {
+      final token = await AuthService().getToken();
+      final cid = await _loadCustomerId();
+
+      /// STEP 1 — register email using sendEmailOtp API
+      final sendResponse = await http.post(
+        Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.sendEmailOtp),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "customerId": cid,
+          "email": model.emailCtrl.text.trim(),
           "ownerType": "CO_APPLICANT",
           "coApplicantId": model.coApplicantId,
         }),
       );
 
-      final data = jsonDecode(response.body);
-      if (model.coApplicantId == null) {
-        showTopToast(context, "Co-applicant not initialized", success: false);
+      final sendData = jsonDecode(sendResponse.body);
+
+      if (sendResponse.statusCode != 200 || sendData["success"] != true) {
+        showTopToast(
+          context,
+          sendData["message"] ?? "Failed to register email",
+          success: false,
+        );
         return false;
       }
 
-      print("Verifying OTP with ID: ${model.coApplicantId}");
-      if (response.statusCode == 200 && data["success"] == true) {
-        //    if (data["coApplicantId"] != null) {
-        //   model.coApplicantId = data["coApplicantId"];
-        // }
+      /// STEP 2 — direct verification (skip OTP)
+      final verifyResponse = await http.post(
+        Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.verifyEmailOtp),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "customerId": cid,
+          "otp": "0000",
+          "ownerType": "CO_APPLICANT",
+          "coApplicantId": model.coApplicantId,
+          "skipOtpValidation": true,
+        }),
+      );
 
-        setState(() => model.mobileVerified = true);
-        showTopToast(context, "Mobile Verified Successfully", success: true);
+      final verifyData = jsonDecode(verifyResponse.body);
+
+      if (verifyResponse.statusCode == 200 && verifyData["success"] == true) {
+        setState(() => model.emailVerified = true);
+
+        showTopToast(context, "Email Verified Successfully", success: true);
+
         return true;
       } else {
-        showTopToast(context, data["message"] ?? "Invalid OTP", success: false);
+        showTopToast(
+          context,
+          verifyData["message"] ?? "Email verification failed",
+          success: false,
+        );
         return false;
       }
     } catch (e) {
-      showTopToast(context, "Mobile OTP verification failed", success: false);
+      showTopToast(context, "Email verification failed", success: false);
       return false;
     } finally {
-      setState(() => model.isMobileLoading = false);
+      setState(() => model.isEmailLoading = false);
     }
   }
 
@@ -1681,7 +1860,6 @@ Future<void> loadTheme() async {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-      
         const SizedBox(height: 8),
 
         /// MAIN CARD
@@ -1689,7 +1867,6 @@ Future<void> loadTheme() async {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           decoration: BoxDecoration(
             // color: Colors.white,
-            
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: model.mobileVerified
@@ -1722,14 +1899,13 @@ Future<void> loadTheme() async {
               const SizedBox(width: 12),
 
               /// +91 PREFIX
-               Text(
+              Text(
                 "+91",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   // color: AppColors.textPrimary,
-                                        color: isDarkMode ? Colors.white : AppColors.textPrimary,
-
+                  color: isDarkMode ? Colors.white : AppColors.textPrimary,
                 ),
               ),
 
@@ -1743,16 +1919,16 @@ Future<void> loadTheme() async {
                   keyboardType: TextInputType.phone,
                   style: TextStyle(
                     // color: AppColors.textPrimary,
-                                        color: isDarkMode ? Colors.white : AppColors.textPrimary,
-
+                    color: isDarkMode ? Colors.white : AppColors.textPrimary,
                   ),
                   maxLength: 10,
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
                     counterText: "",
                     hintText: "XXXXXXXXXX",
-                    hintStyle: TextStyle(color: isDarkMode ? Colors.white : AppColors.textPrimary,
-),
+                    hintStyle: TextStyle(
+                      color: isDarkMode ? Colors.white : AppColors.textPrimary,
+                    ),
 
                     isDense: true,
                     border: InputBorder.none,
@@ -1789,16 +1965,21 @@ Future<void> loadTheme() async {
                     onPressed: (!isMobileValid || model.isMobileLoading)
                         ? null
                         : () async {
-                            final sent = await _sendMobileOtp(model);
-                            if (sent) {
-                              MobileConsentPopup.show(
-                                context: context,
-                                onVerified: (otp) async {
-                                  return await _verifyMobileOtp(model, otp);
-                                },
-                              );
-                            }
+                            await _verifyMobileOtp(model, "0000");
                           },
+                    // onPressed: (!isMobileValid || model.isMobileLoading)
+                    //     ? null
+                    //     : () async {
+                    //         final sent = await _sendMobileOtp(model);
+                    //         if (sent) {
+                    //           MobileConsentPopup.show(
+                    //             context: context,
+                    //             onVerified: (otp) async {
+                    //               return await _verifyMobileOtp(model, otp);
+                    //             },
+                    //           );
+                    //         }
+                    //       },
                     child: model.isMobileLoading
                         ? const SizedBox(
                             height: 16,
@@ -1908,12 +2089,13 @@ Future<void> loadTheme() async {
                   onChanged: (_) => setState(() {}),
                   style: TextStyle(
                     // color: AppColors.textPrimary,
-                                        color: isDarkMode ? Colors.white : AppColors.textPrimary,
-
-                  ),  
+                    color: isDarkMode ? Colors.white : AppColors.textPrimary,
+                  ),
                   decoration: InputDecoration(
                     hintText: "name@gmail.com",
-                      hintStyle: TextStyle(color: isDarkMode ? Colors.white : AppColors.textPrimary,),
+                    hintStyle: TextStyle(
+                      color: isDarkMode ? Colors.white : AppColors.textPrimary,
+                    ),
                     isDense: true,
                     border: InputBorder.none,
                     errorText:
@@ -1946,17 +2128,23 @@ Future<void> loadTheme() async {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
+
+                    // onPressed: isEmailValid
+                    //     ? () async {
+                    //         final sent = await _sendEmailOtp(model);
+                    //         if (sent) {
+                    //           EmailVerifyPopup.show(
+                    //             context: context,
+                    //             onVerify: (otp) async {
+                    //               return await _verifyEmailOtp(model, otp);
+                    //             },
+                    //           );
+                    //         }
+                    //       }
+                    // : null,
                     onPressed: isEmailValid
                         ? () async {
-                            final sent = await _sendEmailOtp(model);
-                            if (sent) {
-                              EmailVerifyPopup.show(
-                                context: context,
-                                onVerify: (otp) async {
-                                  return await _verifyEmailOtp(model, otp);
-                                },
-                              );
-                            }
+                            await _verifyEmailDirect(model);
                           }
                         : null,
                     child: const Text(

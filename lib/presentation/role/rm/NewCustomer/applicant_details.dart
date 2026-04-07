@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -19,7 +18,6 @@ import 'package:supply_chain/core/services/web_camera_capture.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supply_chain/core/theme/app_colors.dart';
 import 'package:supply_chain/core/utils/toast_helper.dart';
-// import 'package:supply_chain/core/utils/tost_healper.dart';
 import 'package:supply_chain/core/widgets/app_loader.dart';
 import 'package:supply_chain/core/widgets/mobile_consent_popup.dart';
 import 'package:supply_chain/presentation/role/rm/NewCustomer/co_applicant.dart';
@@ -93,23 +91,10 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
     return panRegex.hasMatch(pan);
   }
 
-  // Future<int> getCustomerId() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final id = prefs.getInt("customerId");
-
-  //   if (id == null) {
-  //     throw Exception(
-  //       "customerId not found. Complete Company mobile verification.",
-  //     );
-  //   }
-
-  //   return id;
-  // }
-
   @override
   void initState() {
     super.initState();
-        loadTheme();
+    loadTheme();
 
     _initPage();
   }
@@ -294,110 +279,6 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
     }
   }
 
-  // Future<void> _uploadDocument({
-  //   required PlatformFile file,
-  //   required String documentType,
-  //   Map<String, dynamic> meta = const {},
-  // }) async {
-  //   if (documentType == "PAN_CARD") {
-  //     showTopToast(
-  //       context,
-  //       "Verify mobile number before saving PAN",
-  //       success: false,
-  //     );
-  //     return;
-  //   }
-  //   try {
-  //     setState(() => isApiLoading = true);
-
-  //     final token = await AuthService().getToken();
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final int? storedCustomerId = prefs.getInt("customerId");
-
-  //     if (storedCustomerId == null) {
-  //       throw Exception("Customer ID not found. Verify mobile first.");
-  //     }
-
-  //     var request = http.MultipartRequest(
-  //       'POST',
-  //       Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.uploadDocument),
-  //     );
-
-  //     // ✅ Headers
-  //     request.headers.addAll({"Authorization": "Bearer $token"});
-
-  //     // ✅ Required Fields
-  //     request.fields['customerId'] = storedCustomerId.toString();
-  //     request.fields['documentType'] = documentType;
-  //     request.fields['applicantType'] = "COMPANY";
-  //     request.fields['applicantIndex'] = "0";
-
-  //     request.fields['issueDate'] = meta['issueDate'] ?? '';
-  //     request.fields['expiryDate'] = meta['expiryDate'] ?? '';
-  //     request.fields['remarks'] = meta['remarks'] ?? '';
-  //     request.fields['rmRemarks'] = meta['rmRemarks'] ?? '';
-
-  //     // ✅ File Upload (Web + Mobile Safe)
-  //     if (file.bytes != null) {
-  //       final ext = file.extension?.toLowerCase();
-
-  //       MediaType contentType;
-
-  //       if (ext == 'pdf') {
-  //         contentType = MediaType('application', 'pdf');
-  //       } else if (ext == 'jpg' || ext == 'jpeg') {
-  //         contentType = MediaType('image', 'jpeg');
-  //       } else if (ext == 'png') {
-  //         contentType = MediaType('image', 'png');
-  //       } else {
-  //         throw Exception(
-  //           "Invalid file type selected. Only PDF & images allowed.",
-  //         );
-  //       }
-
-  //       request.files.add(
-  //         http.MultipartFile.fromBytes(
-  //           'file',
-  //           file.bytes as Uint8List,
-  //           filename: file.name,
-  //           contentType: contentType,
-  //         ),
-  //       );
-  //     } else if (file.path != null) {
-  //       request.files.add(
-  //         await http.MultipartFile.fromPath('file', file.path!),
-  //       );
-  //     } else {
-  //       throw Exception("Unable to read file");
-  //     }
-
-  //     final streamedResponse = await request.send();
-  //     final response = await http.Response.fromStream(streamedResponse);
-
-  //     print("UPLOAD STATUS: ${response.statusCode}");
-  //     print("UPLOAD BODY: ${response.body}");
-
-  //     final data = jsonDecode(response.body);
-
-  //     if (response.statusCode >= 200 &&
-  //         response.statusCode < 300 &&
-  //         data["success"] == true) {
-  //       showTopToast(
-  //         context,
-  //         data["message"] ?? "Document uploaded successfully",
-  //         success: true,
-  //       );
-  //     } else {
-  //       final message = data["message"] ?? "Upload failed";
-  //       throw Exception(message);
-  //     }
-  //   } catch (e) {
-  //     print("UPLOAD ERROR: $e");
-  //     showTopToast(context, e.toString(), success: false);
-  //   } finally {
-  //     setState(() => isApiLoading = false);
-  //   }
-  // }
   Future<int> _loadCustomerId() async {
     return widget.customerId;
   }
@@ -406,7 +287,7 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-      //  const Color(0xFFF4F6FA),
+          //  const Color(0xFFF4F6FA),
           isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF4F6FA),
 
       body: SafeArea(
@@ -426,19 +307,22 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
                       InkWell(
                         onTap: () => Navigator.pop(context),
                         borderRadius: BorderRadius.circular(12),
-                        child:  Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(8),
-                          child: Icon(Icons.arrow_back_ios_new,
-                                          color: isDarkMode ? Colors.white : Color(0xFF1A237E),
-),
+                          child: Icon(
+                            Icons.arrow_back_ios_new,
+                            color: isDarkMode
+                                ? Colors.white
+                                : Color(0xFF1A237E),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
-                       Text(
+                      Text(
                         "Application Details",
                         style: TextStyle(
                           fontSize: 18,
-                                          color: isDarkMode ? Colors.white : Color(0xFF1A237E),
+                          color: isDarkMode ? Colors.white : Color(0xFF1A237E),
 
                           fontWeight: FontWeight.w600,
                         ),
@@ -528,24 +412,6 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
     );
   }
 
-  // Future<void> _pickPanFromDevice() async {
-  //   final XFile? img = await _picker.pickImage(
-  //     source: ImageSource.gallery,
-  //     imageQuality: 85,
-  //   );
-
-  //   if (img != null) {
-  //     setState(() {
-  //       panFile = img;
-  //       panVerified = false;
-  //       panOcrCompleted = false;
-  //       panNumberVerified = false;
-  //     });
-
-  //     _hitPanOcr(); // AUTO OCR
-  //   }
-  // }
-
   Future<void> _pickPanFromDevice() async {
     final XFile? img = await _picker.pickImage(
       source: ImageSource.gallery,
@@ -581,18 +447,18 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 Text(
+                Text(
                   "Upload PAN Card",
-                  style: TextStyle(fontWeight: FontWeight.w600,
-            
-      color: isDarkMode ? Colors.white : Colors.black54,
-    ),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+
+                    color: isDarkMode ? Colors.white : Colors.black54,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   panFile == null ? "No file selected" : "PAN Selected",
-                  style: const TextStyle(
-                    color: Colors.grey),
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ],
             ),
@@ -601,22 +467,22 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
           // CAMERA BUTTON
           IconButton(
             tooltip: "Capture PAN",
-            icon:  Icon(Icons.camera_alt, 
-                      // color: Color(0xFF1A237E)
-                color: isDarkMode ? Colors.white : Color(0xFF1A237E),
-
-          ),
+            icon: Icon(
+              Icons.camera_alt,
+              // color: Color(0xFF1A237E)
+              color: isDarkMode ? Colors.white : Color(0xFF1A237E),
+            ),
             onPressed: _capturePan,
           ),
 
           // UPLOAD BUTTON
           IconButton(
             tooltip: "Upload from device",
-            icon:  Icon(Icons.upload_file,
-            //  color: Color(0xFF1A237E)
-                            color: isDarkMode ? Colors.white : Color(0xFF1A237E),
-
-             ),
+            icon: Icon(
+              Icons.upload_file,
+              //  color: Color(0xFF1A237E)
+              color: isDarkMode ? Colors.white : Color(0xFF1A237E),
+            ),
             onPressed: _pickPanFromDevice,
           ),
         ],
@@ -624,10 +490,11 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
     );
   }
 
-Future<void> loadTheme() async {
-  final prefs = await SharedPreferences.getInstance();
-  setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
-}
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() => isDarkMode = prefs.getBool("isDarkMode") ?? false);
+  }
+
   Future<void> _verifyPanNumber() async {
     final rawPan = panCtrl.text;
     final rawName = nameCtrl.text;
@@ -703,80 +570,64 @@ Future<void> loadTheme() async {
     }
   }
 
-  //   Future<void> _verifyPanNumber() async {
-  //     final rawPan = panCtrl.text;
-  //     final rawName = nameCtrl.text;
+Future<bool> _sendEmailOtp() async {
+  try {
+    setState(() {
+      isApiLoading = true;
+    });
 
-  //     if (rawPan.isEmpty || rawName.isEmpty) {
-  //       showTopToast(context, "PAN and Name are required", success: false);
-  //       return;
-  //     }
+    final token = await AuthService().getToken();
+    final cid = await _loadCustomerId(); // ✅ FIXED
 
-  //     final pan = normalizePan(rawPan);
-  //     final name = rawName.trim().toUpperCase();
+    print("CID: $cid");
+    print("EMAIL: ${gmailCtrl.text}");
 
-  //     if (!isValidPan(pan)) {
-  //       showTopToast(context, "Invalid PAN format", success: false);
-  //       return;
-  //     }
+    final response = await http.post(
+      Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.sendEmailOtp),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "customerId": cid, // ✅ FIXED
+        "email": gmailCtrl.text.trim(),
+        "ownerType": "APPLICANT",
+      }),
+    );
 
-  //     if (ocrPanNumber == null || pan != ocrPanNumber) {
-  //       showTopToast(
-  //         context,
-  //         "PAN does not match uploaded PAN card",
-  //         success: false,
-  //       );
-  //       return;
-  //     }
+    final data = jsonDecode(response.body);
 
-  //     try {
-  //       setState(() => isApiLoading = true);
-  //  final customerId = 29;
-  //       // final customerId = await _loadCustomerId();
+    print("RESPONSE: $data");
 
-  //       final data = await PanVerifyService.verifyPan(
-  //         customerId: customerId,
-  //         pan: pan,
-  //         name: name,
-  //         ownerType: "APPLICANT",
-  //       );
+    if (response.statusCode == 200 && data["success"] == true) {
+      setState(() {
+        emailVerified = true;
+      });
 
-  //       if (data["verified"] != true) {
-  //         setState(() => panNumberVerified = false);
-
-  //         showTopToast(
-  //           context,
-  //           data["message"] ?? "PAN verification failed",
-  //           success: false,
-  //         );
-  //         return;
-  //       }
-
-  //       setState(() {
-  //         panNumberVerified = true;
-  //         mobileVerified = false;
-  //         emailVerified = false;
-  //       });
-
-  //       showTopToast(context, "PAN verified successfully", success: true);
-  //     } catch (e) {
-  //       setState(() => panNumberVerified = false);
-
-  //       showTopToast(
-  //         context,
-  //         e.toString(), //  SHOW REAL ERROR
-  //         success: false,
-  //       );
-  //     } finally {
-  //       setState(() => isApiLoading = false);
-  //     }
-  //   }
+      showTopToast(context, "Email Saved & Verified", success: true);
+      return true;
+    } else {
+      showTopToast(
+        context,
+        data["message"] ?? "Failed to save email",
+        success: false,
+      );
+      return false;
+    }
+  } catch (e) {
+    print("ERROR: $e");
+    showTopToast(context, "Email Save Failed", success: false);
+    return false;
+  } finally {
+    setState(() {
+      isApiLoading = false;
+    });
+  }
+}
 
   // ---------------- APPLICATION INFO ----------------
   Widget _applicationInfoCard() {
-    
     return _card(
-      
       Column(
         children: [
           _textField("Full Name", nameCtrl),
@@ -788,17 +639,17 @@ Future<void> loadTheme() async {
               Expanded(
                 child: TextField(
                   style: TextStyle(
-  color: isDarkMode ? Colors.white : Colors.black,
-),
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
                   controller: panCtrl,
-                  decoration:  InputDecoration(
-                      hintStyle: TextStyle(
-      color: isDarkMode ? Colors.white54 : Colors.black54,
-    ),
+                  decoration: InputDecoration(
+                    hintStyle: TextStyle(
+                      color: isDarkMode ? Colors.white54 : Colors.black54,
+                    ),
                     labelText: "PAN Number",
-                      labelStyle: TextStyle(
-        color: isDarkMode ? Colors.white70 : Colors.black87,
-      ),
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                    ),
                     border: InputBorder.none,
                   ),
                 ),
@@ -813,9 +664,7 @@ Future<void> loadTheme() async {
                   child: const Text("Verify"),
                 ),
               if (panNumberVerified)
-                const Icon(Icons.verified, 
-                
-                color: Colors.green),
+                const Icon(Icons.verified, color: Colors.green),
             ],
           ),
 
@@ -828,19 +677,18 @@ Future<void> loadTheme() async {
               Expanded(
                 child: TextField(
                   style: TextStyle(
-  color: isDarkMode ? Colors.white : Colors.black,
-),
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
                   controller: mobileCtrl,
                   enabled: panNumberVerified,
                   keyboardType: TextInputType.number,
                   maxLength: 10,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration:  InputDecoration(
-                    
+                  decoration: InputDecoration(
                     labelText: "Mobile Number",
-                      labelStyle: TextStyle(
-        color: isDarkMode ? Colors.white70 : Colors.black87,
-      ),
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                    ),
                     counterText: "",
                     border: InputBorder.none,
                   ),
@@ -854,33 +702,16 @@ Future<void> loadTheme() async {
                       ? () async {
                           final mobile = mobileCtrl.text.trim();
 
-                          if (mobile.isEmpty) {
-                            showTopToast(
-                              context,
-                              "Enter mobile number",
-                              success: false,
-                            );
-                            return;
-                          }
-
                           if (mobile.length != 10) {
                             showTopToast(
                               context,
-                              "Enter 10 digit mobile number",
+                              "Enter valid mobile",
                               success: false,
                             );
                             return;
                           }
 
-                          final sent = await _sendMobileOtp();
-                          if (sent) {
-                            MobileConsentPopup.show(
-                              context: context,
-                              onVerified: (otp) async {
-                                return await _verifyMobileOtp(otp);
-                              },
-                            );
-                          }
+                          await _verifyMobileOtp("0000"); // ✅ DIRECT CALL
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -888,7 +719,7 @@ Future<void> loadTheme() async {
                     foregroundColor: Colors.white,
                     minimumSize: const Size(110, 48),
                   ),
-                  child: const Text("Send OTP"),
+                  child: const Text("Verified"),
                 ),
 
               if (mobileVerified)
@@ -906,11 +737,11 @@ Future<void> loadTheme() async {
                   controller: gmailCtrl,
                   enabled: panNumberVerified,
                   keyboardType: TextInputType.emailAddress,
-                  decoration:  InputDecoration(
+                  decoration: InputDecoration(
                     labelText: "Email ID",
-                      labelStyle: TextStyle(
-        color: isDarkMode ? Colors.white70 : Colors.black87,
-      ),
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                    ),
                     border: InputBorder.none,
                   ),
                 ),
@@ -923,27 +754,18 @@ Future<void> loadTheme() async {
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: ElevatedButton(
-                    key: const ValueKey("emailOtp"),
+                    key: const ValueKey("EmailVerify"),
                     onPressed: () async {
                       if (!isEmailValid) return;
 
-                      bool sent = await _sendEmailOtp(); //  SEND FIRST
-
-                      if (sent) {
-                        EmailVerifyPopup.show(
-                          context: context,
-                          onVerify: (otp) async {
-                            return await _verifyEmailOtp(otp); //  VERIFY
-                          },
-                        );
-                      }
+                      await _sendEmailOtp(); 
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.darkBlue,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(110, 48),
                     ),
-                    child: const Text("Send OTP"),
+                    child: const Text("Verified"),
                   ),
                 ),
 
@@ -1015,52 +837,6 @@ Future<void> loadTheme() async {
     }
   }
 
-  // Future<bool> _verifyMobileOtp(String otp) async {
-  //   if (customerId == null) {
-  //     showTopToast(context, "Customer not initialized", success: false);
-  //     return false;
-  //   }
-
-  //   setState(() => isMobileLoading = true);
-
-  //   try {
-  //     final token = await AuthService().getToken();
-
-  //     final response = await http.post(
-  //       Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.verifyMobileOtp),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "Authorization": "Bearer $token",
-  //       },
-  //       body: jsonEncode({
-  //         "customerId": customerId,
-  //         "otp": otp,
-  //         "mobileNumber": mobileCtrl.text.trim(),
-  //         "ownerType": "APPLICANT",
-  //       }),
-  //     );
-
-  //     final data = jsonDecode(response.body);
-
-  //     if (response.statusCode == 200 && data["success"] == true) {
-  //       setState(() {
-  //         mobileVerified = true;
-  //       });
-
-  //       showTopToast(context, "Mobile Verified Successfully", success: true);
-  //       return true;
-  //     } else {
-  //       showTopToast(context, data["message"], success: false);
-  //       return false;
-  //     }
-  //   } catch (e) {
-  //     showTopToast(context, "Mobile verification failed", success: false);
-  //     return false;
-  //   } finally {
-  //     setState(() => isMobileLoading = false);
-  //   }
-  // }
-
   Future<int?> _fetchApplicantIdWithRetry(int customerId) async {
     for (int i = 0; i < 3; i++) {
       final id = await _fetchApplicantIdFromKyc(customerId);
@@ -1074,14 +850,8 @@ Future<void> loadTheme() async {
     setState(() => isMobileLoading = true);
 
     try {
-      // 🔥 FORCE customerId
-      // final int cid = customerId ?? await _loadCustomerId();
-      // final cid = 29;
-      final prefs = await SharedPreferences.getInstance();
-      // final cid = prefs.getInt("customerId");
-      final cid = await _loadCustomerId();
-
       final token = await AuthService().getToken();
+      final cid = await _loadCustomerId();
 
       final response = await http.post(
         Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.verifyMobileOtp),
@@ -1090,10 +860,11 @@ Future<void> loadTheme() async {
           "Authorization": "Bearer $token",
         },
         body: jsonEncode({
-          "customerId": cid, // ✅ ALWAYS SENT
-          "otp": otp,
+          "customerId": cid,
+          "otp": "0000",
           "mobileNumber": mobileCtrl.text.trim(),
           "ownerType": "APPLICANT",
+          "skipOtpValidation": true,
         }),
       );
 
@@ -1102,26 +873,16 @@ Future<void> loadTheme() async {
       if (response.statusCode == 200 && data["success"] == true) {
         setState(() {
           mobileVerified = true;
-          customerId = cid;
         });
-        final applicantId = await _fetchApplicantIdWithRetry(cid);
 
-        if (applicantId == null) {
-          throw Exception("Applicant created but not found");
-        }
-
-        await prefs.setInt("applicantId", applicantId);
-
-        debugPrint("✅ applicantId stored = $applicantId");
-
-        showTopToast(context, "Mobile Verified Successfully", success: true);
+        showTopToast(context, "Mobile Verified", success: true);
         return true;
-      } else {
-        showTopToast(context, data["message"] ?? "Invalid OTP", success: false);
-        return false;
       }
+
+      showTopToast(context, data["message"], success: false);
+      return false;
     } catch (e) {
-      showTopToast(context, e.toString(), success: false);
+      showTopToast(context, "Verification Failed", success: false);
       return false;
     } finally {
       setState(() => isMobileLoading = false);
@@ -1161,64 +922,12 @@ Future<void> loadTheme() async {
     return applicantRows.first["applicantId"];
   }
 
-  Future<bool> _sendEmailOtp() async {
-    if (customerId == null) {
-      showTopToast(context, "Customer not initialized", success: false);
-      return false;
-    }
-
-    try {
-      setState(() {
-        isApiLoading = true;
-      });
-      final prefs = await SharedPreferences.getInstance();
-      // final cid = prefs.getInt("customerId");
-      final cid = await _loadCustomerId();
-      final applicantId = prefs.getInt("applicantId");
-
-      if (applicantId == null) {
-        throw Exception("Customer or Applicant not initialized");
-      }
-
-      final token = await AuthService().getToken();
-
-      final response = await http.post(
-        Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.sendEmailOtp),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-        body: jsonEncode({
-          "customerId": customerId!,
-          "email": gmailCtrl.text.trim(),
-          "ownerType": "APPLICANT",
-          "applicantId": applicantId,
-          "coApplicantId": null,
-        }),
-      );
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 && data["success"] == true) {
-        showTopToast(context, "Email OTP Sent", success: true);
-        return true;
-      }
-
-      showTopToast(context, data["message"], success: false);
-      return false;
-    } catch (e) {
-      showTopToast(context, "Email OTP Send Failed", success: false);
-      return false;
-    } finally {
-      setState(() => isApiLoading = false);
-    }
-  }
-
   Future<bool> _verifyEmailOtp(String otp) async {
     setState(() => isEmailLoading = true);
 
     try {
       final token = await AuthService().getToken();
+      final cid = await _loadCustomerId();
 
       final response = await http.post(
         Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.verifyEmailOtp),
@@ -1227,10 +936,11 @@ Future<void> loadTheme() async {
           "Authorization": "Bearer $token",
         },
         body: jsonEncode({
-          "customerId": customerId,
-          "otp": otp,
+          "customerId": cid,
+          "otp": "0000",
           "email": gmailCtrl.text.trim(),
           "ownerType": "APPLICANT",
+          "skipOtpValidation": true,
         }),
       );
 
@@ -1238,12 +948,13 @@ Future<void> loadTheme() async {
 
       if (response.statusCode == 200 && data["success"] == true) {
         setState(() => emailVerified = true);
-        showTopToast(context, "Email Verified Successfully", success: true);
-        return true; // ✅ success
+
+        showTopToast(context, "Email Verified", success: true);
+        return true;
       }
 
       showTopToast(context, data["message"], success: false);
-      return false; // ❌ invalid OTP
+      return false;
     } catch (e) {
       showTopToast(context, "Email verification failed", success: false);
       return false;
@@ -1251,41 +962,6 @@ Future<void> loadTheme() async {
       setState(() => isEmailLoading = false);
     }
   }
-
-  // Future<void> _verifyEmailOtp(String otp) async {
-  //   setState(() => isEmailLoading = true);
-
-  //   try {
-  //     final token = await AuthService().getToken();
-
-  //     final response = await http.post(
-  //       Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.verifyEmailOtp),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "Authorization": "Bearer $token",
-  //       },
-  //       body: jsonEncode({
-  //         "customerId": customerId,
-  //         "otp": otp,
-  //         "email": gmailCtrl.text.trim(),
-  //         "ownerType": "APPLICANT",
-  //       }),
-  //     );
-
-  //     final data = jsonDecode(response.body);
-
-  //     if (response.statusCode == 200 && data["success"] == true) {
-  //       setState(() => emailVerified = true);
-  //       showTopToast(context, "Email Verified Successfully", success: true);
-  //     } else {
-  //       showTopToast(context, data["message"], success: false);
-  //     }
-  //   } catch (e) {
-  //     showTopToast(context, "Email verification failed", success: false);
-  //   } finally {
-  //     setState(() => isEmailLoading = false);
-  //   }
-  // }
 
   Future<void> _loadDraft() async {
     try {
@@ -1353,75 +1029,12 @@ Future<void> loadTheme() async {
     }
   }
 
-  // ---------------- AADHAAR BUTTON ----------------
-  // Widget _aadhaarButton() {
-  //   String label;
-  //   VoidCallback? onTap;
-  //   Color bgColor;
-
-  //   switch (_aadhaarStatus) {
-  //     case AadhaarKycStatus.notStarted:
-  //       label = "Complete Aadhaar KYC";
-  //       bgColor = AppColors.primary;
-  //       onTap = _initiateAadhaarKyc;
-  //       break;
-
-  //     case AadhaarKycStatus.initiated:
-  //     case AadhaarKycStatus.inProgress:
-  //       label = "Refresh Aadhaar Status";
-  //       bgColor = AppColors.darkBlue;
-  //       onTap = _checkAadhaarStatus;
-  //       break;
-
-  //     case AadhaarKycStatus.verified:
-  //       label = "Continue";
-  //       bgColor = AppColors.success;
-  //       onTap = () {
-  //         setState(() {
-  //           _aadhaarStatus = AadhaarKycStatus.completed;
-  //         });
-  //       };
-  //       break;
-
-  //     case AadhaarKycStatus.completed:
-  //       label = "Continue";
-  //       bgColor = AppColors.success;
-  //       onTap = _goToApplicantDetails;
-  //       break;
-  //   }
-
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.stretch,
-  //     children: [
-  //       _aadhaarStatusBanner(),
-  //       SizedBox(
-  //         height: 52,
-  //         child: ElevatedButton(
-  //           onPressed: onTap,
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: bgColor,
-  //             foregroundColor: Colors.white,
-  //             shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.circular(14),
-  //             ),
-  //           ),
-  //           child: Text(
-  //             label,
-  //             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget _aadhaarButton() {
     String label;
     VoidCallback? onTap;
     Color bgColor;
 
     switch (_aadhaarStatus) {
-      
       case AadhaarKycStatus.notStarted:
         label = "Complete Aadhaar KYC";
         bgColor = AppColors.darkBlue;
@@ -1504,9 +1117,7 @@ Future<void> loadTheme() async {
               // CAMERA BUTTON
               ElevatedButton.icon(
                 onPressed: _captureLivePhoto,
-                icon: const Icon(Icons.camera,
-                
-                ),
+                icon: const Icon(Icons.camera),
                 label: const Text("Capture"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A237E),
@@ -1519,15 +1130,17 @@ Future<void> loadTheme() async {
               // UPLOAD BUTTON
               OutlinedButton.icon(
                 onPressed: _pickLivePhotoFromDevice,
-                icon:  Icon(Icons.upload_file,
-                                color: isDarkMode ? Colors.white : Color(0xFF1A237E),
-
-                ),
-                label:  Text("Upload",
-                style: TextStyle(
+                icon: Icon(
+                  Icons.upload_file,
                   color: isDarkMode ? Colors.white : Color(0xFF1A237E),
                 ),
-              ),),
+                label: Text(
+                  "Upload",
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Color(0xFF1A237E),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -1571,25 +1184,6 @@ Future<void> loadTheme() async {
       showTopToast(context, "Failed to fetch Aadhaar status", success: false);
     }
   }
-
-  // ---------------- CAMERA ACTIONS ----------------
-  // Future<void> _capturePan() async {
-  //   final XFile? img = await Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (_) => const WebCameraCapture()),
-  //   );
-
-  //   if (img != null) {
-  //     setState(() {
-  //       panFile = img;
-  //       panVerified = false;
-  //       panOcrCompleted = false;
-  //       panNumberVerified = false;
-  //     });
-
-  //     _hitPanOcr(); // AUTO OCR
-  //   }
-  // }
 
   Future<void> _capturePan() async {
     final XFile? img = await Navigator.push(
@@ -1668,92 +1262,6 @@ Future<void> loadTheme() async {
     }
   }
 
-
-  
-  // Future<void> _hitPanOcr() async {
-  //   if (panFile == null) {
-  //     showTopToast(context, "Please upload PAN image first", success: false);
-  //     return;
-  //   }
-
-  //   setState(() {
-  //     isApiLoading = true;
-  //     panOcrCompleted = false;
-  //   });
-
-  //   try {
-  //     final result = await PanOcrService.scanPan(panFile!);
-
-  //     if (result == null || result.panNumber == null) {
-  //       throw Exception("PAN not detected from image");
-  //     }
-
-  //     // 🔥 Normalize PAN
-  //     final extractedPan = result.panNumber!
-  //         .replaceAll(RegExp(r'[^A-Za-z0-9]'), '')
-  //         .toUpperCase()
-  //         .trim();
-
-  //     // 🔥 Validate PAN format
-  //     if (!RegExp(r'^[A-Z]{5}[0-9]{4}[A-Z]$').hasMatch(extractedPan)) {
-  //       throw Exception("Invalid PAN format detected");
-  //     }
-
-  //     setState(() {
-  //       panCtrl.text = extractedPan;
-
-  //       if (result.name != null && result.name!.trim().isNotEmpty) {
-  //         nameCtrl.text = result.name!.trim();
-  //       }
-
-  //       panOcrCompleted = true;
-  //       panNumberVerified = false;
-  //     });
-
-  //     showTopToast(context, "PAN OCR completed successfully", success: true);
-
-  //   } catch (e) {
-  //     setState(() {
-  //       panOcrCompleted = false;
-  //     });
-
-  //     showTopToast(context, "PAN OCR failed: $e", success: false);
-  //   } finally {
-  //     setState(() => isApiLoading = false);
-  //   }
-  // }
-  // Future<void> _hitPanOcr() async {
-  //   if (panFile == null) return;
-
-  //   setState(() => isApiLoading = true);
-
-  //   try {
-  //     final result = await PanOcrService.scanPan(panFile!);
-
-  //     if (result == null || result.panNumber == null) {
-  //       throw "PAN not detected";
-  //     }
-
-  //     final extractedPan = normalizePan(result.panNumber!);
-
-  //     setState(() {
-  //       ocrPanNumber = extractedPan;
-  //       panCtrl.text = extractedPan;
-  //       if (result.name != null) {
-  //         nameCtrl.text = result.name!;
-  //       }
-  //       panOcrCompleted = true;
-  //       panNumberVerified = false;
-  //     });
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text("PAN OCR failed: $e")));
-  //   } finally {
-  //     setState(() => isApiLoading = false);
-  //   }
-  // }
-
   Future<void> _initiateAadhaarKyc() async {
     if (!panNumberVerified || !mobileVerified || !emailVerified) {
       showTopToast(
@@ -1817,12 +1325,11 @@ Future<void> loadTheme() async {
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(
           title,
-          style:  TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             // color: Color(0xFF1A237E),
-                color: isDarkMode ? Colors.white : Color(0xFF1A237E),
-
+            color: isDarkMode ? Colors.white : Color(0xFF1A237E),
           ),
         ),
       ),
@@ -1868,9 +1375,10 @@ Future<void> loadTheme() async {
       ),
       child: Row(
         children: [
-          Icon(Icons.verified_outlined, 
-          // color: color
-          color: isDarkMode ? Colors.white : color,
+          Icon(
+            Icons.verified_outlined,
+            // color: color
+            color: isDarkMode ? Colors.white : color,
           ),
           const SizedBox(width: 8),
           Text(
@@ -1882,64 +1390,12 @@ Future<void> loadTheme() async {
     );
   }
 
-  // Widget _aadhaarStatusBanner() {
-  //   if (_aadhaarStatus == AadhaarKycStatus.notStarted) {
-  //     return const SizedBox();
-  //   }
-
-  //   late String text;
-  //   late Color color;
-
-  //   switch (_aadhaarStatus) {
-  //     case AadhaarKycStatus.initiated:
-  //       text = "Aadhaar KYC Initiated";
-  //       color = Colors.orange;
-  //       break;
-  //     case AadhaarKycStatus.inProgress:
-  //       text = "Aadhaar KYC In Progress";
-  //       color = Colors.blue;
-  //       break;
-  //     case AadhaarKycStatus.verified:
-  //       text = "Aadhaar Verified";
-  //       color = Colors.green;
-  //       break;
-  //     case AadhaarKycStatus.completed:
-  //       text = "Aadhaar KYC Completed";
-  //       color = AppColors.success;
-  //       break;
-  //     default:
-  //       return const SizedBox();
-  //   }
-
-  //   return Container(
-  //     margin: const EdgeInsets.only(bottom: 10),
-  //     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-  //     decoration: BoxDecoration(
-  //       color: color.withOpacity(0.12),
-  //       borderRadius: BorderRadius.circular(14),
-  //       border: Border.all(color: color.withOpacity(0.35)),
-  //     ),
-  //     child: Row(
-  //       children: [
-  //         Icon(Icons.verified_outlined, color: color),
-  //         const SizedBox(width: 8),
-  //         Text(
-  //           text,
-  //           style: TextStyle(color: color, fontWeight: FontWeight.w600),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget _card(Widget child) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         // color: Colors.white,
-        color: isDarkMode
-    ? const Color(0xFF1E293B)
-    : AppColors.card,
+        color: isDarkMode ? const Color(0xFF1E293B) : AppColors.card,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -1956,14 +1412,14 @@ Future<void> loadTheme() async {
   Widget _textField(String label, TextEditingController controller) {
     return TextField(
       controller: controller,
-      style: TextStyle(
-  color: isDarkMode ? Colors.white : Colors.black,
-),
-      decoration: InputDecoration(labelText: label,
+      style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+      decoration: InputDecoration(
+        labelText: label,
         labelStyle: TextStyle(
-        color: isDarkMode ? Colors.white70 : Colors.black87,
+          color: isDarkMode ? Colors.white70 : Colors.black87,
+        ),
+        border: InputBorder.none,
       ),
-       border: InputBorder.none),
     );
   }
 

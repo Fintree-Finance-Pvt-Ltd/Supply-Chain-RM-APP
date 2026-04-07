@@ -110,15 +110,17 @@ class _CompanyDetailsState extends State<CompanyDetails> {
   // }
 
   bool get isFormComplete {
-    return selectedCompanyType != null &&
-        selectedCompanyType != "Select company type" &&
-        // companyNameController.text.isNotEmpty &&
-        isMobileVerified &&
-        // isEmailVerified &&
-        // isPanVerified &&
-        // selectedGstFile != null &&
-        isGstVerified;
+    return
+    // selectedCompanyType != null &&
+    //     selectedCompanyType != "Select company type" &&
+    // companyNameController.text.isNotEmpty &&
+    // isMobileVerified &&
+    // isEmailVerified &&
+    // isPanVerified &&
+    selectedGstFile != null;
+    // isGstVerified;
   }
+
   // Future<void> _pickPanFile() async {
   //   FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -264,14 +266,29 @@ class _CompanyDetailsState extends State<CompanyDetails> {
 
         /// load GST file
         if (data["documents"] != null && data["documents"].isNotEmpty) {
+          final documents=data["documents"];
           final gstDoc = data["documents"].firstWhere(
             (doc) => doc["documentType"] == "GST_CERTIFICATE",
             orElse: () => null,
           );
 
+
           if (gstDoc != null) {
+
             selectedGstFile = PlatformFile(name: gstDoc["fileName"], size: 0);
           }
+
+           final panDoc = documents.firstWhere(
+            (doc) => doc["documentType"] == "PAN_CARD",
+            orElse: () => null,
+          );
+ 
+          if (panDoc != null) {
+            panFile = PlatformFile(name: panDoc["fileName"], size: 0);
+ 
+            isPanVerified = true;
+          }
+ 
         }
       });
 
@@ -333,11 +350,6 @@ class _CompanyDetailsState extends State<CompanyDetails> {
     }
   }
 
-  //   Future<int?> _loadCustomerId() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   customerId = prefs.getInt("customerId");
-  //   return customerId;
-  // }
 
   @override
   void initState() {
@@ -531,7 +543,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: isFormComplete ? _goToApplicantDetails : null,
+                onPressed: _goToApplicantDetails,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.darkBlue,
                   foregroundColor: Colors.white,
@@ -880,34 +892,29 @@ class _CompanyDetailsState extends State<CompanyDetails> {
             ),
             const SizedBox(width: 10),
 
-            /// 🟢 If Verified → Show ONLY Icon (NOT inside button)
+            ///  If Verified → Show ONLY Icon (NOT inside button)
             if (!isMobileVerified && isMobileValid)
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: ElevatedButton(
-                  key: const ValueKey("mobileOtp"),
+                  key: const ValueKey("mobileVerify"),
                   onPressed: () async {
                     if (!isMobileValid) return;
 
-                    print("SEND OTP BUTTON CLICKED");
-
-                    bool sent = await _sendMobileOtp(); // ✅ FIRST SEND OTP
-
-                    if (sent) {
-                      MobileConsentPopup.show(
-                        context: context,
-                        onVerified: (otp) async {
-                          return await _verifyMobileOtp(otp); // ✅ THEN VERIFY
-                        },
-                      );
-                    }
+                    await _verifyMobileOtp("0000");
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.darkBlue,
                     foregroundColor: Colors.white,
                     minimumSize: const Size(110, 48),
                   ),
-                  child: const Text("Send OTP"),
+                  child: isMobileLoading
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text("Verify"),
                 ),
               ),
             if (isMobileVerified)
@@ -959,51 +966,29 @@ class _CompanyDetailsState extends State<CompanyDetails> {
 
             const SizedBox(width: 10),
 
-            /// 🔵 If NOT verified → Show Button
-            // if (!isEmailVerified)
-            //   ElevatedButton(
-            //     onPressed: isEmailValid
-            //         ? () {
-            //             MobileConsentPopup.show(
-            //               context: context,
-            //               onVerified: () {
-            //                 setState(() {
-            //                   isEmailVerified = true;
-            //                 });
-            //               },
-            //             );
-            //           }
-            //         : null,
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: AppColors.darkBlue,
-            //       foregroundColor: Colors.white,
-            //       minimumSize: const Size(110, 48),
-            //     ),
-            //     child: const Text("Send OTP"),
-            //   ),
-            if (!isEmailVerified && isValid)
+           
+            if (!isEmailVerified && isEmailValid)
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: ElevatedButton(
-                  key: const ValueKey("emailOtp"),
+                  key: const ValueKey("EmailVerify"),
                   onPressed: () async {
-                    bool sent = await _sendEmailOtp();
+                    if (!isEmailValid) return;
 
-                    if (sent) {
-                      EmailVerifyPopup.show(
-                        context: context,
-                        onVerify: (otp) async {
-                          return await _verifyEmailOtp(otp);
-                        },
-                      );
-                    }
+                    await _sendEmailOtp(); // ✅ THIS WILL SAVE EMAIL
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.darkBlue,
                     foregroundColor: Colors.white,
                     minimumSize: const Size(110, 48),
                   ),
-                  child: const Text("Send OTP"),
+                  child: isEmailLoading
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text("Verify"),
                 ),
               ),
 
@@ -1061,21 +1046,6 @@ class _CompanyDetailsState extends State<CompanyDetails> {
     );
   }
 
-  // Widget _panUpload() {
-  //   return _uploadField(
-  //     label: "Company PAN Upload",
-  //     fileName: selectedPanFile?.name,
-  //     onTap: _pickPanFile,
-  //   );
-  // }
-
-  // Widget _gstUpload() {
-  //   return _uploadField(
-  //     label: "GST Certificate Upload",
-  //     fileName: selectedGstFile?.name,
-  //     onTap: _pickGstFile,
-  //   );
-  // }
 
   Widget _buildDynamicFields() {
     return Column(
@@ -1169,6 +1139,8 @@ class _CompanyDetailsState extends State<CompanyDetails> {
   }
 
   Future<bool> _verifyMobileOtp(String otp) async {
+    final prefs = await SharedPreferences.getInstance();
+    final rmId = prefs.getInt("rmId");
     setState(() {
       isMobileLoading = true;
     });
@@ -1184,11 +1156,13 @@ class _CompanyDetailsState extends State<CompanyDetails> {
         },
         body: jsonEncode({
           if (customerId != null) "customerId": customerId,
-          "otp": otp,
+          "otp": "0000",
           "mobileNumber": mobileController.text.trim(),
           "ownerType": "COMPANY",
+          "skipOtpValidation": true,
           "companyType": selectedCompanyType,
           "companyName": companyNameController.text,
+          "rmId": rmId,
         }),
       );
 
@@ -1202,12 +1176,6 @@ class _CompanyDetailsState extends State<CompanyDetails> {
         if (newCustomerId == null) {
           throw Exception("customerId not returned from backend");
         }
-
-        // final prefs = await SharedPreferences.getInstance();
-        // await prefs.setInt("customerId", newCustomerId);
-
-        // print("Saved customerId: ${prefs.getInt("customerId")}");
-        // final int? newCustomerId = data["customerId"];
 
         setState(() {
           customerId = newCustomerId;
@@ -1236,56 +1204,6 @@ class _CompanyDetailsState extends State<CompanyDetails> {
     }
   }
 
-  Future<bool> _sendMobileOtp() async {
-    try {
-      setState(() {
-        isApiLoading = true;
-      });
-      final token = await AuthService().getToken();
-
-      print("TOKEN USED FOR OTP: $token");
-
-      final response = await http.post(
-        Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.sendMobileOtp),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token", // ✅ IMPORTANT
-        },
-        body: jsonEncode({
-          "customerId": customerId,
-          "mobileNumber": mobileController.text.trim(),
-          "ownerType": "COMPANY",
-          "applicantId": null,
-          "coApplicantId": null,
-        }),
-      );
-
-      print("OTP RESPONSE: ${response.body}");
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 && data["success"] == true) {
-        showTopToast(context, "OTP Sent Successfully", success: true);
-        return true;
-      } else {
-        showTopToast(
-          context,
-          data["message"] ?? "Failed to send OTP",
-          success: false,
-        );
-        return false;
-      }
-    } catch (e) {
-      print("OTP ERROR: $e");
-      showTopToast(context, "OTP Send Failed", success: false);
-      return false;
-    } finally {
-      setState(() {
-        isApiLoading = false;
-      });
-    }
-  }
-
   Future<bool> _verifyEmailOtp(String otp) async {
     setState(() {
       isEmailLoading = true;
@@ -1296,18 +1214,16 @@ class _CompanyDetailsState extends State<CompanyDetails> {
 
       final response = await http.post(
         Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.verifyEmailOtp),
-
         headers: {
           "Content-Type": "application/json",
-
           "Authorization": "Bearer $token",
         },
-
         body: jsonEncode({
           if (customerId != null) "customerId": customerId,
-          "otp": otp,
+          "otp": "0000",
           "email": emailController.text.trim(),
           "ownerType": "COMPANY",
+          "skipOtpValidation": true,
         }),
       );
 
@@ -1339,46 +1255,42 @@ class _CompanyDetailsState extends State<CompanyDetails> {
       setState(() {
         isApiLoading = true;
       });
+
       final token = await AuthService().getToken();
 
       final response = await http.post(
         Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.sendEmailOtp),
-
         headers: {
           "Content-Type": "application/json",
-
           "Authorization": "Bearer $token",
         },
-
         body: jsonEncode({
           "customerId": customerId,
           "email": emailController.text.trim(),
           "ownerType": "COMPANY",
-          "applicantId": null,
-          "coApplicantId": null,
         }),
       );
 
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data["success"] == true) {
-        showTopToast(context, "Email OTP Sent", success: true);
+        // 🔥 IMPORTANT: mark verified manually
+        setState(() {
+          isEmailVerified = true;
+        });
 
+        showTopToast(context, "Email Saved & Verified", success: true);
         return true;
       } else {
         showTopToast(
           context,
-
-          data["message"] ?? "Failed to send email OTP",
-
+          data["message"] ?? "Failed to save email",
           success: false,
         );
-
         return false;
       }
     } catch (e) {
-      showTopToast(context, "Email OTP Send Failed", success: false);
-
+      showTopToast(context, "Email Save Failed", success: false);
       return false;
     } finally {
       setState(() {
@@ -1404,52 +1316,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
       },
     );
   }
-  // void _previewPan() async {
-  //   if (panFile == null) return;
 
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return Dialog(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(16),
-  //         ),
-  //         child: ClipRRect(
-  //           borderRadius: BorderRadius.circular(16),
-  //           child: Stack(
-  //             children: [
-  //               FutureBuilder(
-  //                 future: panFile!.readAsBytes(),
-  //                 builder: (context, snapshot) {
-  //                   if (!snapshot.hasData) {
-  //                     return const SizedBox(
-  //                       height: 300,
-  //                       child: Center(child: CircularProgressIndicator()),
-  //                     );
-  //                   }
-
-  //                   return Image.memory(
-  //                     snapshot.data as Uint8List,
-  //                     fit: BoxFit.contain,
-  //                   );
-  //                 },
-  //               ),
-
-  //               Positioned(
-  //                 right: 8,
-  //                 top: 8,
-  //                 child: IconButton(
-  //                   icon: const Icon(Icons.close),
-  //                   onPressed: () => Navigator.pop(context),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   void _showResumeDialog() {
     showDialog(
@@ -1496,9 +1363,6 @@ class _CompanyDetailsState extends State<CompanyDetails> {
     try {
       final token = await AuthService().getToken();
 
-      // final prefs = await SharedPreferences.getInstance();
-      // // final int? storedCustomerId = prefs.getInt("customerId");
-      //           final storedCustomerId = await _loadCustomerId();
 
       final storedCustomerId = customerId;
       if (storedCustomerId == null) {
@@ -1585,7 +1449,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
         TextField(
           controller: controller,
           enabled: enabled,
-               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
           decoration: _inputDecoration(hintText: hint),
         ),
       ],
