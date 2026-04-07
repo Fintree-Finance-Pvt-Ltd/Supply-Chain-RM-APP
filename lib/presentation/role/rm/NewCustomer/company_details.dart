@@ -661,7 +661,9 @@ class _CompanyDetailsState extends State<CompanyDetails> {
             Expanded(
               child: Text(
                 panFile!.name,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style:  TextStyle(fontWeight: FontWeight.w600,
+                                  color: isDarkMode ? Colors.white : Colors.black,
+),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

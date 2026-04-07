@@ -734,6 +734,9 @@ Future<bool> _sendEmailOtp() async {
             children: [
               Expanded(
                 child: TextField(
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
                   controller: gmailCtrl,
                   enabled: panNumberVerified,
                   keyboardType: TextInputType.emailAddress,

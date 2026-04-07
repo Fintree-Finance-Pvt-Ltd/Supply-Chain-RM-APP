@@ -971,9 +971,11 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
 
   // ================= PAN =================
   Widget _panSection(CoApplicantModel model) {
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+
         /// 🔹 TITLE
         // const Text(
         //   "PAN Verification",
@@ -983,15 +985,19 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
         //     color: AppColors.textPrimary,
         //   ),
         // ),
-        const SizedBox(height: 8),
+        // const SizedBox(height: 8),
 
         /// 🔹 PAN CARD
         Container(
+
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
+                   
+
             color: model.panVerified
                 ? AppColors.success.withOpacity(0.06)
-                : AppColors.inputFill,
+                // : AppColors.inputFill,
+                :  isDarkMode ? const Color(0xFF1E293B) : AppColors.card,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: model.panVerified
@@ -2048,7 +2054,8 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
             // color: Colors.white,
             color: model.emailVerified
                 ? AppColors.success.withOpacity(0.06)
-                : AppColors.inputFill,
+                // : AppColors.inputFill,
+                :isDarkMode?AppColors.textPrimary:AppColors.inputFill,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: model.emailVerified

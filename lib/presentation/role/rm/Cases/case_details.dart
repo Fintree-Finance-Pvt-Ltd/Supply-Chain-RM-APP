@@ -330,6 +330,45 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
                 ],
               ),
 
+      // const SizedBox(height: 16),
+              if (coApplicants.isNotEmpty)
+                expandableCard(
+                  icon: Icons.group,
+
+                  title: "Co Applicant",
+                  children: [
+                    for (var co in coApplicants)
+                      Column(
+                        children: [
+                          _infoRow("Name", co["name"]),
+                          _infoRow("Mobile", co["mobile"]),
+                          _infoRow("Email", co["email"]),
+                          _infoRow("PAN", co["pan"]),
+                          const Divider(),
+                        ],
+                      ),
+                  ],
+                ),
+
+                    // const SizedBox(height: 16),
+              if (contacts.isNotEmpty)
+                expandableCard(
+                  icon: Icons.phone,
+
+                  title: "Contact Person",
+                  children: [
+                    for (var c in contacts)
+                      Column(
+                        children: [
+                          _infoRow("Name", c["name"]),
+                          _infoRow("Mobile", c["mobile"]),
+                          _infoRow("Email", c["email"]),
+                          const Divider(),
+                        ],
+                      ),
+                  ],
+                ),
+
               if (addresses.isNotEmpty)
                 expandableCard(
                   icon: Icons.location_on,
@@ -349,44 +388,9 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
                   ],
                 ),
 
-              // const SizedBox(height: 16),
-              if (contacts.isNotEmpty)
-                expandableCard(
-                  icon: Icons.phone,
+          
 
-                  title: "Contact Person",
-                  children: [
-                    for (var c in contacts)
-                      Column(
-                        children: [
-                          _infoRow("Name", c["name"]),
-                          _infoRow("Mobile", c["mobile"]),
-                          _infoRow("Email", c["email"]),
-                          const Divider(),
-                        ],
-                      ),
-                  ],
-                ),
-
-              // const SizedBox(height: 16),
-              if (coApplicants.isNotEmpty)
-                expandableCard(
-                  icon: Icons.group,
-
-                  title: "Co Applicant",
-                  children: [
-                    for (var co in coApplicants)
-                      Column(
-                        children: [
-                          _infoRow("Name", co["name"]),
-                          _infoRow("Mobile", co["mobile"]),
-                          _infoRow("Email", co["email"]),
-                          _infoRow("PAN", co["pan"]),
-                          const Divider(),
-                        ],
-                      ),
-                  ],
-                ),
+        
               const SizedBox(height: 16),
 
               FinalSanctionTermsSection(
