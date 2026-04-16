@@ -37,52 +37,47 @@ import '../constants/api_endpoints.dart';
 class AuthService {
   /// 🔐 LOGIN
   Future<Map<String, dynamic>?> login(String email, String password) async {
-    try {
-      final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.login);
+  try {
+    final url = Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.login);
 
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: jsonEncode({"email": email, "password": password}),
-      );
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: jsonEncode({"email": email, "password": password}),
+    );
 
-      final responseData = jsonDecode(response.body);
-      print("Full Response: ${response.body}");
+    final responseData = jsonDecode(response.body);
+    print("Full Response: ${response.body}");
 
-      if (response.statusCode == 200 && responseData["success"] == true) {
-        final data = responseData["data"];
+    if (response.statusCode == 200 && responseData["success"] == true) {
+      final data = responseData["data"];
 
-        print("Token from backend: ${data["token"]}");
+      final prefs = await SharedPreferences.getInstance();
 
-        // Save token locally
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("token", data["token"]);
-        print("Stored token: ${prefs.getString("token")}");
+      // ✅ EXISTING
+      await prefs.setString("token", data["token"]);
+      await prefs.setString("role", data["user"]["role"].toLowerCase());
+      await prefs.setBool("isLoggedIn", true);
+      await prefs.setInt("rmId", data["user"]["id"]);
+      await prefs.setString("rmName", data["user"]["name"]);
 
-        // await prefs.setString("role", data["user"]["role"]);
-        await prefs.setString(
-          "role",
-          data["user"]["role"].toLowerCase(), // 🔥 FIX
-        );
-        print("Login success");
-        print("User role: ${data["user"]["role"]}");
-        await prefs.setBool("isLoggedIn", true);
-        await prefs.setInt("rmId", data["user"]["id"]);
-  await prefs.setString("rmName", data["user"]["name"]);
+      // 🔥 ADD THIS LINE (IMPORTANT)
+      await prefs.setString("userEmail", email);
 
-        print("Stored RM ID: ${prefs.getInt("rmId")}");
-        return data;
-      } else {
-        throw Exception(responseData["message"] ?? "Login failed");
-      }
-    } catch (e) {
-      print("Login error: $e");
-      rethrow;
+      print("Stored Email: ${prefs.getString("userEmail")}");
+
+      return data;
+    } else {
+      throw Exception(responseData["message"] ?? "Login failed");
     }
+  } catch (e) {
+    print("Login error: $e");
+    rethrow;
   }
+}
 
   /// 🚪 LOGOUT
   Future<bool> logout(BuildContext context) async {

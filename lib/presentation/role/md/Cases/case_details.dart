@@ -7,6 +7,7 @@ import 'package:supply_chain/core/constants/api_endpoints.dart';
 import 'package:supply_chain/core/services/auth_service.dart';
 import 'package:supply_chain/core/theme/app_colors.dart';
 import 'package:supply_chain/core/utils/toast_helper.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CaseDetailsPage extends StatefulWidget {
   final int customerId;
@@ -21,9 +22,7 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
   Map<String, dynamic>? caseData;
   bool loading = true;
   bool submitting = false;
-    List<dynamic> sanctionList = [];
-
-  
+  List<dynamic> sanctionList = [];
 
   PlatformFile? selectedFile;
   String? selectedDocType;
@@ -197,19 +196,18 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
               ],
             ),
 
+            const SizedBox(height: 16),
 
-             const SizedBox(height: 16),
-
-              /// APPLICANT CARD
-              expandableCard(
-                title: "Applicant Details",
-                children: [
-                  _infoRow("Name", applicant["name"]),
-                  _infoRow("Mobile", applicant["mobile"]),
-                  _infoRow("Email", applicant["email"]),
-                  _infoRow("PAN", applicant["pan"]),
-                ],
-              ),
+            /// APPLICANT CARD
+            expandableCard(
+              title: "Applicant Details",
+              children: [
+                _infoRow("Name", applicant["name"]),
+                _infoRow("Mobile", applicant["mobile"]),
+                _infoRow("Email", applicant["email"]),
+                _infoRow("PAN", applicant["pan"]),
+              ],
+            ),
 
             const SizedBox(height: 16),
 
@@ -231,47 +229,43 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
                 ],
               ),
 
+            const SizedBox(height: 16),
 
-               const SizedBox(height: 16),
+            /// CONTACT PERSON
+            if (contacts.isNotEmpty)
+              expandableCard(
+                title: "Contact Person",
+                children: [
+                  for (var c in contacts)
+                    Column(
+                      children: [
+                        _infoRow("Name", c["name"]),
+                        _infoRow("Mobile", c["mobile"]),
+                        _infoRow("Email", c["email"]),
+                        const Divider(),
+                      ],
+                    ),
+                ],
+              ),
+            const SizedBox(height: 16),
 
-              /// CONTACT PERSON
-              if (contacts.isNotEmpty)
-                expandableCard(
-                  title: "Contact Person",
-                  children: [
-                    for (var c in contacts)
-                      Column(
-                        children: [
-                          _infoRow("Name", c["name"]),
-                          _infoRow("Mobile", c["mobile"]),
-                          _infoRow("Email", c["email"]),
-                          const Divider(),
-                        ],
-                      ),
-                  ],
-                ),
-              const SizedBox(height: 16),
-
-              /// ADDRESS
-              if (addresses.isNotEmpty)
-                expandableCard(
-                  title: "Address Details",
-                  children: [
-                    for (var a in addresses)
-                      Column(
-                        children: [
-                          _infoRow("Address", a["fullAddress"]),
-                          _infoRow("City", a["city"]),
-                          _infoRow("State", a["state"]),
-                          _infoRow("Pincode", a["pincode"]),
-                          const Divider(),
-                        ],
-                      ),
-                  ],
-                ),
-
-             
-
+            /// ADDRESS
+            if (addresses.isNotEmpty)
+              expandableCard(
+                title: "Address Details",
+                children: [
+                  for (var a in addresses)
+                    Column(
+                      children: [
+                        _infoRow("Address", a["fullAddress"]),
+                        _infoRow("City", a["city"]),
+                        _infoRow("State", a["state"]),
+                        _infoRow("Pincode", a["pincode"]),
+                        const Divider(),
+                      ],
+                    ),
+                ],
+              ),
 
             const SizedBox(height: 16),
 
@@ -301,28 +295,26 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     );
   }
 
-// Future<void> openDocument(String url) async {
-//   final Uri uri = Uri.parse(url);
+  // Future<void> openDocument(String url) async {
+  //   final Uri uri = Uri.parse(url);
 
-//   if (await canLaunchUrl(uri)) {
-//     await launchUrl(uri, mode: LaunchMode.externalApplication);
-//   } else {
-//     showTopToast(context, "Unable to open document", success: false);
-//   }
-// }
+  //   if (await canLaunchUrl(uri)) {
+  //     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  //   } else {
+  //     showTopToast(context, "Unable to open document", success: false);
+  //   }
+  // }
 
+  // Future<void> openDocument(String url) async {
 
-// Future<void> openDocument(String url) async {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (_) => DocumentViewer(url: url),
+  //     ),
+  //   );
 
-//   Navigator.push(
-//     context,
-//     MaterialPageRoute(
-//       builder: (_) => DocumentViewer(url: url),
-//     ),
-//   );
-
-// }
-
+  // }
 
   Widget _readOnlyCard() {
     return Container(
@@ -499,63 +491,61 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     );
   }
 
+  Future<void> approveCase() async {
+    try {
+      final token = await AuthService().getToken();
 
+      final partnerSanctions = sanctionList.map((sanction) {
+        String partner = sanction["partner"] ?? "";
 
-Future<void> approveCase() async {
-  try {
-    final token = await AuthService().getToken();
+        // Fix unsupported lender
+        if (partner == "FFPL") {
+          partner = "Fintree";
+        }
 
-   final partnerSanctions = sanctionList.map((sanction) {
-  String partner = sanction["partner"] ?? "";
+        return {
+          "partner": partner,
+          "sanctionAmount":
+              double.tryParse(sanction["sanctionAmount"].toString()) ?? 0,
+          "tenure": sanction["tenure"] ?? 0,
+          "interestRate": sanction["interestRate"] ?? 0,
+          "penalCharges": sanction["penalCharges"] ?? 0,
+          "processingFees": sanction["processingFees"] ?? 0,
+          "conditions": conditionsController.text.trim(),
+        };
+      }).toList();
 
-  // Fix unsupported lender
-  if (partner == "FFPL") {
-    partner = "Fintree";
-  }
-
-  return {
-    "partner": partner,
-    "sanctionAmount":
-        double.tryParse(sanction["sanctionAmount"].toString()) ?? 0,
-    "tenure": sanction["tenure"] ?? 0,
-    "interestRate": sanction["interestRate"] ?? 0,
-    "penalCharges": sanction["penalCharges"] ?? 0,
-    "processingFees": sanction["processingFees"] ?? 0,
-    "conditions": conditionsController.text.trim(),
-  };
-}).toList();
-
-    final response = await http.post(
-      Uri.parse(
-        "${ApiEndpoints.baseUrl}/workflows/customers/${widget.customerId}/md-approve",
-      ),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode({
-        "approved": true,
-        "remarks": remarksController.text.trim(),
-        "partnerSanctions": partnerSanctions,
-      }),
-    );
-
-    final body = jsonDecode(response.body);
-
-    if (body["success"] == true) {
-      showTopToast(context, "Case Approved Successfully", success: true);
-      Navigator.pop(context);
-    } else {
-      showTopToast(
-        context,
-        body["message"] ?? "Approval failed",
-        success: false,
+      final response = await http.post(
+        Uri.parse(
+          "${ApiEndpoints.baseUrl}/workflows/customers/${widget.customerId}/md-approve",
+        ),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "approved": true,
+          "remarks": remarksController.text.trim(),
+          "partnerSanctions": partnerSanctions,
+        }),
       );
+
+      final body = jsonDecode(response.body);
+
+      if (body["success"] == true) {
+        showTopToast(context, "Case Approved Successfully", success: true);
+        Navigator.pop(context);
+      } else {
+        showTopToast(
+          context,
+          body["message"] ?? "Approval failed",
+          success: false,
+        );
+      }
+    } catch (e) {
+      showTopToast(context, "Something went wrong", success: false);
     }
-  } catch (e) {
-    showTopToast(context, "Something went wrong", success: false);
   }
-}
   // Future<void> approveCase() async {
   //   try {
   //     final token = await AuthService().getToken();
@@ -604,6 +594,84 @@ Future<void> approveCase() async {
   //     showTopToast(context, "Something went wrong", success: false);
   //   }
   // }
+
+  void _openFile(String url) {
+    final isPdf = url.toLowerCase().endsWith(".pdf");
+
+    /// 📄 PDF → open in browser
+    if (isPdf) {
+      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      return;
+    }
+
+    /// 🖼️ IMAGE → open in bottom sheet
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.black,
+      builder: (_) => _imagePreview(url),
+    );
+  }
+
+  Widget _imagePreview(String url) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.95,
+      minChildSize: 0.6,
+      maxChildSize: 1,
+      expand: false,
+      builder: (_, controller) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              /// HEADER
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const Spacer(),
+                    const Text(
+                      "Preview",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.open_in_new, color: Colors.white),
+                      onPressed: () {
+                        launchUrl(Uri.parse(url));
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              /// IMAGE VIEW
+              Expanded(
+                child: InteractiveViewer(
+                  minScale: 0.8,
+                  maxScale: 5,
+                  child: Center(child: Image.network(url, fit: BoxFit.contain)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Future<void> rejectCase() async {
     final token = await AuthService().getToken();
@@ -797,192 +865,185 @@ Future<void> approveCase() async {
     );
   }
 
-Widget _documentsCard(List documents) {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 16),
-    padding: const EdgeInsets.all(18),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(18),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.05),
-          blurRadius: 20,
-          offset: const Offset(0, 10),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Bank Related Documents",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-
-        const SizedBox(height: 18),
-
-        if (documents.isEmpty)
-          const Text(
-            "No documents uploaded",
-            style: TextStyle(color: Colors.grey),
-          )
-        else
-          Column(
-            children: documents.map((doc) {
-              final String fileName = doc["fileName"] ?? "-";
-              final String fileUrl = doc["fileUrl"] ?? "";
-              final String docType = doc["documentType"] ?? "-";
-
-              final String date = doc["createdAt"] != null
-                  ? "${DateTime.parse(doc["createdAt"]).day}/${DateTime.parse(doc["createdAt"]).month}/${DateTime.parse(doc["createdAt"]).year}"
-                  : "-";
-
-              return Container(
-                margin: const EdgeInsets.only(bottom: 14),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade200),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 14,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-
-                    /// FILE ICON
-                    Container(
-                      height: 46,
-                      width: 46,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8ECF8),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.insert_drive_file_rounded,
-                        color: Color(0xFF3B5EDB),
-                      ),
-                    ),
-
-                    const SizedBox(width: 14),
-
-                    /// FILE DETAILS
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-
-                          /// FILE NAME
-                          Text(
-                            fileName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-
-                          const SizedBox(height: 8),
-
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 6,
-                            children: [
-
-                              /// DOC TYPE
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFE0E7FF),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  docType.replaceAll("_", " "),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF3730A3),
-                                  ),
-                                ),
-                              ),
-
-                              /// STATUS
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFF3CD),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  doc["status"] ?? "pending",
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.orange,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 6),
-
-                          /// DATE
-                          Text(
-                            date,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    /// VIEW DOCUMENT
-                    IconButton(
-                      icon: const Icon(
-                        Icons.remove_red_eye_rounded,
-                        color: Color(0xFF2563EB),
-                      ),
-                      onPressed: () {
-
-                        if (fileUrl.isNotEmpty) {
-                          // openDocument(fileUrl);
-                          // _viewDocument(doc.fileUrl);
-                        } else {
-                          showTopToast(
-                            context,
-                            "Document not available",
-                            success: false,
-                          );
-                        }
-
-                      },
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
+  Widget _documentsCard(List documents) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Bank Related Documents",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
 
+          const SizedBox(height: 18),
 
+          if (documents.isEmpty)
+            const Text(
+              "No documents uploaded",
+              style: TextStyle(color: Colors.grey),
+            )
+          else
+            Column(
+              children: documents.map((doc) {
+                final String fileName = doc["fileName"] ?? "-";
+                final String fileUrl = doc["fileUrl"] ?? "";
+                final String docType = doc["documentType"] ?? "-";
+
+                final String date = doc["createdAt"] != null
+                    ? "${DateTime.parse(doc["createdAt"]).day}/${DateTime.parse(doc["createdAt"]).month}/${DateTime.parse(doc["createdAt"]).year}"
+                    : "-";
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 14,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      /// FILE ICON
+                      Container(
+                        height: 46,
+                        width: 46,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8ECF8),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.insert_drive_file_rounded,
+                          color: Color(0xFF3B5EDB),
+                        ),
+                      ),
+
+                      const SizedBox(width: 14),
+
+                      /// FILE DETAILS
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            /// FILE NAME
+                            Text(
+                              fileName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              children: [
+                                /// DOC TYPE
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE0E7FF),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    docType.replaceAll("_", " "),
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF3730A3),
+                                    ),
+                                  ),
+                                ),
+
+                                /// STATUS
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFF3CD),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    doc["status"] ?? "pending",
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 6),
+
+                            /// DATE
+                            Text(
+                              date,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      /// VIEW DOCUMENT
+                      IconButton(
+                        icon: const Icon(
+                          Icons.remove_red_eye_rounded,
+                          color: Color(0xFF2563EB),
+                        ),
+                        onPressed: () {
+                          if (fileUrl.isNotEmpty &&
+                              fileUrl.startsWith("http")) {
+                            _openFile(fileUrl); // 🔥 THIS LINE
+                          } else {
+                            showTopToast(
+                              context,
+                              "Document not available",
+                              success: false,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+        ],
+      ),
+    );
+  }
 
   Widget _infoRow(String label, dynamic value) {
     return Padding(

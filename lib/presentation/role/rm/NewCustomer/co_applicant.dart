@@ -107,6 +107,8 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
   final mobileCtrl = TextEditingController();
   final gmailCtrl = TextEditingController();
 
+
+
   bool _isValidEmail(String email) {
     return email.contains('@') && email.contains('.');
   }
@@ -1570,19 +1572,25 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
         },
         body: jsonEncode({
           "customerId": cid,
-          "otp": "0000", // skipped
+          "otp": otp,
+          // "otp": "0000", // skipped
           "mobileNumber": model.mobileCtrl.text.trim(),
           "ownerType": "CO_APPLICANT",
           "coApplicantId": model.coApplicantId,
-
+"skipOtpValidation": otp == "0000",
           // 🔥 important
-          "skipOtpValidation": true,
+          // "skipOtpValidation": true,
         }),
       );
 
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data["success"] == true) {
+          if (data["coApplicantId"] != null) {
+    setState(() {
+      model.coApplicantId = data["coApplicantId"];
+    });
+  }
         setState(() => model.mobileVerified = true);
 
         showTopToast(context, "Mobile Verified Successfully", success: true);
@@ -1716,7 +1724,16 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
       final token = await AuthService().getToken();
       final cid = await _loadCustomerId();
 
-      /// STEP 1 — register email using sendEmailOtp API
+if (model.coApplicantId == null) {
+  showTopToast(
+    context,
+    "Verify mobile first before email",
+    success: false,
+  );
+  return false;
+}
+
+      // /// STEP 1 — register email using sendEmailOtp API
       final sendResponse = await http.post(
         Uri.parse(ApiEndpoints.baseUrl + ApiEndpoints.sendEmailOtp),
         headers: {
@@ -1752,9 +1769,11 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
         body: jsonEncode({
           "customerId": cid,
           "otp": "0000",
+          "email": model.emailCtrl.text.trim(),
           "ownerType": "CO_APPLICANT",
           "coApplicantId": model.coApplicantId,
           "skipOtpValidation": true,
+          
         }),
       );
 
@@ -1969,10 +1988,40 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
                       ),
                     ),
                     onPressed: (!isMobileValid || model.isMobileLoading)
-                        ? null
-                        : () async {
-                            await _verifyMobileOtp(model, "0000");
-                          },
+    ? null
+    : () async {
+
+final prefs = await SharedPreferences.getInstance();
+final email = prefs.getString("userEmail") ?? "";
+
+        final isInternalUser =
+            email.toLowerCase().endsWith("@fintreefinance.com");
+
+        if (isInternalUser) {
+
+          // ✅ INTERNAL RM → skip OTP
+          await _verifyMobileOtp(model, "0000");
+
+        } else {
+
+          // ❌ EXTERNAL RM → send OTP first
+          final sent = await _sendMobileOtp(model);
+
+          if (sent) {
+            MobileConsentPopup.show(
+              context: context,
+              onVerified: (otp) async {
+                return await _verifyMobileOtp(model, otp);
+              },
+            );
+          }
+        }
+      },
+                    // onPressed: (!isMobileValid || model.isMobileLoading)
+                    //     ? null
+                    //     : () async {
+                    //         await _verifyMobileOtp(model, "0000");
+                    //       },
                     // onPressed: (!isMobileValid || model.isMobileLoading)
                     //     ? null
                     //     : () async {
