@@ -778,9 +778,25 @@ class _InvoicePageState extends State<InvoicePage> {
 
             const SizedBox(height: 10),
 
-            Text("Account: ${bank["bankAccountNumber"] ?? ""}"),
-            Text("IFSC: ${bank["ifscCode"] ?? ""}"),
-            Text("Holder: ${bank["accountHolderName"] ?? ""}"),
+            Text("Account: ${bank["bankAccountNumber"] ?? ""}",
+            style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    )
+            ),
+            Text("IFSC: ${bank["ifscCode"] ?? ""}",
+             style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    )),
+            Text("Holder: ${bank["accountHolderName"] ?? ""}",
+             style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    )),
           ],
         ),
       ),
