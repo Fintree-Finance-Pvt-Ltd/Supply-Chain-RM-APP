@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supply_chain/core/services/auth_service.dart';
 import 'package:supply_chain/core/utils/toast_helper.dart';
+import 'package:supply_chain/presentation/auth/Sign_in_options.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -251,14 +252,30 @@ bool isPasswordVisible = false;
               ),
 
               const SizedBox(height: 28),
-
-              const Text(
-                "Or Sign in with",
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 13,
-                ),
-              ),
+InkWell(
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SignInOptions(),
+      ),
+    );
+  },
+  child: const Text(
+    "Or Sign in with",
+    style: TextStyle(
+      color: Colors.grey,
+      fontSize: 13,
+    ),
+  ),
+)
+              // const Text(
+              //   "Or Sign in with",
+              //   style: TextStyle(
+              //     color: Colors.grey,
+              //     fontSize: 13,
+              //   ),
+              // ),
             ],
           ),
         ),
