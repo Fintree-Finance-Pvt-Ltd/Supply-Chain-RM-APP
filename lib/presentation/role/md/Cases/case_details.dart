@@ -57,11 +57,15 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
       final body = jsonDecode(response.body);
 
       if (body["success"] == true) {
-        setState(() {
-          caseData = body["data"];
+    setState(() {
+  caseData = body["data"];
+});
 
-          loading = false;
-        });
+await loadDocuments();
+
+setState(() {
+  loading = false;
+});
       }
     } catch (e) {
       print("Error: $e");
@@ -112,55 +116,103 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     }
   }
 
-  Future<void> submitToOps() async {
-    try {
-      setState(() {
-        submitting = true;
-      });
+  // Future<void> submitToOps() async {
+  //   try {
+  //     setState(() {
+  //       submitting = true;
+  //     });
 
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString("token");
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final token = prefs.getString("token");
 
-      final response = await http.post(
-        Uri.parse(
-          "${ApiEndpoints.baseUrl}/workflows/customers/${widget.customerId}/ops-submit",
-        ),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode({"remarks": remarksController.text.trim()}),
-      );
+  //     final response = await http.post(
+  //       Uri.parse(
+  //         "${ApiEndpoints.baseUrl}/workflows/customers/${widget.customerId}/ops-submit",
+  //       ),
+  //       headers: {
+  //         "Authorization": "Bearer $token",
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: jsonEncode({"remarks": remarksController.text.trim()}),
+  //     );
 
-      final body = jsonDecode(response.body);
+  //     final body = jsonDecode(response.body);
 
-      if (body["success"] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Case successfully submitted to Operations"),
-          ),
-        );
+  //     if (body["success"] == true) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(
+  //           content: Text("Case successfully submitted to Operations"),
+  //         ),
+  //       );
 
-        /// reload case data
-        await fetchCustomerDetails();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(body["message"] ?? "Submission failed")),
-        );
-      }
-    } catch (e) {
-      print("Submit Ops Error: $e");
+  //       /// reload case data
+  //       await fetchCustomerDetails();
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text(body["message"] ?? "Submission failed")),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print("Submit Ops Error: $e");
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Something went wrong")));
-    } finally {
-      setState(() {
-        submitting = false;
-      });
-    }
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(const SnackBar(content: Text("Something went wrong")));
+  //   } finally {
+  //     setState(() {
+  //       submitting = false;
+  //     });
+  //   }
+  // }
+Future<void> loadDocuments() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    final response = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/documents/customer/${widget.customerId}",
+      ),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    final body = jsonDecode(response.body);
+
+    final uploadedDocs =
+        body["data"] ?? body ?? [];
+
+    final baseUrl = ApiEndpoints.baseUrl
+        .replaceAll("/api", "");
+
+    setState(() {
+      caseData ??= {};
+
+      caseData!["documents"] =
+          uploadedDocs.map((doc) {
+        final filePath =
+            doc["filePath"] ?? "";
+
+        final cleanPath =
+            filePath.startsWith("/")
+                ? filePath.substring(1)
+                : filePath;
+
+        return {
+          ...doc,
+          "fileUrl":
+              filePath.isNotEmpty
+                  ? "$baseUrl/$cleanPath"
+                  : null,
+        };
+      }).toList();
+    });
+  } catch (e) {
+    print("Load Documents Error: $e");
   }
-
+}
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -723,27 +775,27 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
 
           const SizedBox(height: 20),
 
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: submitting ? null : submitToOps,
-              icon: submitting
-                  ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : const Icon(Icons.send),
-              label: const Text("Submit to Operations"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.darkBlue,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-            ),
-          ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: ElevatedButton.icon(
+          //     onPressed: submitting ? null : submitToOps,
+          //     icon: submitting
+          //         ? const SizedBox(
+          //             height: 18,
+          //             width: 18,
+          //             child: CircularProgressIndicator(
+          //               color: Colors.white,
+          //               strokeWidth: 2,
+          //             ),
+          //           )
+          //         : const Icon(Icons.send),
+          //     label: const Text("Submit to Operations"),
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: AppColors.darkBlue,
+          //       padding: const EdgeInsets.symmetric(vertical: 16),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -780,16 +832,16 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
 
           const SizedBox(height: 16),
 
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.send),
-              label: const Text("Final Submit to Ops"),
-              onPressed: () {
-                submitToOps();
-              },
-            ),
-          ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: ElevatedButton.icon(
+          //     icon: const Icon(Icons.send),
+          //     label: const Text("Final Submit to Ops"),
+          //     onPressed: () {
+          //       submitToOps();
+          //     },
+          //   ),
+          // ),
 
           const SizedBox(height: 10),
 

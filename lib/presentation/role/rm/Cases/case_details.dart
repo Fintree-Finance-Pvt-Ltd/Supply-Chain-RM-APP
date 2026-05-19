@@ -36,6 +36,8 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
   final penalChargesController = TextEditingController();
   final processingFeesController = TextEditingController();
   final conditionsController = TextEditingController();
+
+  Map<String, dynamic>? responseData;
   @override
   void initState() {
     super.initState();
@@ -66,43 +68,29 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
       if (response.statusCode == 200 && data["success"] == true) {
         final List uploadedDocs = data["data"];
         final baseUrl = ApiEndpoints.baseUrl.replaceAll("/api", "");
+setState(() {
 
-        setState(() {
-          for (var doc in caseData?["documents"] ?? []) {
-            /// ✅ FIRST: check existing filePath
-            final existingPath = doc["filePath"] ?? "";
+  // ✅ DIRECTLY USE API DOCUMENTS
+  caseData ??= {};
 
-            if (existingPath.isNotEmpty) {
-              final cleanPath = existingPath.startsWith("/")
-                  ? existingPath.substring(1)
-                  : existingPath;
+  caseData!["documents"] = uploadedDocs.map((doc) {
 
-              doc["fileUrl"] = "$baseUrl/$cleanPath";
-            }
+    final filePath = doc["filePath"] ?? "";
 
-            /// ✅ SECOND: match from API
-            final match = uploadedDocs.firstWhere(
-              (d) =>
-                  (d["documentType"] ?? "").toString().toUpperCase().trim() ==
-                  (doc["documentType"] ?? "").toString().toUpperCase().trim(),
-              orElse: () => null,
-            );
+    final cleanPath = filePath.startsWith("/")
+        ? filePath.substring(1)
+        : filePath;
 
-            if (match != null) {
-              final filePath = match["filePath"] ?? "";
+    return {
+      ...doc,
+      "fileUrl": filePath.isNotEmpty
+          ? "$baseUrl/$cleanPath"
+          : null,
+    };
 
-              if (filePath.isNotEmpty) {
-                final cleanPath = filePath.startsWith("/")
-                    ? filePath.substring(1)
-                    : filePath;
+  }).toList();
 
-                doc["fileUrl"] = "$baseUrl/$cleanPath";
-              }
-            }
-
-            print("FINAL FILE URL: ${doc["fileUrl"]}");
-          }
-        });
+});
       }
     } catch (e) {
       print("FETCH ERROR: $e");
@@ -120,33 +108,158 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     }
   }
 
-  Future<void> fetchCustomerDetails() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString("token");
+Future<void> fetchCustomerDetails() async {
+  try {
+    setState(() {
+      loading = true;
+    });
 
-      final response = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers/${widget.customerId}"),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-        },
-      );
+    final prefs = await SharedPreferences.getInstance();
 
-      final body = jsonDecode(response.body);
+    final token = prefs.getString("token");
 
-      if (body["success"] == true) {
-        setState(() {
-          caseData = body["data"];
+    final headers = {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    };
 
-          loading = false;
-        });
-        await _fetchUploadedDocuments();
-      }
-    } catch (e) {
-      print("Error: $e");
-    }
+    // ================================
+    // CUSTOMER KYC API
+    // ================================
+    final kycResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/kyc",
+      ),
+      headers: headers,
+    );
+
+    // ================================
+    // CO-APPLICANTS API
+    // ================================
+    final coApplicantResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/coapplicants",
+      ),
+      headers: headers,
+    );
+
+    // ================================
+    // ADDRESSES API
+    // ================================
+    final addressResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/addresses",
+      ),
+      headers: headers,
+    );
+
+    // ================================
+    // CONTACT PERSONS API
+    // ================================
+    final contactPersonResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/contact-persons",
+      ),
+      headers: headers,
+    );
+
+    // ================================
+    // DOCUMENTS API
+    // ================================
+    final documentResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/documents/customer/${widget.customerId}",
+      ),
+      headers: headers,
+    );
+
+    final kycBody = jsonDecode(kycResponse.body);
+
+    final coApplicantBody =
+        jsonDecode(coApplicantResponse.body);
+
+    final addressBody =
+        jsonDecode(addressResponse.body);
+
+    final contactPersonBody =
+        jsonDecode(contactPersonResponse.body);
+
+    final documentBody =
+        jsonDecode(documentResponse.body);
+
+    final baseUrl =
+        ApiEndpoints.baseUrl.replaceAll("/api", "");
+
+    final uploadedDocs =
+        documentBody["data"] ??
+            documentBody ??
+            [];
+
+    setState(() {
+      // =================================
+      // MAIN RESPONSE
+      // =================================
+      responseData = kycBody;
+
+      caseData = {
+        "customerProfile":
+            kycBody["data"]?["customerProfile"] ?? {},
+
+        "applicant":
+            kycBody["data"]?["applicant"] ?? {},
+
+        "kycDetails":
+            kycBody["data"]?["kycDetails"] ?? [],
+
+        "coApplicants":
+            coApplicantBody["data"] ??
+                coApplicantBody ??
+                [],
+
+        "addresses":
+            addressBody["data"] ??
+                addressBody ??
+                [],
+
+        "contactPersons":
+            contactPersonBody["data"] ??
+                contactPersonBody ??
+                [],
+
+        "documents":
+            uploadedDocs.map((doc) {
+          final filePath =
+              doc["filePath"] ?? "";
+
+          final cleanPath =
+              filePath.startsWith("/")
+                  ? filePath.substring(1)
+                  : filePath;
+
+          return {
+            ...doc,
+            "fileUrl":
+                filePath.isNotEmpty
+                    ? "$baseUrl/$cleanPath"
+                    : null,
+          };
+        }).toList(),
+      };
+
+      loading = false;
+    });
+
+    print("Customer Details Loaded");
+    print(caseData);
+
+  } catch (e) {
+    print("Fetch Customer Details Error: $e");
+
+    setState(() {
+      loading = false;
+    });
   }
+}
 
   Future<void> submitToMD() async {
     try {
@@ -260,12 +373,14 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    
     if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final status = caseData?["status"];
     final applicant = caseData?["applicant"] ?? {};
-    final company = caseData ?? {};
+      final company =
+      caseData?["customerProfile"] ?? {};
     final coApplicants = caseData?["coApplicants"] ?? [];
     final addresses = caseData?["addresses"] ?? [];
     final contacts = caseData?["contactPersons"] ?? [];
@@ -304,17 +419,47 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
             // child: Column(
             children: [
               /// COMPANY CARD
-              expandableCard(
-                icon: Icons.business,
+            expandableCard(
+  icon: Icons.business,
+  title: "Company Details",
+  children: [
 
-                title: "Company Details",
-                children: [
-                  _infoRow("Company Name", company["companyName"]),
-                  _infoRow("Mobile", company["companyMobile"]),
-                  _infoRow("Email", company["companyEmail"]),
-                  _infoRow("GST", company["gstNumber"]),
-                ],
-              ),
+    _infoRow(
+      "Company Type",
+      company["companyType"]?.toString() ?? "N/A",
+    ),
+
+    _infoRow(
+      "Company Name",
+      company["companyName"]?.toString() ?? "N/A",
+    ),
+
+    _infoRow(
+      "Mobile",
+      company["companyMobile"]?.toString() ?? "N/A",
+    ),
+
+    _infoRow(
+      "Email",
+      company["companyEmail"]?.toString() ?? "N/A",
+    ),
+
+    _infoRow(
+      "Company PAN",
+      company["companyPan"]?.toString() ?? "N/A",
+    ),
+
+    _infoRow(
+      "GST",
+      company["gstNumber"]?.toString() ?? "N/A",
+    ),
+
+    _infoRow(
+      "Remarks",
+      company["remarks"]?.toString() ?? "N/A",
+    ),
+  ],
+),
               // const SizedBox(height: 16),
 
               // /// APPLICANT
