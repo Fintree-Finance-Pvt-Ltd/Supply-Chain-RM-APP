@@ -99,11 +99,11 @@ class _SignInOptionsState extends State<SignInOptions> {
               padding: const EdgeInsets.all(25),
 
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(.9),
+                color: Colors.white.withValues(alpha: .9),
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(.08),
+                    color: Colors.black.withValues(alpha: .08),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -214,7 +214,7 @@ class _SignInOptionsState extends State<SignInOptions> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.withOpacity(.25),
+                            color: Colors.blue.withValues(alpha: .25),
                             blurRadius: 10,
                             offset: const Offset(0, 6),
                           ),

@@ -107,7 +107,7 @@ class _CeoDashboardState extends State<CeoDashboard> {
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.blue.withOpacity(0.25),
+              color: Colors.blue.withValues(alpha: 0.25),
               blurRadius: 20,
               offset: const Offset(0, 10),
             )
@@ -176,7 +176,7 @@ class _CeoDashboardState extends State<CeoDashboard> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 12,
             )
           ],
@@ -255,7 +255,7 @@ class _CeoDashboardState extends State<CeoDashboard> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
           )
         ],
@@ -263,7 +263,7 @@ class _CeoDashboardState extends State<CeoDashboard> {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: color.withOpacity(0.15),
+            backgroundColor: color.withValues(alpha: 0.15),
             child: Icon(icon, color: color),
           ),
           const SizedBox(width: 12),

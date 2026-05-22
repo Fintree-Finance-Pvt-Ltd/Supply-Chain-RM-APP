@@ -19,7 +19,6 @@ import 'package:flutter/foundation.dart';
 import 'package:supply_chain/core/theme/app_colors.dart';
 import 'package:supply_chain/core/utils/toast_helper.dart';
 import 'package:supply_chain/core/widgets/app_loader.dart';
-import 'package:supply_chain/core/widgets/mobile_consent_popup.dart';
 import 'package:supply_chain/presentation/role/rm/NewCustomer/co_applicant.dart';
 
 class ApplicantDetails extends StatefulWidget {
@@ -358,7 +357,7 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
             ///  GLOBAL APP LOADER
             if (isApiLoading)
               Container(
-                color: Colors.black.withOpacity(0.25),
+                color: Colors.black.withValues(alpha: 0.25),
                 child: const Center(
                   child: AppLoader(size: 60, color: Color(0xFF0052FF)),
                 ),
@@ -1372,9 +1371,9 @@ Future<bool> _sendEmailOtp() async {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.35)),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
       ),
       child: Row(
         children: [
@@ -1402,7 +1401,7 @@ Future<bool> _sendEmailOtp() async {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),

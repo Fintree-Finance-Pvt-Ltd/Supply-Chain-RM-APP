@@ -1,4 +1,4 @@
-package com.rm.scf.com
+package com.fintree.supplychain
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -164,7 +164,7 @@ bool isPasswordVisible = false;
             borderRadius: BorderRadius.circular(36),
             boxShadow: [
               BoxShadow(
-                color: Colors.blue.withOpacity(0.15),
+                color: Colors.blue.withValues(alpha: 0.15),
                 blurRadius: 40,
                 offset: const Offset(0, 20),
               ),
@@ -232,7 +232,7 @@ bool isPasswordVisible = false;
                     color: const Color.fromARGB(255, 26, 65, 150),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.withOpacity(0.35),
+                        color: Colors.blue.withValues(alpha: 0.35),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -293,7 +293,7 @@ InkWell(
       borderRadius: BorderRadius.circular(30),
       boxShadow: [
         BoxShadow(
-          color: Colors.blue.withOpacity(0.1),
+          color: Colors.blue.withValues(alpha: 0.1),
           blurRadius: 14,
           offset: const Offset(0, 8),
         ),
@@ -343,7 +343,7 @@ Widget _softInput({
       borderRadius: BorderRadius.circular(30),
       boxShadow: [
         BoxShadow(
-          color: Colors.blue.withOpacity(0.1),
+          color: Colors.blue.withValues(alpha: 0.1),
           blurRadius: 14,
           offset: const Offset(0, 8),
         ),

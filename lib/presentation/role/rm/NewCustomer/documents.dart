@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -370,7 +369,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
             color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(blurRadius: 12, color: Colors.black.withOpacity(0.06)),
+              BoxShadow(blurRadius: 12, color: Colors.black.withValues(alpha: 0.06)),
             ],
           ),
           child: Row(

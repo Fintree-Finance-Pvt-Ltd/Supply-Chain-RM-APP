@@ -404,8 +404,8 @@ class _AddressDetailsState extends State<AddressDetails> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.darkBlue.withOpacity(0.95),
-            AppColors.primary.withOpacity(0.75),
+            AppColors.darkBlue.withValues(alpha: 0.95),
+            AppColors.primary.withValues(alpha: 0.75),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -413,7 +413,7 @@ class _AddressDetailsState extends State<AddressDetails> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.35),
+            color: AppColors.primary.withValues(alpha: 0.35),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -682,8 +682,8 @@ class _AddressDetailsState extends State<AddressDetails> {
           BoxShadow(
             // color: Colors.black.withOpacity(0.05),
             color: isDarkMode
-                ? Colors.grey.withOpacity(0.2)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.grey.withValues(alpha: 0.2)
+                : Colors.black.withValues(alpha: 0.05),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -711,7 +711,7 @@ class _AddressDetailsState extends State<AddressDetails> {
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.close, size: 18, color: Colors.red),

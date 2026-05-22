@@ -112,7 +112,7 @@ class MobileConsentPopup {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: AppColors.primary.withOpacity(0.25),
+                              color: AppColors.primary.withValues(alpha: 0.25),
                             ),
                           ),
                           child: SingleChildScrollView(
@@ -178,8 +178,8 @@ class MobileConsentPopup {
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(14),
                                         borderSide: BorderSide(
-                                          color: AppColors.darkBlue.withOpacity(
-                                            0.35,
+                                          color: AppColors.darkBlue.withValues(
+                                            alpha: 0.35,
                                           ),
                                         ),
                                       ),
@@ -589,7 +589,7 @@ class EmailVerifyPopup {
                         gradient: LinearGradient(
                           colors: [
                             AppColors.primary,
-                            AppColors.primary.withOpacity(0.75),
+                            AppColors.primary.withValues(alpha: 0.75),
                           ],
                         ),
                       ),
@@ -658,8 +658,8 @@ class EmailVerifyPopup {
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                     borderSide: BorderSide(
-                                      color: AppColors.darkBlue.withOpacity(
-                                        0.35,
+                                      color: AppColors.darkBlue.withValues(
+                                        alpha: 0.35,
                                       ),
                                     ),
                                   ),

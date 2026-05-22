@@ -31,39 +31,48 @@ class _SubmittedCasesPageState extends State<SubmittedCasesPage> {
     });
   }
 
-  Future<void> _loadSubmittedCases() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString("token");
-      final rmId = prefs.getInt("rmId");
+Future<void> _loadSubmittedCases() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+    final rmId = prefs.getInt("rmId");
 
-      final response = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers"),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-        },
-      );
+    final response = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/workflows/customers/dashboard/rm",
+      ),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
 
-      final body = jsonDecode(response.body);
+    final body = jsonDecode(response.body);
 
-      if (body["success"] == true) {
-        final List data = body["data"];
+    if (body["success"] == true) {
+      // Correct path
+      final List customers = body["data"]["customers"];
 
-        final submitted = data.where((e) {
-          return e["status"] == "submitted" && e["rmId"] == rmId;
-        }).toList();
+      // Only submitted + rmId match
+      final submitted = customers.where((e) {
+        return e["status"] == "Submitted" &&
+            e["rmId"] == rmId;
+      }).toList();
 
-        setState(() {
-          submittedCases = submitted;
-          loading = false;
-        });
-      }
-    } catch (e) {
-      print("Submitted cases fetch error: $e");
+      setState(() {
+        submittedCases = submitted;
+        loading = false;
+      });
+
+      debugPrint("Submitted Cases: ${submittedCases.length}");
+    } else {
+      setState(() => loading = false);
     }
+  } catch (e) {
+    debugPrint("Submitted cases fetch error: $e");
+    setState(() => loading = false);
   }
-
+}
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -124,8 +133,8 @@ class _SubmittedCasesPageState extends State<SubmittedCasesPage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(
-                        isDarkMode ? 0.2 : 0.05),
+                    color: Colors.black.withValues(
+                        alpha: isDarkMode ? 0.2 : 0.05),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -180,8 +189,8 @@ class _SubmittedCasesPageState extends State<SubmittedCasesPage> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(
-                                    isDarkMode ? 0.25 : 0.15),
+                                color: Colors.green.withValues(
+                                    alpha: isDarkMode ? 0.25 : 0.15),
                                 borderRadius:
                                     BorderRadius.circular(20),
                               ),
@@ -257,7 +266,7 @@ class _SubmittedCasesPageState extends State<SubmittedCasesPage> {
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: isDarkMode
-                                    ? Colors.blue.withOpacity(0.2)
+                                    ? Colors.blue.withValues(alpha: 0.2)
                                     : const Color(0xFFE0F2FE),
                                 borderRadius:
                                     BorderRadius.circular(8),

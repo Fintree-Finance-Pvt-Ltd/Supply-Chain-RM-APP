@@ -8,7 +8,7 @@ import 'package:supply_chain/core/routes/app_route.dart';
 import 'package:supply_chain/presentation/role/md/Cases/handled_cases_page.dart';
 import 'package:supply_chain/presentation/role/md/Cases/pending_approvals_page.dart';
 import 'package:supply_chain/presentation/role/md/Cases/rejected_cases_page.dart';
-
+import 'package:supply_chain/presentation/role/md/invoice/invoice_dashboard.dart';
 class MdDashboard extends StatefulWidget {
   const MdDashboard({super.key});
 
@@ -181,7 +181,7 @@ class _MdDashboardState extends State<MdDashboard> {
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(.1),
+                color: Colors.green.withValues(alpha: .1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Icons.dashboard, color: Colors.green),
@@ -202,7 +202,7 @@ class _MdDashboardState extends State<MdDashboard> {
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(.1),
+                color: Colors.red.withValues(alpha: .1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(Icons.logout, color: Colors.red),
@@ -253,7 +253,7 @@ class _MdDashboardState extends State<MdDashboard> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(.4),
+                      color: Colors.white.withValues(alpha: .4),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -388,65 +388,100 @@ class _MdDashboardState extends State<MdDashboard> {
   }
 
   /// ================= RECENT SECTION =================
-
-  Widget _recentSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Recent Cases",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+Widget _recentSection() {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Recent Cases",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
 
-          const SizedBox(height: 14),
+        const SizedBox(height: 14),
 
-          _caseTile(
-            Icons.schedule,
-            "Pending Approvals",
-            loadingCount ? "Loading..." : "$pendingCount Cases",
-            () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const PendingApprovalsPage()),
-              );
-            },
-          ),
-
-          _caseTile(
-            Icons.check_circle,
-            "Handled Cases",
-            loadingCount ? "Loading..." : "${handledCases.length} Cases",
-            () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const HandledCasesPage()),
-              );
-            },
-          ),
-
-          _caseTile(Icons.cancel, "Rejected Cases", "View", () {
+        _caseTile(
+          Icons.schedule,
+          "Pending Approvals",
+          loadingCount
+              ? "Loading..."
+              : "$pendingCount Cases",
+          () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const RejectedCasesPage()),
+              MaterialPageRoute(
+                builder: (_) =>
+                    const PendingApprovalsPage(),
+              ),
             );
-          }),
-        ],
-      ),
-    );
-  }
+          },
+        ),
 
+        _caseTile(
+          Icons.check_circle,
+          "Handled Cases",
+          loadingCount
+              ? "Loading..."
+              : "${handledCases.length} Cases",
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>
+                    const HandledCasesPage(),
+              ),
+            );
+          },
+        ),
+
+        _caseTile(
+          Icons.cancel,
+          "Rejected Cases",
+          "View",
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>
+                    const RejectedCasesPage(),
+              ),
+            );
+          },
+        ),
+
+        /// 🔥 NEW INVOICE CARD
+        _caseTile(
+          Icons.receipt_long,
+          "Invoice Discounting",
+          "MD Invoice Approval",
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>
+                    const InvoiceDashboard(),
+              ),
+            );
+          },
+        ),
+      ],
+    ),
+  );
+}
   Widget _caseTile(
     IconData icon,
     String title,
@@ -456,7 +491,7 @@ class _MdDashboardState extends State<MdDashboard> {
     return ListTile(
       onTap: onTap,
       leading: CircleAvatar(
-        backgroundColor: Colors.green.withOpacity(.1),
+        backgroundColor: Colors.green.withValues(alpha: .1),
         child: Icon(icon, color: Colors.green),
       ),
       title: Text(title),

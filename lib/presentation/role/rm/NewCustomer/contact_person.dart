@@ -308,8 +308,8 @@ class _ContactPersonState extends State<ContactPerson> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.darkBlue.withOpacity(0.95),
-            AppColors.primary.withOpacity(0.75),
+            AppColors.darkBlue.withValues(alpha: 0.95),
+            AppColors.primary.withValues(alpha: 0.75),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -317,7 +317,7 @@ class _ContactPersonState extends State<ContactPerson> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.35),
+            color: AppColors.primary.withValues(alpha: 0.35),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -427,7 +427,7 @@ class _ContactPersonState extends State<ContactPerson> {
         color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(blurRadius: 12, color: Colors.black.withOpacity(0.06)),
+          BoxShadow(blurRadius: 12, color: Colors.black.withValues(alpha: 0.06)),
         ],
       ),
       child: Column(
@@ -651,13 +651,13 @@ class _ContactPersonState extends State<ContactPerson> {
                               ),
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? AppColors.primary.withOpacity(0.12)
+                                    ? AppColors.primary.withValues(alpha: 0.12)
                                     : Colors.white,
                                 borderRadius: BorderRadius.circular(30),
                                 border: Border.all(
                                   color: selected
                                       ? AppColors.primary
-                                      : AppColors.grey.withOpacity(0.4),
+                                      : AppColors.grey.withValues(alpha: 0.4),
                                   width: 1.4,
                                 ),
                               ),
@@ -841,7 +841,7 @@ class _ContactPersonState extends State<ContactPerson> {
       margin: const EdgeInsets.only(right: 10),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.15),
+        color: Colors.green.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

@@ -17,7 +17,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.rm.scf.com"
+    namespace = "com.fintree.supplychain"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -32,7 +32,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.rm.scf.com"
+        // applicationId = "com.rm.scf.com"
+        applicationId = "com.fintree.supplychain"
         minSdk = flutter.minSdkVersion   // ✅ IMPORTANT (Firebase requirement)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

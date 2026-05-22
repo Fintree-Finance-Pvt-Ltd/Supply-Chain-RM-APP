@@ -41,37 +41,158 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
   }
 
   /// FETCH API
-  Future<void> fetchCustomerDetails() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString("token");
-
-      final response = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers/${widget.customerId}"),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-        },
-      );
-
-      final body = jsonDecode(response.body);
-
-      if (body["success"] == true) {
+Future<void> fetchCustomerDetails() async {
+  try {
     setState(() {
-  caseData = body["data"];
-});
+      loading = true;
+    });
 
-await loadDocuments();
+    final prefs = await SharedPreferences.getInstance();
 
-setState(() {
-  loading = false;
-});
-      }
-    } catch (e) {
-      print("Error: $e");
-    }
+    final token = prefs.getString("token");
+
+    final headers = {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    };
+
+    // ================================
+    // CUSTOMER KYC API
+    // ================================
+    final kycResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/kyc",
+      ),
+      headers: headers,
+    );
+
+    // ================================
+    // CO-APPLICANTS API
+    // ================================
+    final coApplicantResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/coapplicants",
+      ),
+      headers: headers,
+    );
+
+    // ================================
+    // ADDRESSES API
+    // ================================
+    final addressResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/addresses",
+      ),
+      headers: headers,
+    );
+
+    // ================================
+    // CONTACT PERSONS API
+    // ================================
+    final contactPersonResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/contact-persons",
+      ),
+      headers: headers,
+    );
+
+    // ================================
+    // DOCUMENTS API
+    // ================================
+    final documentResponse = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/documents/customer/${widget.customerId}",
+      ),
+      headers: headers,
+    );
+
+    final kycBody = jsonDecode(kycResponse.body);
+
+    final coApplicantBody =
+        jsonDecode(coApplicantResponse.body);
+
+    final addressBody =
+        jsonDecode(addressResponse.body);
+
+    final contactPersonBody =
+        jsonDecode(contactPersonResponse.body);
+
+    final documentBody =
+        jsonDecode(documentResponse.body);
+
+    final baseUrl =
+        ApiEndpoints.baseUrl.replaceAll("/api", "");
+
+    final uploadedDocs =
+        documentBody["data"] ??
+            documentBody ??
+            [];
+
+    setState(() {
+      // =================================
+      // MAIN RESPONSE
+      // =================================
+      // responseData = kycBody;
+
+      caseData = {
+        "customerProfile":
+            kycBody["data"]?["customerProfile"] ?? {},
+
+        "applicant":
+            kycBody["data"]?["applicant"] ?? {},
+
+        "kycDetails":
+            kycBody["data"]?["kycDetails"] ?? [],
+
+        "coApplicants":
+            coApplicantBody["data"] ??
+                coApplicantBody ??
+                [],
+
+        "addresses":
+            addressBody["data"] ??
+                addressBody ??
+                [],
+
+        "contactPersons":
+            contactPersonBody["data"] ??
+                contactPersonBody ??
+                [],
+
+        "documents":
+            uploadedDocs.map((doc) {
+          final filePath =
+              doc["filePath"] ?? "";
+
+          final cleanPath =
+              filePath.startsWith("/")
+                  ? filePath.substring(1)
+                  : filePath;
+
+          return {
+            ...doc,
+            "fileUrl":
+                filePath.isNotEmpty
+                    ? "$baseUrl/$cleanPath"
+                    : null,
+          };
+        }).toList(),
+      };
+
+      loading = false;
+    });
+
+    print("Customer Details Loaded");
+    print(caseData);
+
+  } catch (e) {
+    print("Fetch Customer Details Error: $e");
+
+    setState(() {
+      loading = false;
+    });
   }
-
+}
   Future<void> submitToMD() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -221,7 +342,8 @@ Future<void> loadDocuments() async {
     final String status = (caseData?["status"] ?? "").toString().toLowerCase();
 
     final applicant = caseData?["applicant"] ?? {};
-    final company = caseData ?? {};
+   final company =
+    caseData?["customerProfile"] ?? {};
     final coApplicants = caseData?["coApplicants"] ?? [];
     final addresses = caseData?["addresses"] ?? [];
     final contacts = caseData?["contactPersons"] ?? [];
@@ -413,7 +535,7 @@ Future<void> loadDocuments() async {
         border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -475,7 +597,7 @@ Future<void> loadDocuments() async {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 12),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 12),
         ],
       ),
       child: Column(
@@ -926,7 +1048,7 @@ Future<void> loadDocuments() async {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -967,7 +1089,7 @@ Future<void> loadDocuments() async {
                     border: Border.all(color: Colors.grey.shade200),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 14,
                         offset: const Offset(0, 6),
                       ),

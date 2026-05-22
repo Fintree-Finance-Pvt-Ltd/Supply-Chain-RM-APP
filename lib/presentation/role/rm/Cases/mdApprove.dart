@@ -134,8 +134,8 @@ class _mdApprovedState extends State<mdApproved> {
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(
-                                  isDarkMode ? 0.2 : 0.05),
+                              color: Colors.black.withValues(
+                                  alpha: isDarkMode ? 0.2 : 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -149,7 +149,7 @@ class _mdApprovedState extends State<mdApproved> {
                               width: 50,
                               decoration: BoxDecoration(
                                 color: isDarkMode
-                                    ? Colors.indigo.withOpacity(0.2)
+                                    ? Colors.indigo.withValues(alpha: 0.2)
                                     : const Color(0xFFE0E7FF),
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -226,8 +226,8 @@ class _mdApprovedState extends State<mdApproved> {
                               ),
                               decoration: BoxDecoration(
                                 color: isDarkMode
-                                    ? Colors.green.withOpacity(0.25)
-                                    : Colors.green.withOpacity(0.15),
+                                    ? Colors.green.withValues(alpha: 0.25)
+                                    : Colors.green.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(

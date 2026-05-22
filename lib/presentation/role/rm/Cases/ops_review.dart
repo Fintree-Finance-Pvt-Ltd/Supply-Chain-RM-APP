@@ -139,7 +139,7 @@ class _OpsReviewState extends State<OpsReview> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
+              color: Colors.black.withValues(alpha: isDarkMode ? 0.2 : 0.05),
               blurRadius: 20,
               offset: const Offset(0, 6),
             ),
@@ -171,7 +171,7 @@ class _OpsReviewState extends State<OpsReview> {
                         /// AVATAR
                         CircleAvatar(
                           radius: 20,
-                          backgroundColor: Colors.purple.withOpacity(0.2),
+                          backgroundColor: Colors.purple.withValues(alpha: 0.2),
                           child: Text(
                             initial,
                             style: const TextStyle(
@@ -231,7 +231,7 @@ class _OpsReviewState extends State<OpsReview> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: Colors.purple.withOpacity(0.15),
+                            color: Colors.purple.withValues(alpha: 0.15),
                             borderRadius:
                                 BorderRadius.circular(20),
                           ),
@@ -258,7 +258,7 @@ class _OpsReviewState extends State<OpsReview> {
                             horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           color: isDarkMode
-                              ? Colors.blue.withOpacity(0.2)
+                              ? Colors.blue.withValues(alpha: 0.2)
                               : const Color(0xFFEFF6FF),
                           borderRadius:
                               BorderRadius.circular(10),
