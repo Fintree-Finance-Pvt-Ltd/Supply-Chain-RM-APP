@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supply_chain/core/constants/api_endpoints.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supply_chain/core/services/auth_service.dart';
 import 'package:supply_chain/core/services/draft_service.dart';
-
+import 'dart:html' as html;
 import 'package:supply_chain/core/theme/app_colors.dart';
 import 'package:supply_chain/presentation/role/rm/NewCustomer/Documents.dart'
     hide AppColors;
@@ -123,7 +124,7 @@ class _AddressDetailsState extends State<AddressDetails> {
       final token = await AuthService().getToken();
 
       final response = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers/${widget.customerId}"),
+        Uri.parse("${ApiEndpoints.baseUrl}/customers/${widget.customerId}/addresses"),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
@@ -135,7 +136,7 @@ class _AddressDetailsState extends State<AddressDetails> {
       if (response.statusCode == 200 && data["success"] == true) {
         final customer = data["data"];
 
-        final List addressList = customer["addresses"] ?? [];
+        final List addressList = customer;
 
         addresses.clear();
 
@@ -331,7 +332,7 @@ class _AddressDetailsState extends State<AddressDetails> {
       final customerId = await _loadCustomerId();
 
       final response = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers/$customerId"),
+        Uri.parse("${ApiEndpoints.baseUrl}/customers/$customerId/kyc"),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -339,7 +340,7 @@ class _AddressDetailsState extends State<AddressDetails> {
 
       if (data["success"] == true) {
         setState(() {
-          companyType = data["data"]["companyType"];
+          companyType = data["data"]["customerProfile"]["companyType"];
         });
       }
     } catch (e) {
@@ -347,51 +348,138 @@ class _AddressDetailsState extends State<AddressDetails> {
     }
   }
 
-  Future<void> _fetchLocationFromPincode(String pincode, int index) async {
-    if (pincode.length != 6) return;
+ Future<void> _fetchLocationFromPincode(String pincode, int index) async {
+  if (pincode.length != 6) return;
+
+setState(() {
+  addresses[index].isPincodeLoading = true;
+});
+  /// WEB BLOCK
+if (kIsWeb) {
+
+  _showError(
+    "Auto pincode lookup unavailable on web. Please enter city/state manually.",
+  );
+
+  setState(() {
+    addresses[index].isPincodeLoading = false;
+  });
+
+  return;
+}
+  try {
+
+  final response = await html.HttpRequest.getString(
+    "https://api.allorigins.win/raw?url=https://api.postalpincode.in/pincode/$pincode",
+  );
+
+  print("BODY => $response");
+
+  final data = jsonDecode(response);
+
+  if (data is List &&
+      data.isNotEmpty &&
+      data[0]["Status"] == "Success") {
+
+    final offices =
+        data[0]["PostOffice"] ?? [];
+
+    if (offices.isNotEmpty) {
+
+      setState(() {
+
+        addresses[index].postOffices =
+            offices.map<PostOfficeModel>((e) {
+
+          return PostOfficeModel(
+            name: e["Name"] ?? "",
+            district: e["District"] ?? "",
+            state: e["State"] ?? "",
+          );
+
+        }).toList();
+
+        addresses[index].selectedCity = null;
+
+        addresses[index].stateController.text =
+            offices[0]["State"] ?? "";
+
+        addresses[index].isPincodeLoading = false;
+      });
+
+    } else {
+
+      _showError("Invalid Pincode");
+
+      setState(() {
+        addresses[index].isPincodeLoading = false;
+      });
+    }
+
+  } else {
+
+    _showError("Invalid Pincode");
 
     setState(() {
-      addresses[index].isPincodeLoading = true;
-      addresses[index].postOffices = [];
-      addresses[index].selectedCity = null;
+      addresses[index].isPincodeLoading = false;
     });
+  }
 
-    try {
-      final response = await http.get(
-        Uri.parse("https://api.postalpincode.in/pincode/$pincode"),
-      );
+} catch (e) {
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+  print("PINCODE ERROR => $e");
 
-        if (data[0]["Status"] == "Success") {
-          List offices = data[0]["PostOffice"];
+  _showError("Error fetching pincode");
 
-          setState(() {
-            addresses[index].postOffices = offices
-                .map((e) => PostOfficeModel.fromJson(e))
-                .toList();
+  setState(() {
+    addresses[index].isPincodeLoading = false;
+  });
+}
+  //   if (pincode.length != 6) return;
 
-            addresses[index].stateController.text = offices[0]["State"] ?? "";
+  //   setState(() {
+  //     addresses[index].isPincodeLoading = true;
+  //     addresses[index].postOffices = [];
+  //     addresses[index].selectedCity = null;
+  //   });
 
-            addresses[index].isPincodeLoading = false;
-          });
-        } else {
-          _showError("Invalid Pincode");
-          setState(() {
-            addresses[index].isPincodeLoading = false;
-            addresses[index].postOffices = [];
-          });
-          // setState(() => addresses[index].isPincodeLoading = false);
-        }
-      } else {
-        _showError("Failed to fetch location");
-        setState(() => addresses[index].isPincodeLoading = false);
-      }
-    } catch (e) {
-      _showError("Error fetching pincode");
-      setState(() => addresses[index].isPincodeLoading = false);
-    }
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse("https://api.postalpincode.in/pincode/$pincode"),
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+
+  //       if (data[0]["Status"] == "Success") {
+  //         List offices = data[0]["PostOffice"];
+
+  //         setState(() {
+  //           addresses[index].postOffices = offices
+  //               .map((e) => PostOfficeModel.fromJson(e))
+  //               .toList();
+
+  //           addresses[index].stateController.text = offices[0]["State"] ?? "";
+
+  //           addresses[index].isPincodeLoading = false;
+  //         });
+  //       } else {
+  //         _showError("Invalid Pincode");
+  //         setState(() {
+  //           addresses[index].isPincodeLoading = false;
+  //           addresses[index].postOffices = [];
+  //         });
+  //         // setState(() => addresses[index].isPincodeLoading = false);
+  //       }
+  //     } else {
+  //       _showError("Failed to fetch location");
+  //       setState(() => addresses[index].isPincodeLoading = false);
+  //     }
+  //   } catch (e) {
+  //     _showError("Error fetching pincode");
+  //     setState(() => addresses[index].isPincodeLoading = false);
+  //   }
+  // 
   }
 
   /// =======================
@@ -404,8 +492,8 @@ class _AddressDetailsState extends State<AddressDetails> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.darkBlue.withValues(alpha: 0.95),
-            AppColors.primary.withValues(alpha: 0.75),
+            AppColors.darkBlue.withOpacity(0.95),
+            AppColors.primary.withOpacity(0.75),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -413,7 +501,7 @@ class _AddressDetailsState extends State<AddressDetails> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.35),
+            color: AppColors.primary.withOpacity(0.35),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -682,8 +770,8 @@ class _AddressDetailsState extends State<AddressDetails> {
           BoxShadow(
             // color: Colors.black.withOpacity(0.05),
             color: isDarkMode
-                ? Colors.grey.withValues(alpha: 0.2)
-                : Colors.black.withValues(alpha: 0.05),
+                ? Colors.grey.withOpacity(0.2)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -711,7 +799,7 @@ class _AddressDetailsState extends State<AddressDetails> {
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
+                      color: Colors.red.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.close, size: 18, color: Colors.red),
@@ -971,3 +1059,5 @@ class AddressModel {
         addressType.isNotEmpty;
   }
 }
+
+

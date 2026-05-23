@@ -159,7 +159,7 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
       final customerId = await _loadCustomerId();
 
       final response = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers/$customerId"),
+        Uri.parse("${ApiEndpoints.baseUrl}/customers/$customerId/kyc"),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
@@ -170,6 +170,7 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
 
       if (response.statusCode == 200 && data["success"] == true) {
         final customer = data["data"];
+          
         final applicant = customer["applicant"];
 
         if (applicant != null) {
@@ -357,7 +358,7 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
             ///  GLOBAL APP LOADER
             if (isApiLoading)
               Container(
-                color: Colors.black.withValues(alpha: 0.25),
+                color: Colors.black.withOpacity(0.25),
                 child: const Center(
                   child: AppLoader(size: 60, color: Color(0xFF0052FF)),
                 ),
@@ -390,7 +391,8 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
   }
 
   Future<void> _goToApplicantDetails() async {
-    await DraftService.saveWithStep(widget.customerId, "coApplicantDetails", {
+    await DraftService.saveWithStep(widget.customerId, "applicantDetails", {
+    // await DraftService.saveWithStep(widget.customerId, "coApplicantDetails", {
       "applicant": {
         "name": nameCtrl.text,
         "pan": panCtrl.text,
@@ -1371,9 +1373,9 @@ Future<bool> _sendEmailOtp() async {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
+        border: Border.all(color: color.withOpacity(0.35)),
       ),
       child: Row(
         children: [
@@ -1401,7 +1403,7 @@ Future<bool> _sendEmailOtp() async {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),

@@ -727,7 +727,7 @@ Widget build(BuildContext context) {
         /// ================= FULL SCREEN LOADER =================
         if (loading)
           Container(
-            color: Colors.black.withValues(alpha: 0.25),
+            color: Colors.black.withOpacity(0.25),
             child: const Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,

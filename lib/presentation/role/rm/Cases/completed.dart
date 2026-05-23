@@ -291,7 +291,7 @@ class _CompletedCasesPageState extends State<CompletedCasesPage> {
                                     decoration: BoxDecoration(
                                       color: isDarkMode
                                           ? Colors.green
-                                              .withValues(alpha: 0.25)
+                                              .withOpacity(0.25)
                                           : const Color(0xFFE6F7ED),
                                       borderRadius:
                                           BorderRadius.circular(20),
@@ -331,7 +331,7 @@ class _CompletedCasesPageState extends State<CompletedCasesPage> {
                                   decoration: BoxDecoration(
                                     color: isDarkMode
                                         ? Colors.blue
-                                            .withValues(alpha: 0.2)
+                                            .withOpacity(0.2)
                                         : const Color(0xFFEFF6FF),
                                     borderRadius:
                                         BorderRadius.circular(10),

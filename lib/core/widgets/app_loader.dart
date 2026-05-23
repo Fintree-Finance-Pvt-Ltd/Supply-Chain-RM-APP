@@ -71,7 +71,7 @@ class _FinancePainter extends CustomPainter {
  
     // 1. Draw the "Background Track" (Subtle Gray)
     final Paint trackPaint = Paint()
-      ..color = const Color(0xFFE0E0E0).withValues(alpha: 0.3)
+      ..color = const Color(0xFFE0E0E0).withOpacity(0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
     canvas.drawCircle(center, radius, trackPaint);

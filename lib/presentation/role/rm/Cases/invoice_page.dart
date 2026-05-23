@@ -555,7 +555,7 @@ class _InvoicePageState extends State<InvoicePage> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDarkMode ? 0.2 : .05),
+            color: Colors.black.withOpacity(isDarkMode ? 0.2 : .05),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -743,7 +743,7 @@ class _InvoicePageState extends State<InvoicePage> {
         decoration: BoxDecoration(
           color: isSelected
               ? (isDarkMode
-                    ? Colors.blue.withValues(alpha: 0.2)
+                    ? Colors.blue.withOpacity(0.2)
                     : const Color(0xFFE8F0FE))
               : (isDarkMode ? const Color(0xFF1E293B) : Colors.white),
           borderRadius: BorderRadius.circular(14),
@@ -835,7 +835,7 @@ class _InvoicePageState extends State<InvoicePage> {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: .18),
+                        color: Colors.white.withOpacity(.18),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: GestureDetector(
@@ -882,9 +882,9 @@ class _InvoicePageState extends State<InvoicePage> {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: .18),
+                    color: Colors.white.withOpacity(.18),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white.withValues(alpha: .25)),
+                    border: Border.all(color: Colors.white.withOpacity(.25)),
                   ),
                   child: Row(
                     children: [
@@ -1009,7 +1009,7 @@ class _InvoicePageState extends State<InvoicePage> {
                               ),
                               borderRadius: BorderRadius.circular(12),
                               color: isDarkMode
-                                  ? Colors.blue.withValues(alpha: 0.15)
+                                  ? Colors.blue.withOpacity(0.15)
                                   : const Color(0xFFEFF6FF),
                             ),
                             child: Column(

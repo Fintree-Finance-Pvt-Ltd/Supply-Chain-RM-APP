@@ -175,12 +175,12 @@ class _RmDashboardState extends State<RmDashboard> {
         color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withValues(alpha: 0.3), // 🔥 colored border instead of icon
+          color: color.withOpacity(0.3), // 🔥 colored border instead of icon
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -280,7 +280,7 @@ class _RmDashboardState extends State<RmDashboard> {
             right: -20,
             child: CircleAvatar(
               radius: 60,
-              backgroundColor: Colors.white.withValues(alpha: 0.08),
+              backgroundColor: Colors.white.withOpacity(0.08),
             ),
           ),
           Positioned(
@@ -288,7 +288,7 @@ class _RmDashboardState extends State<RmDashboard> {
             left: -30,
             child: CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.white.withValues(alpha: 0.05),
+              backgroundColor: Colors.white.withOpacity(0.05),
             ),
           ),
           // Content
@@ -486,7 +486,7 @@ child: Container(
     borderRadius: BorderRadius.circular(24),
     boxShadow: [
       BoxShadow(
-        color: Colors.black.withValues(alpha: 0.04),
+        color: Colors.black.withOpacity(0.04),
         blurRadius: 10,
         offset: const Offset(0, 4),
       ),
@@ -498,7 +498,7 @@ child: Container(
       Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
+          color: color.withOpacity(0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: color, size: 26),
@@ -628,7 +628,7 @@ child: Container(
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
-        splashColor: color.withValues(alpha: 0.1),
+        splashColor: color.withOpacity(0.1),
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -636,7 +636,7 @@ child: Container(
             border: Border.all(
               color: isDarkMode
                   ? Colors.white10
-                  : Colors.black.withValues(alpha: 0.04),
+                  : Colors.black.withOpacity(0.04),
             ),
           ),
           child: Column(
@@ -646,7 +646,7 @@ child: Container(
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -677,7 +677,7 @@ child: Container(
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -714,7 +714,7 @@ child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: isSelected
             ? BoxDecoration(
-                color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                color: const Color(0xFF2563EB).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               )
             : null,
@@ -828,7 +828,7 @@ child: Container(
  
             Divider(
               color: isDarkMode
-                  ? Colors.white.withValues(alpha: 0.08)
+                  ? Colors.white.withOpacity(0.08)
                   : Colors.grey.shade300,
             ),
  
@@ -853,7 +853,7 @@ child: Container(
  
             Divider(
               color: isDarkMode
-                  ? Colors.white.withValues(alpha: 0.08)
+                  ? Colors.white.withOpacity(0.08)
                   : Colors.grey.shade300,
             ),
  
@@ -927,7 +927,7 @@ child: Container(
                 children: [
                   Divider(
                     color: isDarkMode
-                        ? Colors.white.withValues(alpha: 0.08)
+                        ? Colors.white.withOpacity(0.08)
                         : Colors.grey.shade300,
                   ),
                   Text(
@@ -956,7 +956,7 @@ child: Container(
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: isDarkMode ? color.withValues(alpha: 0.2) : color.withValues(alpha: .1),
+          color: isDarkMode ? color.withOpacity(0.2) : color.withOpacity(.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: color),

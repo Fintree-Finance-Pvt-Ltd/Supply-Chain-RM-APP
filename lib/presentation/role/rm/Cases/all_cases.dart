@@ -202,47 +202,41 @@ class _CasesScreenState extends State<CasesScreen> {
       isDarkMode = prefs.getBool("isDarkMode") ?? false;
     });
   }
-Future<void> fetchCustomers() async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString("token");
-    final rmId = prefs.getInt("rmId");
 
-    final response = await http.get(
-      Uri.parse("${ApiEndpoints.baseUrl}/workflows/customers/dashboard/rm"),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-    );
+  Future<void> fetchCustomers() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("token");
+      final rmId = prefs.getInt("rmId");
 
-    final data = jsonDecode(response.body);
+      final response = await http.get(
+        // Uri.parse("${ApiEndpoints.baseUrl}/customers"),
+          Uri.parse("${ApiEndpoints.baseUrl}/workflows/customers/dashboard/rm"),
 
-    if (data["success"] == true) {
-      // Correct list
-      final List customers = data["data"]["customers"];
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
 
-      // Filter by RM ID
-      final filteredList =
-          customers.where((e) => e["rmId"] == rmId).toList();
+      final data = jsonDecode(response.body);
 
-      setState(() {
-        cases = filteredList
-            .map((e) => CaseModel.fromJson(e))
-            .toList();
+      if (data["success"]) {
+        final List list = data["data"]["customers"];
+        final filteredList = list.where((e) => e["rmId"] == rmId).toList();
 
-        loading = false;
-      });
-
-      debugPrint("Total Cases: ${cases.length}");
-    } else {
+        setState(() {
+          cases = filteredList.map((e) => CaseModel.fromJson(e)).toList();
+          loading = false;
+        });
+      } else {
+        setState(() => loading = false);
+      }
+    } catch (e) {
+      debugPrint("Customer Fetch Error: $e");
       setState(() => loading = false);
     }
-  } catch (e) {
-    debugPrint("Customer Fetch Error: $e");
-    setState(() => loading = false);
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +322,7 @@ Future<void> fetchCustomers() async {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: Colors.black.withOpacity(0.04),
               blurRadius: 24,
               offset: const Offset(0, 12),
             ),
@@ -458,7 +452,7 @@ Future<void> fetchCustomers() async {
     }
 
 if (isDarkMode) {
-  bg = bg.withValues(alpha: 0.2);
+  bg = bg.withOpacity(0.2);
 }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

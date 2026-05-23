@@ -369,7 +369,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
             color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(blurRadius: 12, color: Colors.black.withValues(alpha: 0.06)),
+              BoxShadow(blurRadius: 12, color: Colors.black.withOpacity(0.06)),
             ],
           ),
           child: Row(
@@ -664,7 +664,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
       final token = await AuthService().getToken();
 
       final response = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/documents/customer/$customerId"),
+        Uri.parse("${ApiEndpoints.baseUrl}/customers/$customerId/documents?page=1&limit=20"),
 
         headers: {"Authorization": "Bearer $token"},
       );
@@ -677,21 +677,66 @@ class _DocumentsPageState extends State<DocumentsPage> {
       if (response.statusCode == 200 && data["success"] == true) {
         final List uploadedDocs = data["data"];
 
-        setState(() {
-          for (var doc in documents) {
-            final backendType = doc.type; // ✅ FIXED
+setState(() {
 
-            final matches = uploadedDocs
-                .where((d) => d["documentType"] == backendType)
-                .toList();
+  for (var doc in documents) {
 
-            final base = ApiEndpoints.baseUrl.replaceAll("/api", "");
+    final matches = uploadedDocs.where((d) {
 
-            doc.fileUrls = matches.map<String>((m) {
-              return "$base/${m["filePath"]}";
-            }).toList();
-          }
-        });
+      final apiType =
+          d["documentType"]
+              .toString()
+              .trim()
+              .toLowerCase();
+
+      final localType =
+          doc.type
+              .toString()
+              .trim()
+              .toLowerCase();
+
+      print("API TYPE => $apiType");
+      print("LOCAL TYPE => $localType");
+
+      return apiType == localType;
+
+    }).toList();
+
+    print("MATCHES => $matches");
+
+    final base =
+        ApiEndpoints.baseUrl
+            .replaceAll("/api", "");
+
+    doc.fileUrls =
+        matches.map<String>((m) {
+
+      final path = m["filePath"]
+          .toString()
+          .replaceAll("\\", "/");
+
+      return "$base/$path";
+
+    }).toList();
+
+    print("FILE URLS => ${doc.fileUrls}");
+  }
+});
+        // setState(() {
+        //   for (var doc in documents) {
+        //     final backendType = doc.type; // ✅ FIXED
+
+        //     final matches = uploadedDocs
+        //         .where((d) => d["documentType"] == backendType)
+        //         .toList();
+
+        //     final base = ApiEndpoints.baseUrl.replaceAll("/api", "");
+
+        //     doc.fileUrls = matches.map<String>((m) {
+        //       return "$base/${m["filePath"]}";
+        //     }).toList();
+        //   }
+        // });
       }
     } catch (e) {
       print("FETCH ERROR: $e");

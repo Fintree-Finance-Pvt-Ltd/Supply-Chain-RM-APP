@@ -256,7 +256,7 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
             /// 🔥 GLOBAL LOADER OVERLAY
             if (isApiLoading)
               Container(
-                color: Colors.black.withValues(alpha: 0.25),
+                color: Colors.black.withOpacity(0.25),
                 child: const Center(
                   child: AppLoader(size: 60, color: Color(0xFF0052FF)),
                 ),
@@ -331,7 +331,7 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
       final customerId = await _loadCustomerId();
 
       final response = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers/$customerId"),
+        Uri.parse("${ApiEndpoints.baseUrl}/customers/$customerId/coapplicants"),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
@@ -342,8 +342,8 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
 
       if (response.statusCode == 200 && data["success"] == true) {
         final customer = data["data"];
-
-        final List coApplicantList = customer["coApplicants"] ?? [];
+print("Co-applicant data: $customer");
+        final List coApplicantList = customer;
 
         coApplicants.clear();
 
@@ -724,7 +724,7 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
           colors: [
-            AppColors.darkBlue.withValues(alpha: 0.9),
+            AppColors.darkBlue.withOpacity(0.9),
             const Color.fromARGB(255, 169, 167, 193),
           ],
           begin: Alignment.topLeft,
@@ -732,7 +732,7 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
@@ -796,7 +796,7 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.35),
+                      color: AppColors.primary.withOpacity(0.35),
                       blurRadius: 10,
                       offset: const Offset(0, 6),
                     ),
@@ -846,12 +846,12 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withOpacity(0.06),
             blurRadius: 22,
             offset: const Offset(0, 12),
           ),
         ],
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColors.primary.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -933,7 +933,7 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.danger.withValues(alpha: 0.1),
+              color: AppColors.danger.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.close, size: 18, color: AppColors.danger),
@@ -997,14 +997,14 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
                    
 
             color: model.panVerified
-                ? AppColors.success.withValues(alpha: 0.06)
+                ? AppColors.success.withOpacity(0.06)
                 // : AppColors.inputFill,
                 :  isDarkMode ? const Color(0xFF1E293B) : AppColors.card,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: model.panVerified
                   ? AppColors.success
-                  : AppColors.primary.withValues(alpha: 0.15),
+                  : AppColors.primary.withOpacity(0.15),
             ),
           ),
           child: Column(
@@ -1023,7 +1023,7 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
                     color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: AppColors.primary.withOpacity(0.2),
                     ),
                   ),
                   child: Row(
@@ -1190,7 +1190,7 @@ class _CoApplicantPageState extends State<CoApplicantPage> {
   }) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+        backgroundColor: AppColors.primary.withOpacity(0.1),
         child: Icon(icon, color: AppColors.primary),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -1896,7 +1896,7 @@ if (model.coApplicantId == null) {
             border: Border.all(
               color: model.mobileVerified
                   ? AppColors.success
-                  : AppColors.primary.withValues(alpha: 0.2),
+                  : AppColors.primary.withOpacity(0.2),
             ),
           ),
           child: Row(
@@ -1908,8 +1908,8 @@ if (model.coApplicantId == null) {
                 width: 40,
                 decoration: BoxDecoration(
                   color: model.mobileVerified
-                      ? AppColors.success.withValues(alpha: 0.12)
-                      : AppColors.primary.withValues(alpha: 0.08),
+                      ? AppColors.success.withOpacity(0.12)
+                      : AppColors.primary.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -2102,14 +2102,14 @@ final email = prefs.getString("userEmail") ?? "";
           decoration: BoxDecoration(
             // color: Colors.white,
             color: model.emailVerified
-                ? AppColors.success.withValues(alpha: 0.06)
+                ? AppColors.success.withOpacity(0.06)
                 // : AppColors.inputFill,
                 :isDarkMode?AppColors.textPrimary:AppColors.inputFill,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: model.emailVerified
                   ? AppColors.success
-                  : AppColors.primary.withValues(alpha: 0.2),
+                  : AppColors.primary.withOpacity(0.2),
             ),
           ),
           child: Row(
@@ -2121,8 +2121,8 @@ final email = prefs.getString("userEmail") ?? "";
                 width: 40,
                 decoration: BoxDecoration(
                   color: model.emailVerified
-                      ? AppColors.success.withValues(alpha: 0.12)
-                      : AppColors.primary.withValues(alpha: 0.08),
+                      ? AppColors.success.withOpacity(0.12)
+                      : AppColors.primary.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -2242,7 +2242,7 @@ final email = prefs.getString("userEmail") ?? "";
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.12),
+        color: AppColors.success.withOpacity(0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -2267,7 +2267,7 @@ final email = prefs.getString("userEmail") ?? "";
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.15),
+        color: AppColors.success.withOpacity(0.15),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -2338,7 +2338,7 @@ final email = prefs.getString("userEmail") ?? "";
 
               /// BACKGROUND
               backgroundColor: AppColors.inputFill,
-              selectedColor: AppColors.primary.withValues(alpha: 0.15),
+              selectedColor: AppColors.primary.withOpacity(0.15),
 
               /// BORDER
               shape: RoundedRectangleBorder(
@@ -2346,7 +2346,7 @@ final email = prefs.getString("userEmail") ?? "";
                 side: BorderSide(
                   color: selected
                       ? AppColors.primary
-                      : AppColors.primary.withValues(alpha: 0.3),
+                      : AppColors.primary.withOpacity(0.3),
                   width: selected ? 1.5 : 1,
                 ),
               ),
@@ -2414,8 +2414,8 @@ final email = prefs.getString("userEmail") ?? "";
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        color: color.withValues(alpha: 0.12),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
+        color: color.withOpacity(0.12),
+        border: Border.all(color: color.withOpacity(0.35)),
       ),
       child: Row(
         children: [

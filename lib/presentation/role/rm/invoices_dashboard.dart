@@ -222,7 +222,7 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
         color: isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF5F7FB),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDarkMode ? 0.2 : 0.05),
+            color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -341,7 +341,7 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 14,
               offset: const Offset(0, 6),
             ),
@@ -354,7 +354,7 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [color.withValues(alpha: 0.8), color],
+                  colors: [color.withOpacity(0.8), color],
                 ),
               ),
               child: Icon(icon, color: Colors.white, size: 18),
@@ -444,8 +444,8 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
         boxShadow: [
           BoxShadow(
             color: isDarkMode
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.black.withValues(alpha: 0.04),
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.04),
             blurRadius: 10,
             offset: const Offset(0, 6),
           ),
@@ -597,15 +597,15 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
 
         border: Border.all(
           color: isDarkMode
-              ? Colors.white.withValues(alpha: 0.05)
+              ? Colors.white.withOpacity(0.05)
               : const Color(0xFFE5E7EB),
         ),
 
         boxShadow: [
           BoxShadow(
             color: isDarkMode
-                ? Colors.black.withValues(alpha: 0.25)
-                : Colors.black.withValues(alpha: 0.03),
+                ? Colors.black.withOpacity(0.25)
+                : Colors.black.withOpacity(0.03),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -733,8 +733,8 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: statusColor.withValues(
-                            alpha: isDarkMode ? 0.2 : 0.1,
+                          color: statusColor.withOpacity(
+                            isDarkMode ? 0.2 : 0.1,
                           ),
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -782,15 +782,15 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
 
                 border: Border.all(
                   color: isDarkMode
-                      ? Colors.white.withValues(alpha: 0.05) // subtle border
-                      : Colors.black.withValues(alpha: 0.05),
+                      ? Colors.white.withOpacity(0.05) // subtle border
+                      : Colors.black.withOpacity(0.05),
                 ),
 
                 boxShadow: [
                   BoxShadow(
                     color: isDarkMode
                         ? const Color.fromARGB(255, 18, 22, 39) // deeper shadow
-                        : Colors.black.withValues(alpha: 0.03),
+                        : Colors.black.withOpacity(0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),

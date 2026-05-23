@@ -239,66 +239,277 @@ class _CompanyDetailsState extends State<CompanyDetails> {
     });
   }
 
+
+
+Future<void> _loadCustomerDetails() async {
+  try {
+
+    setState(() => isApiLoading = true);
+
+    final token = await AuthService().getToken();
+
+    final response = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/kyc",
+      ),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 &&
+        data["success"] == true) {
+
+      final profile =
+          data["data"]["customerProfile"];
+
+      if (profile != null) {
+
+        setState(() {
+
+          selectedCompanyType =
+              (profile["companyType"] == null ||
+                      profile["companyType"] == "")
+                  ? "Select company type"
+                  : profile["companyType"];
+
+          companyNameController.text =
+              profile["companyName"] ?? "";
+
+          mobileController.text =
+              profile["companyMobile"] ?? "";
+
+          emailController.text =
+              profile["companyEmail"] ?? "";
+
+          gstController.text =
+              profile["gstNumber"] ?? "";
+
+          panController.text =
+              profile["companyPan"] ?? "";
+
+          isMobileVerified =
+              (profile["companyMobile"] ?? "")
+                  .toString()
+                  .isNotEmpty;
+
+          isEmailVerified =
+              (profile["companyEmail"] ?? "")
+                  .toString()
+                  .isNotEmpty;
+
+          isGstVerified =
+              (profile["gstNumber"] ?? "")
+                  .toString()
+                  .isNotEmpty;
+        });
+      }
+    }
+
+  } catch (e) {
+
+    debugPrint("Load customer error: $e");
+
+  } finally {
+
+    setState(() => isApiLoading = false);
+  }
+}
   Future<void> _loadDraft() async {
     /// API draft passed from Resume page
-    if (widget.draftData != null) {
-      final data = widget.draftData!;
+    // if (widget.draftData != null) {
+    //   final data = widget.draftData!;
 
-      setState(() {
-        selectedCompanyType =
-            (data["companyType"] == null || data["companyType"] == "")
-            ? "Select company type"
-            : data["companyType"];
+    //   setState(() {
+    //     selectedCompanyType =
+    //         (data["companyType"] == null || data["companyType"] == "")
+    //         ? "Select company type"
+    //         : data["companyType"];
 
-        companyNameController.text = data["companyName"] ?? "";
+    //     companyNameController.text = data["companyName"] ?? "";
 
-        mobileController.text = data["companyMobile"] ?? "";
+    //     mobileController.text = data["companyMobile"] ?? "";
 
-        emailController.text = data["companyEmail"] ?? "";
+    //     emailController.text = data["companyEmail"] ?? "";
 
-        gstController.text = data["gstNumber"] ?? "";
+    //     gstController.text = data["gstNumber"] ?? "";
 
-        isMobileVerified = data["companyMobile"] != null;
-        isEmailVerified = data["companyEmail"] != null;
-        isGstVerified = data["gstNumber"] != null;
+    //     isMobileVerified = data["companyMobile"] != null;
+    //     isEmailVerified = data["companyEmail"] != null;
+    //     isGstVerified = data["gstNumber"] != null;
 
-        /// load GST file
-        if (data["documents"] != null && data["documents"].isNotEmpty) {
-          final gstDoc = data["documents"].firstWhere(
-            (doc) => doc["documentType"] == "GST_CERTIFICATE",
-            orElse: () => null,
-          );
+    //     /// load GST file
+    //     if (data["documents"] != null && data["documents"].isNotEmpty) {
+    //       final gstDoc = data["documents"].firstWhere(
+    //         (doc) => doc["documentType"] == "GST_CERTIFICATE",
+    //         orElse: () => null,
+    //       );
 
-          if (gstDoc != null) {
-            selectedGstFile = PlatformFile(name: gstDoc["fileName"], size: 0);
-          }
-        }
-      });
+    //       if (gstDoc != null) {
+    //         selectedGstFile = PlatformFile(name: gstDoc["fileName"], size: 0);
+    //       }
+    //     }
+    //   });
 
-      return;
-    }
+    //   return;
+    // }
+// if (widget.draftData != null) {
+//   final profile = widget.draftData!["customerProfile"];
+
+//   if (profile != null) {
+//     setState(() {
+//       selectedCompanyType =
+//           (profile["companyType"] == null ||
+//                   profile["companyType"] == "")
+//               ? "Select company type"
+//               : profile["companyType"];
+
+//       companyNameController.text =
+//           profile["companyName"] ?? "";
+
+//       mobileController.text =
+//           profile["companyMobile"] ?? "";
+
+//       emailController.text =
+//           profile["companyEmail"] ?? "";
+
+//       gstController.text =
+//           profile["gstNumber"] ?? "";
+
+//       panController.text =
+//           profile["companyPan"] ?? "";
+
+//       isMobileVerified =
+//           (profile["companyMobile"] ?? "").toString().isNotEmpty;
+
+//       isEmailVerified =
+//           (profile["companyEmail"] ?? "").toString().isNotEmpty;
+
+//       isGstVerified =
+//           (profile["gstNumber"] ?? "").toString().isNotEmpty;
+//     });
+//   }
+
+//   return;
+// }\\
+
+
+/// API draft passed from Resume page
+if (widget.draftData != null) {
+
+  final apiData = widget.draftData!["data"];
+  final profile = apiData?["customerProfile"];
+  
+
+  if (profile != null) {
+    setState(() {
+
+      selectedCompanyType =
+          (profile["companyType"] == null ||
+                  profile["companyType"] == "")
+              ? "Select company type"
+              : profile["companyType"];
+
+      companyNameController.text =
+          profile["companyName"] ?? "";
+
+      mobileController.text =
+          profile["companyMobile"] ?? "";
+
+      emailController.text =
+          profile["companyEmail"] ?? "";
+
+      gstController.text =
+          profile["gstNumber"] ?? "";
+
+      panController.text =
+          profile["companyPan"] ?? "";
+
+      isMobileVerified =
+          (profile["companyMobile"] ?? "")
+              .toString()
+              .isNotEmpty;
+
+      isEmailVerified =
+          (profile["companyEmail"] ?? "")
+              .toString()
+              .isNotEmpty;
+
+      isGstVerified =
+          (profile["gstNumber"] ?? "")
+              .toString()
+              .isNotEmpty;
+    });
+  }
+
+  return;
+}
+
+/// fallback → local draft
+if (customerId == null) return;
+
+final draft = await DraftService.loadDraft(customerId!);
+
+if (draft == null) return;
+
+final company = draft["company"];
+
+setState(() {
+  selectedCompanyType =
+      company["companyType"] ?? "Select company type";
+
+  companyNameController.text =
+      company["companyName"] ?? "";
+
+  mobileController.text =
+      company["mobile"] ?? "";
+
+  emailController.text =
+      company["email"] ?? "";
+
+  gstController.text =
+      company["gst"] ?? "";
+
+  panController.text =
+      company["pan"] ?? "";
+
+  isMobileVerified =
+      company["isMobileVerified"] == true;
+
+  isEmailVerified =
+      company["isEmailVerified"] == true;
+
+  isPanVerified =
+      company["isPanVerified"] == true;
+
+  isGstVerified =
+      company["isGstVerified"] == true;
+});
 
     /// fallback → local draft
     if (customerId == null) return;
+final apiData = widget.draftData!["data"];
+    // final draft = await DraftService.loadDraft(customerId!);
 
-    final draft = await DraftService.loadDraft(customerId!);
+    // if (draft == null) return;
 
-    if (draft == null) return;
+    // final company = draft["company"];
 
-    final company = draft["company"];
+    // setState(() {
+    //   selectedCompanyType = company["companyType"];
+    //   companyNameController.text = company["companyName"] ?? "";
+    //   mobileController.text = company["mobile"] ?? "";
+    //   emailController.text = company["email"] ?? "";
+    //   gstController.text = company["gst"] ?? "";
 
-    setState(() {
-      selectedCompanyType = company["companyType"];
-      companyNameController.text = company["companyName"] ?? "";
-      mobileController.text = company["mobile"] ?? "";
-      emailController.text = company["email"] ?? "";
-      gstController.text = company["gst"] ?? "";
-
-      isMobileVerified = company["isMobileVerified"] == true;
-      isEmailVerified = company["isEmailVerified"] == true;
-      isPanVerified = company["isPanVerified"] == true;
-      isGstVerified = company["isGstVerified"] == true;
-    });
+    //   isMobileVerified = company["isMobileVerified"] == true;
+    //   isEmailVerified = company["isEmailVerified"] == true;
+    //   isPanVerified = company["isPanVerified"] == true;
+    //   isGstVerified = company["isGstVerified"] == true;
+    // });
   }
 
   Future<void> _captureLivePhoto() async {
@@ -345,14 +556,17 @@ class _CompanyDetailsState extends State<CompanyDetails> {
     loadTheme();
 
     customerId = widget.customerId;
+        _loadCustomerDetails();
 
     //  _loadcustomerId().then((_) {
 
-    if (widget.isResume) {
-      _loadDraft();
-    } else {
-      _resetForm();
-    }
+    // if (widget.isResume) {
+    //     _loadCustomerDetails();
+
+    //   // _loadDraft();
+    // } else {
+    //   _resetForm();
+    // }
 
     // });
 
@@ -436,7 +650,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
           /// GLOBAL APP LOADER (PAN OCR + GST VERIFY)
           if (isApiLoading)
             Container(
-              color: Colors.black.withValues(alpha: 0.35),
+              color: Colors.black.withOpacity(0.35),
               child: const Center(child: AppLoader(size: 75)),
             ),
         ],
@@ -453,7 +667,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -562,7 +776,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
         color: isDarkMode ? const Color(0xFF1E293B) : AppColors.card,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 12,
             offset: const Offset(2, 6),
           ),

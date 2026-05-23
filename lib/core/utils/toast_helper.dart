@@ -27,7 +27,7 @@ Widget verificationSuccessCard({
   return Container(
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(
-      color: AppColors.success.withValues(alpha: .12),
+      color: AppColors.success.withOpacity(.12),
       borderRadius: BorderRadius.circular(14),
       border: Border.all(color: AppColors.success),
     ),
@@ -93,19 +93,19 @@ void showTopToast(
                   gradient: LinearGradient(
                     colors: success
                         ? [
-                            AppColors.secondary.withValues(alpha: .95),
-                            AppColors.darkBlue.withValues(alpha: .95),
+                            AppColors.secondary.withOpacity(.95),
+                            AppColors.darkBlue.withOpacity(.95),
                           ]
                         : [
-                            AppColors.danger.withValues(alpha: .95),
-                            AppColors.danger.withValues(alpha: .8),
+                            AppColors.danger.withOpacity(.95),
+                            AppColors.danger.withOpacity(.8),
                           ],
                   ),
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 18,
                       offset: const Offset(0, 10),
-                      color: Colors.black.withValues(alpha: .25),
+                      color: Colors.black.withOpacity(.25),
                     ),
                   ],
                 ),
@@ -166,7 +166,7 @@ void showSuccessCardToast({
   entry = OverlayEntry(
     builder: (_) => Positioned.fill(
       child: Material(
-        color: Colors.black.withValues(alpha: 0.45),
+        color: Colors.black.withOpacity(0.45),
         child: Center(
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -177,7 +177,7 @@ void showSuccessCardToast({
               boxShadow: [
                 BoxShadow(
                   blurRadius: 30,
-                  color: Colors.black.withValues(alpha: 0.25),
+                  color: Colors.black.withOpacity(0.25),
                 ),
               ],
             ),
@@ -188,7 +188,7 @@ void showSuccessCardToast({
                   height: 72,
                   width: 72,
                   decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.15),
+                    color: AppColors.success.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
