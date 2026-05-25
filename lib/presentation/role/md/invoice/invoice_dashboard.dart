@@ -74,7 +74,7 @@ class _InvoiceDashboardState extends State<InvoiceDashboard> with SingleTickerPr
               Text(
                 "Invoices",
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 16,
                   letterSpacing: 1,
                 ),
@@ -91,7 +91,7 @@ class _InvoiceDashboardState extends State<InvoiceDashboard> with SingleTickerPr
           ),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
@@ -122,9 +122,9 @@ class _InvoiceDashboardState extends State<InvoiceDashboard> with SingleTickerPr
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +146,7 @@ class _InvoiceDashboardState extends State<InvoiceDashboard> with SingleTickerPr
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -157,7 +157,7 @@ class _InvoiceDashboardState extends State<InvoiceDashboard> with SingleTickerPr
         indicatorColor: Colors.transparent,
         dividerColor: Colors.transparent,
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.white.withOpacity(0.4),
+        unselectedLabelColor: Colors.white.withValues(alpha: 0.4),
         tabs: [
           _buildTabIcon(Icons.hourglass_empty_rounded, "Pending", 0),
           _buildTabIcon(Icons.check_circle_outline_rounded, "Approved", 1),

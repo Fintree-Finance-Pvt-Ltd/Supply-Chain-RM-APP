@@ -81,5 +81,5 @@ class InvoiceModel {
     );
   }
 
-  get loanAccount => null;
+  Null get loanAccount => null;
 }

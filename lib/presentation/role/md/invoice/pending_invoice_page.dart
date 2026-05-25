@@ -59,13 +59,13 @@ class _PendingInvoicePageState extends State<PendingInvoicePage> {
   Map<String, Color> getStatusTheme(String status) {
     switch (status) {
       case "PENDING_MD_APPROVAL":
-        return {"bg": Colors.orange.withOpacity(0.1), "text": Colors.orange.shade800};
+        return {"bg": Colors.orange.withValues(alpha: 0.1), "text": Colors.orange.shade800};
       case "ACTIVE":
-        return {"bg": Colors.green.withOpacity(0.1), "text": Colors.green.shade800};
+        return {"bg": Colors.green.withValues(alpha: 0.1), "text": Colors.green.shade800};
       case "REJECTED":
-        return {"bg": Colors.red.withOpacity(0.1), "text": Colors.red.shade800};
+        return {"bg": Colors.red.withValues(alpha: 0.1), "text": Colors.red.shade800};
       default:
-        return {"bg": Colors.grey.withOpacity(0.1), "text": Colors.grey.shade800};
+        return {"bg": Colors.grey.withValues(alpha: 0.1), "text": Colors.grey.shade800};
     }
   }
 
@@ -121,7 +121,7 @@ class _PendingInvoicePageState extends State<PendingInvoicePage> {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
