@@ -46,8 +46,20 @@ class _InvoicePageState extends State<InvoicePage> {
   final TextEditingController accountHolder = TextEditingController();
   String? customerName;
 
+  final TextEditingController roiController =
+    TextEditingController();
+
+final TextEditingController penalController =
+    TextEditingController();
+
+final TextEditingController serviceFeeController =
+    TextEditingController();
+
   List<Map<String, dynamic>> lanList = [];
 
+double? sanctionAmount;
+double? utilizedAmount;
+double? unutilizedAmount;
   // File? invoiceFile;
   PlatformFile? invoiceFile;
   bool isInvoiceUploaded = false;
@@ -84,7 +96,49 @@ class _InvoicePageState extends State<InvoicePage> {
 
     loadSuppliers();
     fetchCustomerName();
-    loadLan();
+  if (lanList.isNotEmpty) {
+
+  sanctionAmount =
+      double.tryParse(
+        lanList[0]["sanctionAmount"]
+            .toString(),
+      ) ??
+      0;
+
+  utilizedAmount =
+      double.tryParse(
+        lanList[0]["utilizedAmount"]
+            .toString(),
+      ) ??
+      0;
+
+  unutilizedAmount =
+      double.tryParse(
+        lanList[0]["unutilizedAmount"]
+            .toString(),
+      ) ??
+      0;
+
+  tenureDays.text =
+      lanList[0]["tenure"]
+          ?.toString() ??
+      "90";
+
+  roiController.text =
+      lanList[0]["interestRate"]
+          ?.toString() ??
+      "";
+
+  penalController.text =
+      lanList[0]["penalCharges"]
+          ?.toString() ??
+      "";
+
+  serviceFeeController.text =
+      lanList[0]["processingFees"]
+          ?.toString() ??
+      "";
+}
 
     tenureDays.text = "90 Days"; // default value
     _scrollController.addListener(() {
@@ -484,7 +538,7 @@ class _InvoicePageState extends State<InvoicePage> {
 
       final response = await http.get(
         Uri.parse(
-          "https://supplychain-prod.fintreelms.com/api/customers/${widget.customerId}",
+          "${ApiEndpoints.baseUrl}/customers/${widget.customerId}",
         ),
         headers: {
           "Authorization": "Bearer $token",
@@ -803,6 +857,35 @@ class _InvoicePageState extends State<InvoicePage> {
     );
   }
 
+  Widget _limitItem(
+  String title,
+  String value,
+) {
+  return Column(
+    children: [
+
+      Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white70,
+          fontSize: 12,
+        ),
+      ),
+
+      const SizedBox(height: 6),
+
+      Text(
+        value,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+        ),
+      ),
+    ],
+  );
+}
+
   /// BUILD PAGE
   @override
   Widget build(BuildContext context) {
@@ -922,76 +1005,246 @@ class _InvoicePageState extends State<InvoicePage> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  /// CUSTOMER CARD
                   modernCard(
-                    title: "Customer Invoice",
-                    child: Column(
-                      children: [
-                        inputField(
-                          label: "Customer Name",
-                          controller: TextEditingController(
-                            text: customerName ?? "",
-                          ),
-                          icon: Icons.person,
-                          readOnly: true,
-                        ),
-                        // lanDropdown(),
-                        lanExists
-                            ? Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 14,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.grey.shade300,
-                                  ),
-                                  color: isDarkMode
-                                      ? const Color(0xFF1E293B)
-                                      : Colors.grey.shade100,
-                                ),
-                                child: Text(
-                                  existinglanName ?? "",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 5,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                              )
-                            : lanDropdown(),
+  title: "Customer Invoice",
+  child: Column(
+    children: [
 
-                        inputField(
-                          label: "Invoice Number",
-                          controller: invoiceNumber,
-                          icon: Icons.receipt_long,
-                        ),
-                        inputField(
-                          label: "Invoice Date",
-                          controller: invoiceDate,
-                          icon: Icons.calendar_today,
-                          readOnly: true,
-                          onTap: pickDate,
-                        ),
+      /// CUSTOMER NAME
+      inputField(
+        label: "Customer Name",
+        controller: TextEditingController(
+          text: customerName ?? "",
+        ),
+        icon: Icons.person,
+        readOnly: true,
+      ),
 
-                        inputField(
-                          label: "Invoice Amount",
-                          controller: invoiceAmount,
-                          icon: Icons.currency_rupee,
-                        ),
+      /// LAN DROPDOWN
+      lanExists
+          ? Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 16,
+              ),
+              margin: const EdgeInsets.only(
+                bottom: 14,
+              ),
 
-                        inputField(
-                          label: "Tenure Days",
-                          controller: tenureDays,
-                          icon: Icons.schedule,
-                        ),
-                      ],
+              decoration: BoxDecoration(
+                borderRadius:
+                    BorderRadius.circular(14),
+
+                border: Border.all(
+                  color:
+                      Colors.grey.shade300,
+                ),
+
+                color:
+                    isDarkMode
+                        ? const Color(
+                            0xFF1E293B,
+                          )
+                        : Colors
+                            .grey
+                            .shade100,
+              ),
+
+              child: Row(
+                children: [
+
+                  Icon(
+                    Icons.account_tree,
+                    color:
+                        isDarkMode
+                            ? Colors.white70
+                            : Colors.black54,
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  Expanded(
+                    child: Text(
+                      existinglanName ?? "",
+
+                      style: TextStyle(
+                        fontWeight:
+                            FontWeight.w600,
+
+                        fontSize: 15,
+
+                        color:
+                            isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                      ),
                     ),
                   ),
+                ],
+              ),
+            )
+          : lanDropdown(),
+
+      /// INVOICE NUMBER
+      inputField(
+        label: "Invoice Number",
+        controller: invoiceNumber,
+        icon: Icons.receipt_long,
+      ),
+
+      /// INVOICE DATE
+      inputField(
+        label: "Invoice Date",
+        controller: invoiceDate,
+        icon: Icons.calendar_today,
+        readOnly: true,
+        onTap: pickDate,
+      ),
+
+      /// INVOICE AMOUNT
+      inputField(
+        label: "Invoice Amount",
+        controller: invoiceAmount,
+        icon: Icons.currency_rupee,
+      ),
+
+      /// TENURE + ROI
+      Row(
+        children: [
+
+          Expanded(
+            child: inputField(
+              label: "Tenure Days",
+              controller: tenureDays,
+              icon: Icons.schedule,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: inputField(
+              label: "ROI %",
+              controller: roiController,
+              icon: Icons.percent,
+            ),
+          ),
+        ],
+      ),
+
+      /// PENAL + PROCESSING
+      Row(
+        children: [
+
+          Expanded(
+            child: inputField(
+              label: "Penal Charges",
+              controller: penalController,
+              icon: Icons.money_off,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: inputField(
+              label: "Processing Fee",
+              controller:
+                  serviceFeeController,
+              icon: Icons.wallet,
+            ),
+          ),
+        ],
+      ),
+
+      /// LIMIT CARD
+      if (sanctionAmount != null)
+        Container(
+          width: double.infinity,
+
+          margin: const EdgeInsets.only(
+            top: 10,
+          ),
+
+          padding: const EdgeInsets.all(
+            16,
+          ),
+
+          decoration: BoxDecoration(
+            gradient:
+                const LinearGradient(
+              colors: [
+                Color(0xFF1E40AF),
+                Color(0xFF2563EB),
+              ],
+            ),
+
+            borderRadius:
+                BorderRadius.circular(
+              18,
+            ),
+          ),
+
+          child: Column(
+            children: [
+
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment
+                        .spaceBetween,
+
+                children: [
+
+                  _limitItem(
+                    "Sanction",
+                    "₹${sanctionAmount ?? 0}",
+                  ),
+
+                  _limitItem(
+                    "Utilized",
+                    "₹${utilizedAmount ?? 0}",
+                  ),
+
+                  _limitItem(
+                    "Available",
+                    "₹${unutilizedAmount ?? 0}",
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              LinearProgressIndicator(
+                value:
+                    sanctionAmount == 0
+                        ? 0
+                        : (utilizedAmount ??
+                                0) /
+                            (sanctionAmount ??
+                                1),
+
+                backgroundColor:
+                    Colors.white24,
+
+                valueColor:
+                    const AlwaysStoppedAnimation(
+                  Colors.white,
+                ),
+
+                minHeight: 8,
+
+                borderRadius:
+                    BorderRadius.circular(
+                  10,
+                ),
+              ),
+            ],
+          ),
+        ),
+    ],
+  ),
+),
 
                   Column(
                     children: [
