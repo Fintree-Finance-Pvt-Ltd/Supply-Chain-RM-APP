@@ -6,7 +6,7 @@ import 'package:supply_chain/core/constants/api_endpoints.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supply_chain/core/services/auth_service.dart';
 import 'package:supply_chain/core/services/draft_service.dart';
-import 'dart:html' as html;
+// import 'dart:html' as html;
 import 'package:supply_chain/core/theme/app_colors.dart';
 import 'package:supply_chain/presentation/role/rm/NewCustomer/Documents.dart'
     hide AppColors;
@@ -353,10 +353,12 @@ class _AddressDetailsState extends State<AddressDetails> {
 
 setState(() {
   addresses[index].isPincodeLoading = true;
+  addresses[index].postOffices = [];
+  addresses[index].selectedCity = null;
 });
-  /// WEB BLOCK
-if (kIsWeb) {
 
+/// WEB BLOCK
+if (kIsWeb) {
   _showError(
     "Auto pincode lookup unavailable on web. Please enter city/state manually.",
   );
@@ -367,120 +369,75 @@ if (kIsWeb) {
 
   return;
 }
-  try {
 
-  final response = await html.HttpRequest.getString(
-    "https://api.allorigins.win/raw?url=https://api.postalpincode.in/pincode/$pincode",
+try {
+  final response = await http.get(
+    Uri.parse("https://api.postalpincode.in/pincode/$pincode"),
   );
 
-  print("BODY => $response");
+  print("BODY => ${response.body}");
 
-  final data = jsonDecode(response);
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
 
-  if (data is List &&
-      data.isNotEmpty &&
-      data[0]["Status"] == "Success") {
+    if (data is List &&
+        data.isNotEmpty &&
+        data[0]["Status"] == "Success") {
+      final offices = data[0]["PostOffice"] ?? [];
 
-    final offices =
-        data[0]["PostOffice"] ?? [];
+      if (offices.isNotEmpty) {
+        setState(() {
+          addresses[index].postOffices =
+              offices.map<PostOfficeModel>((e) {
+            return PostOfficeModel(
+              name: e["Name"] ?? "",
+              district: e["District"] ?? "",
+              state: e["State"] ?? "",
+            );
+          }).toList();
 
-    if (offices.isNotEmpty) {
+          addresses[index].selectedCity = null;
 
-      setState(() {
+          addresses[index].stateController.text =
+              offices[0]["State"] ?? "";
 
-        addresses[index].postOffices =
-            offices.map<PostOfficeModel>((e) {
+          addresses[index].isPincodeLoading = false;
+        });
+      } else {
+        _showError("Invalid Pincode");
 
-          return PostOfficeModel(
-            name: e["Name"] ?? "",
-            district: e["District"] ?? "",
-            state: e["State"] ?? "",
-          );
-
-        }).toList();
-
-        addresses[index].selectedCity = null;
-
-        addresses[index].stateController.text =
-            offices[0]["State"] ?? "";
-
-        addresses[index].isPincodeLoading = false;
-      });
-
+        setState(() {
+          addresses[index].isPincodeLoading = false;
+          addresses[index].postOffices = [];
+        });
+      }
     } else {
-
       _showError("Invalid Pincode");
 
       setState(() {
         addresses[index].isPincodeLoading = false;
+        addresses[index].postOffices = [];
       });
     }
-
   } else {
-
-    _showError("Invalid Pincode");
+    _showError("Failed to fetch location");
 
     setState(() {
       addresses[index].isPincodeLoading = false;
+      addresses[index].postOffices = [];
     });
   }
-
 } catch (e) {
-
   print("PINCODE ERROR => $e");
 
   _showError("Error fetching pincode");
 
   setState(() {
     addresses[index].isPincodeLoading = false;
+    addresses[index].postOffices = [];
   });
 }
-  //   if (pincode.length != 6) return;
-
-  //   setState(() {
-  //     addresses[index].isPincodeLoading = true;
-  //     addresses[index].postOffices = [];
-  //     addresses[index].selectedCity = null;
-  //   });
-
-  //   try {
-  //     final response = await http.get(
-  //       Uri.parse("https://api.postalpincode.in/pincode/$pincode"),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       final data = json.decode(response.body);
-
-  //       if (data[0]["Status"] == "Success") {
-  //         List offices = data[0]["PostOffice"];
-
-  //         setState(() {
-  //           addresses[index].postOffices = offices
-  //               .map((e) => PostOfficeModel.fromJson(e))
-  //               .toList();
-
-  //           addresses[index].stateController.text = offices[0]["State"] ?? "";
-
-  //           addresses[index].isPincodeLoading = false;
-  //         });
-  //       } else {
-  //         _showError("Invalid Pincode");
-  //         setState(() {
-  //           addresses[index].isPincodeLoading = false;
-  //           addresses[index].postOffices = [];
-  //         });
-  //         // setState(() => addresses[index].isPincodeLoading = false);
-  //       }
-  //     } else {
-  //       _showError("Failed to fetch location");
-  //       setState(() => addresses[index].isPincodeLoading = false);
-  //     }
-  //   } catch (e) {
-  //     _showError("Error fetching pincode");
-  //     setState(() => addresses[index].isPincodeLoading = false);
-  //   }
-  // 
-  }
+ }
 
   /// =======================
   /// HEADER

@@ -161,7 +161,7 @@ class _PendingInvoicePageState extends State<PendingInvoicePage> {
                       style: TextStyle(
                         color: statusTheme["text"],
                         fontWeight: FontWeight.bold,
-                        fontSize: 11,
+                        fontSize: 6,
                       ),
                     ),
                   ),

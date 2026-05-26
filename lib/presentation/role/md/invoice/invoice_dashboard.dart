@@ -80,11 +80,11 @@ class _InvoiceDashboardState extends State<InvoiceDashboard> with SingleTickerPr
                 ),
               ),
               const Text(
-                "Manage all your invoices in one place",
+                "Manage all your invoices",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],

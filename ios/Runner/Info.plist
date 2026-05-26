@@ -8,14 +8,6 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Supply Chain</string>
-	<key>NSCameraUsageDescription</key>
-	<string>This app requires camera access to capture photos.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to your photo library to select images.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app requires permission to save photos to your gallery.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>This app requires microphone access for camera usage.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -34,6 +26,20 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access is required to capture customer KYC documents, applicant photos, invoices, and other loan-related documents. For example, the app may use the camera to upload a customer's PAN card, Aadhaar card, or invoice during the loan application process.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access is required to capture customer KYC documents, applicant photos, invoices, and other loan-related documents. For example, the app may use the camera to upload a customer's PAN card, Aadhaar card, invoice, or signed loan document during the loan application and verification process.</string>
+
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone access may be required while recording videos or capturing documents within the loan application process, such as recording customer verification videos or audio during document capture.</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access is required to allow users to upload existing customer KYC documents, invoices, PAN cards, Aadhaar cards, and other loan-related images from their device gallery.</string>
+
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Photo library save access is required to allow users to save captured loan-related images or documents, such as invoices and customer verification photos, to their device gallery.</string>
+	
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

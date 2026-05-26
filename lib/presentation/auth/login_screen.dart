@@ -252,23 +252,23 @@ bool isPasswordVisible = false;
               ),
 
               const SizedBox(height: 28),
-InkWell(
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SignInOptions(),
-      ),
-    );
-  },
-  child: const Text(
-    "Or Sign in with",
-    style: TextStyle(
-      color: Colors.grey,
-      fontSize: 13,
-    ),
-  ),
-)
+// InkWell(
+//   onTap: () {
+//     Navigator.push(
+//       context,
+//       MaterialPageRoute(
+//         builder: (context) => SignInOptions(),
+//       ),
+//     );
+//   },
+//   child: const Text(
+//     "Or Sign in with",
+//     style: TextStyle(
+//       color: Colors.grey,
+//       fontSize: 13,
+//     ),
+//   ),
+// )
               // const Text(
               //   "Or Sign in with",
               //   style: TextStyle(

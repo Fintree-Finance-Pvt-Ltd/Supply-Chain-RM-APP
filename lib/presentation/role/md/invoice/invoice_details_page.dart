@@ -169,7 +169,7 @@ class _InvoiceDetailsPageState extends State<InvoiceDetailsPage> {
         children: [
           Icon(icon, size: 20, color: secondaryText),
           const SizedBox(width: 12),
-          Text(title, style: TextStyle(color: secondaryText, fontSize: 14)),
+          Text(title, style: TextStyle(color: secondaryText, fontSize: 8)),
           const Spacer(),
           Text(value, style: TextStyle(color: primaryDark, fontWeight: FontWeight.w600, fontSize: 14)),
         ],
