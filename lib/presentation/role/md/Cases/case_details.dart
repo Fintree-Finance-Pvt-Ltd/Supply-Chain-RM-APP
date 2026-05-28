@@ -34,7 +34,7 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
   final processingFeesController = TextEditingController();
   final conditionsController = TextEditingController();
   final TextEditingController remarksController = TextEditingController();
-  
+
   @override
   void initState() {
     super.initState();
@@ -64,25 +64,40 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
 
       // CO-APPLICANTS API
       final coApplicantResponse = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers/${widget.customerId}/coapplicants"),
+        Uri.parse(
+          "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/coapplicants",
+        ),
         headers: headers,
       );
 
       // ADDRESSES API
       final addressResponse = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers/${widget.customerId}/addresses"),
+        Uri.parse(
+          "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/addresses",
+        ),
         headers: headers,
       );
 
       // CONTACT PERSONS API
       final contactPersonResponse = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers/${widget.customerId}/contact-persons"),
+        Uri.parse(
+          "${ApiEndpoints.baseUrl}/customers/${widget.customerId}/contact-persons",
+        ),
+        headers: headers,
+      );
+
+          final customerResponse = await http.get(
+        Uri.parse(
+          "${ApiEndpoints.baseUrl}/customers/${widget.customerId}",
+        ),
         headers: headers,
       );
 
       // DOCUMENTS API
       final documentResponse = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/documents/customer/${widget.customerId}"),
+        Uri.parse(
+          "${ApiEndpoints.baseUrl}/documents/customer/${widget.customerId}",
+        ),
         headers: headers,
       );
 
@@ -90,6 +105,7 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
       final coApplicantBody = jsonDecode(coApplicantResponse.body);
       final addressBody = jsonDecode(addressResponse.body);
       final contactPersonBody = jsonDecode(contactPersonResponse.body);
+      final customerBody = jsonDecode(customerResponse.body);
       final documentBody = jsonDecode(documentResponse.body);
 
       final baseUrl = ApiEndpoints.baseUrl.replaceAll("/api", "");
@@ -102,10 +118,14 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
           "kycDetails": kycBody["data"]?["kycDetails"] ?? [],
           "coApplicants": coApplicantBody["data"] ?? coApplicantBody ?? [],
           "addresses": addressBody["data"] ?? addressBody ?? [],
-          "contactPersons": contactPersonBody["data"] ?? contactPersonBody ?? [],
+          "contactPersons":
+              contactPersonBody["data"] ?? contactPersonBody ?? [],
+          "customer": customerBody["data"] ?? customerBody ?? [],
           "documents": uploadedDocs.map((doc) {
             final filePath = doc["filePath"] ?? "";
-            final cleanPath = filePath.startsWith("/") ? filePath.substring(1) : filePath;
+            final cleanPath = filePath.startsWith("/")
+                ? filePath.substring(1)
+                : filePath;
 
             return {
               ...doc,
@@ -125,59 +145,20 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     }
   }
 
-  Future<void> submitToMD() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString("token");
-
-      final response = await http.post(
-        Uri.parse("${ApiEndpoints.baseUrl}/workflows/customers/${widget.customerId}/rm-submit-md"),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode({
-          "remarks": "Final terms confirmed by RM",
-          "sanctionAmount": "500000.00",
-          "tenure": "4",
-          "interestRate": "10.00",
-          "penalCharges": "5.00",
-          "processingFees": "1000",
-          "conditions": "ok",
-        }),
-      );
-
-      final body = jsonDecode(response.body);
-
-      if (body["success"] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Submitted to MD successfully")),
-        );
-        Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Submission failed")),
-        );
-      }
-    } catch (e) {
-      print("Submit error: $e");
-    }
-  }
-
   Future<void> loadDocuments() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString("token");
 
-    final response = await http.get(
-      Uri.parse(
-        "${ApiEndpoints.baseUrl}/documents/customer/${widget.customerId}",
-      ),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-    );
+      final response = await http.get(
+        Uri.parse(
+          "${ApiEndpoints.baseUrl}/documents/customer/${widget.customerId}",
+        ),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
 
       final body = jsonDecode(response.body);
       final uploadedDocs = body["data"] ?? body ?? [];
@@ -187,7 +168,9 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
         caseData ??= {};
         caseData!["documents"] = uploadedDocs.map((doc) {
           final filePath = doc["filePath"] ?? "";
-          final cleanPath = filePath.startsWith("/") ? filePath.substring(1) : filePath;
+          final cleanPath = filePath.startsWith("/")
+              ? filePath.substring(1)
+              : filePath;
 
           return {
             ...doc,
@@ -205,7 +188,10 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    final String status = (caseData?["status"] ?? "").toString().toLowerCase();
+    final String status =
+    (caseData?["customer"]?["status"] ?? "")
+        .toString()
+        .toLowerCase();
 
     final applicant = caseData?["applicant"] ?? {};
     final company = caseData?["customerProfile"] ?? {};
@@ -499,7 +485,8 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
 
         return {
           "partner": partner,
-          "sanctionAmount": double.tryParse(sanction["sanctionAmount"].toString()) ?? 0,
+          "sanctionAmount":
+              double.tryParse(sanction["sanctionAmount"].toString()) ?? 0,
           "tenure": sanction["tenure"] ?? 0,
           "interestRate": sanction["interestRate"] ?? 0,
           "penalCharges": sanction["penalCharges"] ?? 0,
@@ -509,7 +496,9 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
       }).toList();
 
       final response = await http.post(
-        Uri.parse("${ApiEndpoints.baseUrl}/workflows/customers/${widget.customerId}/md-approve"),
+        Uri.parse(
+          "${ApiEndpoints.baseUrl}/workflows/customers/${widget.customerId}/md-approve",
+        ),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
@@ -569,7 +558,10 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 child: Row(
                   children: [
                     IconButton(
@@ -612,7 +604,9 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     final token = await AuthService().getToken();
 
     await http.post(
-      Uri.parse("${ApiEndpoints.baseUrl}/workflows/customers/${widget.customerId}/md-reject"),
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/workflows/customers/${widget.customerId}/md-reject",
+      ),
       headers: {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json",
@@ -639,7 +633,9 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
     }
 
     // Displays the first 2 documents initially unless the showAllDocuments state flag is toggled
-    final visibleDocuments = showAllDocuments ? documents : documents.take(2).toList();
+    final visibleDocuments = showAllDocuments
+        ? documents
+        : documents.take(2).toList();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -658,35 +654,40 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-         Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    // Wrap the title text with Expanded to prevent horizontal overflow
-    Expanded( 
-      child: const Text(
-        "Bank Related Documents",
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        overflow: TextOverflow.ellipsis, // Elegantly truncates with '...' if the screen is too narrow
-      ),
-    ),
-    const SizedBox(width: 8), // Added subtle spacing between the title and the button
-    if (documents.length > 2)
-      TextButton(
-        onPressed: () {
-          setState(() {
-            showAllDocuments = !showAllDocuments; 
-          });
-        },
-        child: Text(
-          showAllDocuments ? "Show Less" : "View All (${documents.length})",
-          style: const TextStyle(
-            color: Color(0xFF4F46E5),
-            fontWeight: FontWeight.bold,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Wrap the title text with Expanded to prevent horizontal overflow
+              Expanded(
+                child: const Text(
+                  "Bank Related Documents",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  overflow: TextOverflow
+                      .ellipsis, // Elegantly truncates with '...' if the screen is too narrow
+                ),
+              ),
+              const SizedBox(
+                width: 8,
+              ), // Added subtle spacing between the title and the button
+              if (documents.length > 2)
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      showAllDocuments = !showAllDocuments;
+                    });
+                  },
+                  child: Text(
+                    showAllDocuments
+                        ? "Show Less"
+                        : "View All (${documents.length})",
+                    style: const TextStyle(
+                      color: Color(0xFF4F46E5),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
           ),
-        ),
-      ),
-  ],
-),
           const SizedBox(height: 18),
           Column(
             children: visibleDocuments.map((doc) {
@@ -746,7 +747,10 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
                             runSpacing: 6,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFE0E7FF),
                                   borderRadius: BorderRadius.circular(20),
@@ -761,7 +765,10 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
                                 ),
                               ),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFFF3CD),
                                   borderRadius: BorderRadius.circular(20),
@@ -780,7 +787,10 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
                           const SizedBox(height: 6),
                           Text(
                             date,
-                            style: const TextStyle(fontSize: 11, color: Colors.grey),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
@@ -839,7 +849,8 @@ class FinalSanctionTermsSection extends StatefulWidget {
   const FinalSanctionTermsSection({super.key, required this.customerId});
 
   @override
-  State<FinalSanctionTermsSection> createState() => _FinalSanctionTermsSectionState();
+  State<FinalSanctionTermsSection> createState() =>
+      _FinalSanctionTermsSectionState();
 }
 
 class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
@@ -847,11 +858,13 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
   bool loading = true;
   bool isEditable = true;
 
-  final TextEditingController sanctionAmountController = TextEditingController();
+  final TextEditingController sanctionAmountController =
+      TextEditingController();
   final TextEditingController tenureController = TextEditingController();
   final TextEditingController interestRateController = TextEditingController();
   final TextEditingController penalChargesController = TextEditingController();
-  final TextEditingController processingFeesController = TextEditingController();
+  final TextEditingController processingFeesController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -936,12 +949,18 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
             itemBuilder: (context, i) {
               final sanction = sanctionList[i];
 
+              final bool isApproved =
+                  (sanction["status"] ?? "").toString().toLowerCase() ==
+                  "approved";
               final titles = [
                 "SANCTION AMOUNT",
                 "TENURE (MONTHS)",
                 "INTEREST RATE (%)",
                 "PENAL CHARGES (%)",
                 "PROCESSING FEES (%)",
+                "Legal Charges (%)",
+                "Service Fee Charges (%)",
+                "Cash Collateral",
               ];
 
               final values = [
@@ -950,39 +969,71 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
                 sanction["interestRate"] ?? "",
                 sanction["penalCharges"] ?? "",
                 sanction["processingFees"] ?? "",
+                sanction["legalCharges"] ?? "",
+                sanction["serviceFeeCharges"] ?? "",
+                sanction["cashCollateral"] ?? "",
               ];
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  Text(
-                    sanction["partner"] == "FFPL"
-                        ? "Fintree Finance Pvt Ltd (FFPL)"
-                        : sanction["partner"] == "Kite"
-                            ? "KITE FINANCE (KF)"
-                            : "Muthoot Finance (MF)",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          sanction["partner"] == "FFPL"
+                              ? "Fintree Finance Pvt Ltd (FFPL)"
+                              : sanction["partner"] == "Kite"
+                              ? "KITE FINANCE (KF)"
+                              : "Muthoot Finance (MF)",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if (isApproved)
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Text(
+                            "APPROVED & LOCKED",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 14),
                   GridView.builder(
                     itemCount: titles.length,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 1.2,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 1.2,
+                        ),
                     itemBuilder: (context, index) {
                       return Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFDDE2F1),
+                          color: isApproved
+                              ? Colors.green.withOpacity(0.15)
+                              : const Color.fromARGB(255, 189, 209, 250),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
@@ -997,7 +1048,7 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            isEditable
+                            !isApproved
                                 ? TextFormField(
                                     initialValue: values[index].toString(),
                                     decoration: const InputDecoration(
