@@ -46,6 +46,13 @@ class _InvoicePageState extends State<InvoicePage> {
   final TextEditingController accountHolder = TextEditingController();
   String? customerName;
 
+  List<Map<String, dynamic>> invoices = []; 
+    // List of LANs and suppliers
+  List<Map<String, dynamic>> loanAccounts = []; // <-- define this
+  List<Map<String, dynamic>> suppliers = [];// <-- store all invoices
+
+
+
   final TextEditingController roiController =
     TextEditingController();
 
@@ -83,7 +90,6 @@ double? unutilizedAmount;
 
   bool isDarkMode = false;
 
-  List<Map<String, dynamic>> suppliers = [];
   Map<String, dynamic>? selectedSupplier;
   final ScrollController _scrollController = ScrollController();
   double scrollOffset = 0;
@@ -96,6 +102,10 @@ double? unutilizedAmount;
 
     loadSuppliers();
     fetchCustomerName();
+    loadLan();
+    loadInvoices();
+    
+      
   if (lanList.isNotEmpty) {
 
   sanctionAmount =
@@ -154,6 +164,95 @@ double? unutilizedAmount;
       isDarkMode = prefs.getBool("isDarkMode") ?? false;
     });
   }
+
+Future<void> loadInvoices() async {
+  try {
+    final token = await AuthService().getToken();
+    final response = await http.get(
+      Uri.parse("${ApiEndpoints.baseUrl}/workflows/invoices/dashboard/rm"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      // Flatten data to a list of Map<String, dynamic>
+      final fetchedInvoices = List<Map<String, dynamic>>.from(
+        data["data"]["invoices"] ?? [],
+      );
+
+      setState(() {
+        invoices = fetchedInvoices;
+      });
+
+      print("Invoices loaded: ${invoices.length}");
+    } else {
+      print("Failed to fetch invoices: ${response.statusCode}");
+      setState(() => invoices = []);
+    }
+  } catch (e) {
+    print("Error fetching invoices: $e");
+    setState(() => invoices = []);
+  }
+}
+
+
+/// Call this whenever disbursementAmount changes
+void validateAndSetDisbursement(String value) {
+  final enteredAmount = int.tryParse(value) ?? 0;
+
+  // Total allowed limit
+  final availableLimit = unutilizedAmount ?? sanctionAmount ?? 0;
+
+  // Calculate existing disbursement for the same invoice
+  final existingDisbursement = invoices
+      .where((inv) =>
+          (inv["invoiceNumber"] == invoiceNumber.text ||
+              (inv["invoiceNumber"]?.toString().startsWith(
+                      "${invoiceNumber.text}_") ??
+                  false)) &&
+          (inv["supplierId"] ?? inv["supplier"]?["id"]) ==
+              selectedSupplier?["id"] &&
+          inv["invoiceDate"]?.toString().split("T")[0] == invoiceDate.text &&
+          inv["loanAccountId"] == selectedLanId)
+      .fold<double>(
+          0, (sum, inv) => sum + (double.tryParse(inv["disbursementAmount"]?.toString() ?? "0") ?? 0));
+
+  final invoiceAmt = double.tryParse(invoiceAmount.text) ?? 0;
+
+  final totalDisbursement = existingDisbursement + enteredAmount;
+
+  // ❌ invoice amount exceeded
+  if (totalDisbursement > invoiceAmt) {
+    showTopToast(
+      context,
+      "Total disbursement cannot exceed invoice amount.\n"
+      "Already Utilized: ₹${existingDisbursement.toStringAsFixed(2)}\n"
+      "Invoice Amount: ₹${invoiceAmt.toStringAsFixed(2)}\n"
+      "Remaining Allowed: ₹${(invoiceAmt - existingDisbursement).toStringAsFixed(2)}",
+      success: false,
+    );
+    return;
+  }
+
+  // ❌ validation against unutilized limit
+  if (enteredAmount > availableLimit) {
+    showTopToast(
+      context,
+      "Disbursement amount cannot exceed unutilized limit of ₹${availableLimit.toStringAsFixed(2)}",
+      success: false,
+    );
+    return;
+  }
+
+  // ✅ If valid, update controller
+  setState(() {
+    disbursementAmount.text = enteredAmount.toStringAsFixed(2);
+  });
+}
 
   Future<void> loadExistingInvoiceFromRM() async {
     try {
@@ -391,10 +490,55 @@ double? unutilizedAmount;
           lanList = List<Map<String, dynamic>>.from(data["data"]);
         });
       }
+      
     } catch (e) {
       print("LAN API Error: $e");
     }
   }
+
+/// Fetch rates for selected LAN and supplier
+Future<void> fetchRates({required int lanId}) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    final response = await http.get(
+      Uri.parse(
+        "${ApiEndpoints.baseUrl}/workflows/invoices/customers/${widget.customerId}/lans/$lanId/rates",
+      ),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data["success"] == true && data["data"] != null) {
+        final rateData = data["data"];
+
+        setState(() {
+          roiController.text = rateData["roi"] ?? "";
+          penalController.text = rateData["penalCharges"] ?? "";
+          serviceFeeController.text = rateData["serviceFee"] ?? "";
+          sanctionAmount =
+              double.tryParse(rateData["sanctionAmount"] ?? "0") ?? 0;
+          utilizedAmount =
+              double.tryParse(rateData["utilizedLimit"]?.toString() ?? "0") ?? 0;
+          unutilizedAmount =
+              double.tryParse(rateData["unutilizedLimit"]?.toString() ?? "0") ?? 0;
+        });
+      }
+    } else {
+      showTopToast(
+          context, "Rate API error: ${response.statusCode}", success: false);
+    }
+  } catch (e) {
+    print("Rate API error: $e");
+    showTopToast(context, "Error fetching rate details", success: false);
+  }
+}
+
 
   Future<void> loadSuppliers() async {
     try {
@@ -530,6 +674,43 @@ double? unutilizedAmount;
       print("API Error: $e");
     }
   }
+
+
+/// Fetch invoice amount locally based on LAN, Supplier, Number, and Date
+/// Fetch invoice amount locally based on LAN, Supplier, Number, and Date
+void fetchInvoiceAmountFromLocal({
+  required String invoiceNumber,
+  required String invoiceDate,
+  required int lanId,
+  required int supplierId,
+}) {
+  if (invoiceNumber.isEmpty || invoiceDate.isEmpty || lanId == 0 || supplierId == 0) {
+    setState(() => invoiceAmount.text = "");
+    return;
+  }
+
+  if (invoices.isEmpty) {
+    print("Invoices list is empty. Fetch invoices first.");
+    return;
+  }
+
+  final existingInvoice = invoices.firstWhere(
+    (inv) =>
+        inv["invoiceNumber"]?.toString().toLowerCase().trim() == invoiceNumber.toLowerCase().trim() &&
+        inv["invoiceDate"]?.toString().split("T")[0] == invoiceDate &&
+        inv["loanAccountId"] == lanId &&
+        (inv["supplierId"] ?? inv["supplier"]?["id"]) == supplierId,
+    orElse: () => {},
+  );
+
+  setState(() {
+    invoiceAmount.text = existingInvoice["invoiceAmount"]?.toString() ?? "";
+  });
+
+  if (existingInvoice.isNotEmpty) {
+    showTopToast(context, "Invoice amount loaded", success: true);
+  }
+}
 
   Future<void> fetchCustomerName() async {
     try {
@@ -709,11 +890,20 @@ double? unutilizedAmount;
         );
       }).toList(),
 
-      onChanged: (value) {
-        setState(() {
-          selectedLanId = value;
-        });
-      },
+      // onChanged: (value) async{
+      //   setState(() {
+      //     selectedLanId = value;
+      //   });
+      //     await fetchRates();
+      // },
+onChanged: (value) async {
+  if (value == null) return;
+
+  setState(() => selectedLanId = value);
+
+  // fetch rates immediately for selected LAN
+  await fetchRates(lanId: value);
+}
     ),
   );
 }
@@ -1086,29 +1276,311 @@ double? unutilizedAmount;
             )
           : lanDropdown(),
 
+      /// LAN DROPDOWN
+      supplierExists
+          ? Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 16,
+              ),
+              margin: const EdgeInsets.only(
+                bottom: 14,
+              ),
+
+              decoration: BoxDecoration(
+                borderRadius:
+                    BorderRadius.circular(14),
+
+                border: Border.all(
+                  color:
+                      Colors.grey.shade300,
+                ),
+
+                color:
+                    isDarkMode
+                        ? const Color(
+                            0xFF1E293B,
+                          )
+                        : Colors
+                            .grey
+                            .shade100,
+              ),
+
+              child: Row(
+                children: [
+
+                  Icon(
+                    Icons.account_tree,
+                    color:
+                        isDarkMode
+                            ? Colors.white70
+                            : Colors.black54,
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  Expanded(
+                    child: Text(
+                      existingSupplierName ?? "",
+
+                      style: TextStyle(
+                        fontWeight:
+                            FontWeight.w600,
+
+                        fontSize: 15,
+
+                        color:
+                            isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : supplierDropdown(),
       /// INVOICE NUMBER
-      inputField(
-        label: "Invoice Number",
-        controller: invoiceNumber,
-        icon: Icons.receipt_long,
-      ),
+      // inputField(
+      //   label: "Invoice Number",
+      //   controller: invoiceNumber,
+      //   icon: Icons.receipt_long,
+      // ),
+
+// Invoice Number TextField
+// Invoice Number TextField
+
+// Invoice Number Input
+TextField(
+  controller: invoiceNumber,
+  decoration: InputDecoration(
+    labelText: "Invoice Number",
+    prefixIcon: Icon(Icons.receipt_long),
+  ),
+  onChanged: (_) {
+    if (selectedLanId != null && selectedSupplier?['id'] != null) {
+      fetchInvoiceAmountFromLocal(
+        invoiceNumber: invoiceNumber.text,
+        invoiceDate: invoiceDate.text,
+        lanId: selectedLanId!,
+        supplierId: selectedSupplier!['id'],
+      );
+    }
+  },
+),
+
+// Invoice Date Input
+TextField(
+  controller: invoiceDate,
+  decoration: InputDecoration(
+    labelText: "Invoice Date",
+    prefixIcon: Icon(Icons.calendar_today),
+  ),
+  readOnly: true,
+  onTap: () async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (picked != null) {
+      invoiceDate.text = picked.toString().split(" ")[0];
+      if (selectedLanId != null && selectedSupplier?['id'] != null) {
+        fetchInvoiceAmountFromLocal(
+          invoiceNumber: invoiceNumber.text,
+          invoiceDate: invoiceDate.text,
+          lanId: selectedLanId!,
+          supplierId: selectedSupplier!['id'],
+        );
+      }
+    }
+  },
+),
+
+// LAN Dropdown
+
+// Supplier Dropdown
+
+// Invoice Amount (read-only)
+
 
       /// INVOICE DATE
-      inputField(
-        label: "Invoice Date",
-        controller: invoiceDate,
-        icon: Icons.calendar_today,
-        readOnly: true,
-        onTap: pickDate,
-      ),
+      // inputField(
+      //   label: "Invoice Date",
+      //   controller: invoiceDate,
+      //   icon: Icons.calendar_today,
+      //   readOnly: true,
+      //   onTap: pickDate,
+      // ),
 
       /// INVOICE AMOUNT
-      inputField(
-        label: "Invoice Amount",
-        controller: invoiceAmount,
-        icon: Icons.currency_rupee,
-      ),
+      // inputField(
+      //   label: "Invoice Amount",
+      //   controller: invoiceAmount,
+      //   icon: Icons.currency_rupee,
+      // ),
+TextField(
+  controller: invoiceAmount,
+  decoration: InputDecoration(
+    labelText: "Invoice Amount",
+    prefixIcon: Icon(Icons.currency_rupee),
+  ),
+  keyboardType: TextInputType.number,
+),
 
+            // inputField(
+            //   label: "disbursement amount",
+            //   controller: disbursementAmount,
+            //   icon: Icons.price_change,
+            // ),
+//          TextField(
+//   controller: disbursementAmount,
+//   keyboardType: TextInputType.number,
+//   decoration: InputDecoration(
+//     labelText: "Disbursement Amount",
+//     prefixIcon: Icon(Icons.attach_money),
+//     border: OutlineInputBorder(),
+//   ),
+//   onChanged: validateAndSetDisbursement,
+// ),
+      
+  //     TextField(
+  // controller: disbursementAmount,
+  // keyboardType: TextInputType.number,
+  // decoration: InputDecoration(
+  //   labelText: "Disbursement Amount",
+  //   prefixIcon: Icon(Icons.attach_money),
+  //   border: OutlineInputBorder(),
+  // ),
+  // onChanged: (value) {
+  //   final enteredAmount = double.tryParse(value) ?? 0;
+
+  //   final availableLimit = unutilizedAmount ?? sanctionAmount ?? 0;
+
+  //   final existingDisbursement = invoices
+  //       .where((inv) =>
+  //           (inv["invoiceNumber"] == invoiceNumber.text ||
+  //               (inv["invoiceNumber"]?.toString().startsWith("${invoiceNumber.text}_") ?? false)) &&
+  //           (inv["supplierId"] ?? inv["supplier"]?["id"]) == selectedSupplier?["id"] &&
+  //           inv["invoiceDate"]?.toString().split("T")[0] == invoiceDate.text &&
+  //           inv["loanAccountId"] == selectedLanId)
+  //       .fold<double>(
+  //           0,
+  //           (sum, inv) =>
+  //               sum + (double.tryParse(inv["disbursementAmount"]?.toString() ?? "0") ?? 0));
+
+  //   final invoiceAmt = double.tryParse(invoiceAmount.text) ?? 0;
+
+  //   final totalDisbursement = existingDisbursement + enteredAmount;
+
+  //   // Show validation toast but do NOT modify controller
+  //   if (totalDisbursement > invoiceAmt) {
+  //     showTopToast(
+  //       context,
+  //       "Total disbursement cannot exceed invoice amount.\n"
+  //       "Already Utilized: ₹${existingDisbursement.toStringAsFixed(2)}\n"
+  //       "Invoice Amount: ₹${invoiceAmt.toStringAsFixed(2)}\n"
+  //       "Remaining Allowed: ₹${(invoiceAmt - existingDisbursement).toStringAsFixed(2)}",
+  //       success: false,
+  //     );
+  //     return;
+  //   }
+
+  //   if (enteredAmount > availableLimit) {
+  //     showTopToast(
+  //       context,
+  //       "Disbursement amount cannot exceed unutilized limit of ₹${availableLimit.toStringAsFixed(2)}",
+  //       success: false,
+  //     );
+  //     return;
+  //   }
+
+  //   // ✅ Valid input, just allow typing — don't set controller text
+  // },
+// ), 
+TextField(
+  controller: disbursementAmount,
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: "Disbursement Amount",
+    prefixIcon: Icon(Icons.attach_money),
+    border: OutlineInputBorder(),
+  ),
+  onChanged: (value) {
+    double enteredAmount = double.tryParse(value) ?? 0;
+
+    // Available/unutilized limit
+    final double availableLimit = (unutilizedAmount ?? sanctionAmount ?? 0);
+
+    // Existing utilized disbursement for same invoice
+    final double existingDisbursement = invoices
+        .where((inv) =>
+            (inv["invoiceNumber"] == invoiceNumber.text ||
+                (inv["invoiceNumber"]?.toString().startsWith("${invoiceNumber.text}_") ?? false)) &&
+            (inv["supplierId"] ?? inv["supplier"]?["id"]) == selectedSupplier?["id"] &&
+            inv["invoiceDate"]?.toString().split("T")[0] == invoiceDate.text &&
+            inv["loanAccountId"] == selectedLanId)
+        .fold<double>(
+            0,
+            (sum, inv) =>
+                sum + (double.tryParse(inv["disbursementAmount"]?.toString() ?? "0") ?? 0));
+
+    final double invoiceAmt = double.tryParse(invoiceAmount.text) ?? 0;
+    final double totalDisbursement = existingDisbursement + enteredAmount;
+
+    // ❌ Invoice amount exceeded — clamp and show toast
+    if (totalDisbursement > invoiceAmt) {
+      enteredAmount = invoiceAmt - existingDisbursement;
+      if (enteredAmount < 0) enteredAmount = 0;
+
+      setState(() {
+        disbursementAmount.text = enteredAmount.toStringAsFixed(2);
+        disbursementAmount.selection = TextSelection.fromPosition(
+          TextPosition(offset: disbursementAmount.text.length),
+        );
+      });
+
+      showTopToast(
+        context,
+        "Total disbursement cannot exceed invoice amount.\n"
+        "Already Utilized: ₹${existingDisbursement.toStringAsFixed(2)}\n"
+        "Invoice Amount: ₹${invoiceAmt.toStringAsFixed(2)}\n"
+        "Remaining Allowed: ₹${(invoiceAmt - existingDisbursement).toStringAsFixed(2)}",
+        success: false,
+      );
+      return;
+    }
+
+    // ❌ Available/unutilized limit exceeded — clamp and show toast
+    if (enteredAmount > availableLimit) {
+      enteredAmount = availableLimit;
+
+      setState(() {
+        disbursementAmount.text = enteredAmount.toStringAsFixed(2);
+        disbursementAmount.selection = TextSelection.fromPosition(
+          TextPosition(offset: disbursementAmount.text.length),
+        );
+      });
+
+      showTopToast(
+        context,
+        "Disbursement amount cannot exceed unutilized limit of ₹${availableLimit.toStringAsFixed(2)}",
+        success: false,
+      );
+      return;
+    }
+
+    // ✅ Valid input — update controller
+    setState(() {
+      disbursementAmount.text = enteredAmount.toStringAsFixed(2);
+      disbursementAmount.selection = TextSelection.fromPosition(
+        TextPosition(offset: disbursementAmount.text.length),
+      );
+    });
+  },
+),  
       /// TENURE + ROI
       Row(
         children: [
@@ -1130,6 +1602,7 @@ double? unutilizedAmount;
               icon: Icons.percent,
             ),
           ),
+           
         ],
       ),
 
@@ -1172,13 +1645,14 @@ double? unutilizedAmount;
           ),
 
           decoration: BoxDecoration(
-            gradient:
-                const LinearGradient(
-              colors: [
-                Color(0xFF1E40AF),
-                Color(0xFF2563EB),
-              ],
-            ),
+            color:AppColors.darkBlue,
+            // gradient:
+            //     const LinearGradient(
+            //   colors: [
+               
+            //     AppColors.darkBlue,
+            //   ],
+            // ),
 
             borderRadius:
                 BorderRadius.circular(
@@ -1361,30 +1835,30 @@ double? unutilizedAmount;
 
                   /// SUPPLIER CARD
                   // supplierDropdown(),
-                  supplierExists
-                      ? Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 14,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade300),
-                            color: isDarkMode
-                                ? const Color(0xFF1E293B)
-                                : Colors.grey.shade100,
-                          ),
-                          child: Text(
-                            existingSupplierName ?? "",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                              color: isDarkMode ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        )
-                      : supplierDropdown(),
+                  // supplierExists
+                  //     ? Container(
+                  //         width: double.infinity,
+                  //         padding: const EdgeInsets.symmetric(
+                  //           horizontal: 12,
+                  //           vertical: 14,
+                  //         ),
+                  //         decoration: BoxDecoration(
+                  //           borderRadius: BorderRadius.circular(12),
+                  //           border: Border.all(color: Colors.grey.shade300),
+                  //           color: isDarkMode
+                  //               ? const Color(0xFF1E293B)
+                  //               : Colors.grey.shade100,
+                  //         ),
+                  //         child: Text(
+                  //           existingSupplierName ?? "",
+                  //           style: TextStyle(
+                  //             fontWeight: FontWeight.w600,
+                  //             fontSize: 15,
+                  //             color: isDarkMode ? Colors.white : Colors.black,
+                  //           ),
+                  //         ),
+                  //       )
+                  //     : supplierDropdown(),
 
                   const SizedBox(height: 10),
 
@@ -1400,14 +1874,14 @@ double? unutilizedAmount;
                     ),
 
                   const SizedBox(height: 10),
-                  modernCard(
-                    title: "Disbursement Details",
-                    child: inputField(
-                      label: "disbursement amount",
-                      controller: disbursementAmount,
-                      icon: Icons.price_change,
-                    ),
-                  ),
+                  // modernCard(
+                  //   title: "Disbursement Details",
+                  //   child: inputField(
+                  //     label: "disbursement amount",
+                  //     controller: disbursementAmount,
+                  //     icon: Icons.price_change,
+                  //   ),
+                  // ),
 
                   /// SUBMIT BUTTON
                   SizedBox(
