@@ -8,11 +8,13 @@ import 'package:supply_chain/core/constants/api_endpoints.dart';
 import 'package:supply_chain/core/services/auth_service.dart';
 import 'package:supply_chain/core/utils/toast_helper.dart';
 import 'package:supply_chain/presentation/auth/login_screen.dart';
+
 import 'package:supply_chain/presentation/role/rm/Cases/all_Cases.dart';
 import 'package:supply_chain/presentation/role/rm/Cases/completed.dart';
 import 'package:supply_chain/presentation/role/rm/Cases/draft.dart';
 import 'package:supply_chain/presentation/role/rm/Cases/mdApprove.dart';
 import 'package:supply_chain/presentation/role/rm/Cases/ops_review.dart';
+import 'package:supply_chain/presentation/role/rm/Cases/readyFor_md_submit.dart';
 import 'package:supply_chain/presentation/role/rm/Cases/rejected.dart';
 import 'package:supply_chain/presentation/role/rm/Cases/submitted.dart';
 import 'package:supply_chain/presentation/role/rm/NewCustomer/company_details.dart';
@@ -574,10 +576,17 @@ child: Container(
       (
         "Submitted",
         Icons.send_outlined,
-        Colors.purple,
+        const Color.fromARGB(255, 39, 176, 121),
         const SubmittedCasesPage(),
       ),
-      ("Ops Review", Icons.rate_review_outlined, Colors.amber, OpsReview()),
+     (
+  "Submit for MD Approval",
+  Icons.workspace_premium_rounded,
+  Colors.green,
+  const CreditApprovedCases(),
+),
+      
+      ("Ready for Ops", Icons.rate_review_outlined, Colors.amber, const OpsReview()),
       (
         "Completed",
         Icons.verified_outlined,
