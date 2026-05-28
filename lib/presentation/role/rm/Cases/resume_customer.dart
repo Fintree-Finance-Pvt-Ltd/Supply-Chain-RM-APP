@@ -457,6 +457,7 @@ final addressResult =
  
   bool get applicantDone {
       final applicant = draft["applicant"];
+              draft["applicant"]["name"] != "" ;
 
   if (applicant == null || applicant is! Map) {
     return false;
@@ -580,9 +581,13 @@ bool canAccessStep(int stepIndex) {
             title: "Applicant Details",
             completed:
               draft["applicant"] != null &&
+              draft["applicant"]["name"] != "" &&
               draft["applicant"]["id"] != null,
+              
 
             enabled: companyDone,
+              // enabled:draft["company"] != null,
+
 
             onResume: () => _go(
     ApplicantDetails(
@@ -601,8 +606,8 @@ bool canAccessStep(int stepIndex) {
           // _draftStepCard(
           //   title: "Co Applicant",
           //   completed: coApplicantDone,
-          //   // enabled: canAccessStep(2),
-          //   enabled: true,
+          //   enabled: canAccessStep(2),
+          //   // enabled: true,
           //   onResume: () =>
           //       _go(CoApplicantPage(customerId: customerId)),
           // ),
@@ -613,10 +618,12 @@ _draftStepCard(
 
  completed:
     draft["coApplicants"] is List &&
+
     (draft["coApplicants"] as List).isNotEmpty,
 
   enabled:
-      draft["applicant"] != null,
+  applicantDone,
+      // draft["applicant"] != null,
 
   onResume: () => _go(
     CoApplicantPage(

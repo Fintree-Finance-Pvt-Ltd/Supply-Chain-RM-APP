@@ -52,7 +52,8 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
       final rmId = prefs.getInt("rmId");
 
       final response = await http.get(
-        Uri.parse("${ApiEndpoints.baseUrl}/customers"),
+        // Uri.parse("${ApiEndpoints.baseUrl}/customers"),
+        Uri.parse("${ApiEndpoints.baseUrl}/workflows/customers/dashboard/rm"),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
@@ -62,10 +63,11 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
       final body = jsonDecode(response.body);
 
       if (body["success"] == true) {
-        final List data = body["data"];
+        final List data = body["data"]["customers"];
 
         final draftCases = data.where((e) {
-          return e["status"] == "draft" && e["rmId"] == rmId;
+          return e["status"] == "draft";
+          //  && e["rmId"] == rmId;
         }).toList();
 
         setState(() {
