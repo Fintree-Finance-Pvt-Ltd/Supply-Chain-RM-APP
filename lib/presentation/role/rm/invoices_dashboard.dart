@@ -22,15 +22,24 @@ class InvoiceDashboard {
     required this.totalAmount,
   });
 
+  // factory InvoiceDashboard.fromJson(Map<String, dynamic> json) {
+  //   return InvoiceDashboard(
+  //     totalInvoices: json["totalInvoices"] ?? 0,
+  //     pending: json["pending"] ?? 0,
+  //     active: json["active"] ?? 0,
+  //     rejected: json["rejected"] ?? 0,
+  //     totalAmount: json["totalDisbursed"] ?? "0",
+  //   );
+  // }
   factory InvoiceDashboard.fromJson(Map<String, dynamic> json) {
-    return InvoiceDashboard(
-      totalInvoices: json["totalInvoices"] ?? 0,
-      pending: json["pending"] ?? 0,
-      active: json["active"] ?? 0,
-      rejected: json["rejected"] ?? 0,
-      totalAmount: json["totalDisbursed"] ?? "0",
-    );
-  }
+  return InvoiceDashboard(
+    totalInvoices: int.tryParse(json["totalInvoices"]?.toString() ?? "0") ?? 0,
+    pending: int.tryParse(json["pending"]?.toString() ?? "0") ?? 0,
+    active: int.tryParse(json["active"]?.toString() ?? "0") ?? 0,
+    rejected: int.tryParse(json["rejected"]?.toString() ?? "0") ?? 0,
+    totalAmount: json["totalDisbursed"]?.toString() ?? "0",
+  );
+}
 }
 
 /// ================= MODEL =================
@@ -52,17 +61,28 @@ class InvoiceModel {
     required this.customerName,
   });
 
+  // factory InvoiceModel.fromJson(Map<String, dynamic> json) {
+  //   return InvoiceModel(
+  //     invoiceNumber: json["invoiceNumber"] ?? "",
+  //     supplierName: json["supplier"]?["supplierName"] ?? "N/A",
+  //     amount: json["invoiceAmount"] ?.toString()?? "0",
+  //     status: json["status"] ?? "",
+  //     customerId: json["customerId"],
+  //     customerName: (json["customer"]?["companyName"] ?? "").toString().trim(),
+  //     invoiceId: json["id"], // if exists
+  //   );
+  // }
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
-    return InvoiceModel(
-      invoiceNumber: json["invoiceNumber"] ?? "",
-      supplierName: json["supplier"]?["supplierName"] ?? "N/A",
-      amount: json["invoiceAmount"] ?? "0",
-      status: json["status"] ?? "",
-      customerId: json["customerId"],
-      customerName: (json["customer"]?["companyName"] ?? "").toString().trim(),
-      invoiceId: json["id"], // if exists
-    );
-  }
+  return InvoiceModel(
+    invoiceNumber: json["invoiceNumber"]?.toString() ?? "",
+    supplierName: json["supplier"]?["supplierName"]?.toString() ?? "N/A",
+    amount: json["invoiceAmount"]?.toString() ?? "0",
+    status: json["status"]?.toString() ?? "",
+    customerId: int.tryParse(json["customerId"]?.toString() ?? ""),
+    customerName: json["customer"]?["companyName"]?.toString().trim() ?? "",
+    invoiceId: int.tryParse(json["id"]?.toString() ?? ""),
+  );
+}
 }
 
 /// ================= PAGE =================
@@ -212,6 +232,7 @@ class _InvoiceDashboardPageState extends State<InvoiceDashboardPage> {
 
     final totalAmount =
         double.tryParse(dashboard!.totalAmount)?.toStringAsFixed(2) ?? "0.00";
+        
 
     return Container(
       width: double.infinity,
