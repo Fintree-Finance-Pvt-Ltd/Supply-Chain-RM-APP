@@ -774,8 +774,7 @@ try {
           _addressTypeDropdown(index),
           const SizedBox(height: 14),
 
-_addressTypeDropdown(index),
-const SizedBox(height: 14),
+
 
 Text(
   "Ownership",
