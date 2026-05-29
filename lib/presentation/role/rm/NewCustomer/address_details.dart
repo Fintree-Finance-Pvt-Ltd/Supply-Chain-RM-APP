@@ -25,7 +25,7 @@ class _AddressDetailsState extends State<AddressDetails> {
   final TextEditingController remarkController = TextEditingController();
   String? companyType;
   bool isDarkMode = false;
-
+String? ownershipType = "Owned";
   @override
   void initState() {
     super.initState();
@@ -66,6 +66,7 @@ class _AddressDetailsState extends State<AddressDetails> {
   Future<void> _processAddress({
     int? id,
     required String type,
+    required String? ownershipType,
     required String fullAddress,
     required String pincode,
     required String state,
@@ -86,6 +87,7 @@ class _AddressDetailsState extends State<AddressDetails> {
         "id": id,
         "customerId": customerId,
         "type": type,
+        "ownership": ownershipType, 
         "fullAddress": fullAddress,
         "pincode": pincode,
         "state": state,
@@ -145,6 +147,7 @@ class _AddressDetailsState extends State<AddressDetails> {
 
           model.id = item["id"];
           model.addressType = item["type"] ?? "";
+          model.ownershipType = item["ownership"] ?? "Owned";
           model.fullAddressController.text = item["fullAddress"] ?? "";
           model.pincodeController.text = item["pincode"] ?? "";
           model.stateController.text = item["state"] ?? "";
@@ -209,6 +212,7 @@ class _AddressDetailsState extends State<AddressDetails> {
         await _processAddress(
           id: model.id,
           type: model.addressType,
+          ownershipType: model.ownershipType,
           fullAddress: model.fullAddressController.text,
           pincode: model.pincodeController.text,
           state: model.stateController.text,
@@ -770,6 +774,64 @@ try {
           _addressTypeDropdown(index),
           const SizedBox(height: 14),
 
+_addressTypeDropdown(index),
+const SizedBox(height: 14),
+
+Text(
+  "Ownership",
+  style: TextStyle(
+    fontWeight: FontWeight.w600,
+    color: isDarkMode ? Colors.white : const Color(0xFF1A237E),
+  ),
+),
+
+Row(
+  children: [
+    Expanded(
+      child: RadioListTile<String>(
+        contentPadding: EdgeInsets.zero,
+        dense: true,
+        title: Text(
+          "Owned",
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        value: "Owned",
+        groupValue: addresses[index].ownershipType,
+        activeColor: const Color(0xFF1A237E),
+        onChanged: (value) {
+          setState(() {
+            addresses[index].ownershipType = value;
+          });
+        },
+      ),
+    ),
+    Expanded(
+      child: RadioListTile<String>(
+        contentPadding: EdgeInsets.zero,
+        dense: true,
+        title: Text(
+          "Rented",
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        value: "Rented",
+        groupValue: addresses[index].ownershipType,
+        activeColor: const Color(0xFF1A237E),
+        onChanged: (value) {
+          setState(() {
+            addresses[index].ownershipType = value;
+          });
+        },
+      ),
+    ),
+  ],
+),
+
+const SizedBox(height: 14),
+
           _textField(
             label: "Full Address",
             controller: addresses[index].fullAddressController,
@@ -808,71 +870,71 @@ try {
 
           const SizedBox(height: 14),
 
-          // _textField(
-          //   label: "City",
-          //   controller: addresses[index].cityController,
-          // ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "City",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: isDarkMode ? Colors.white : Color(0xFF1A237E),
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              addresses[index].isPincodeLoading
-                  ? const CircularProgressIndicator()
-                  : DropdownButtonFormField<String>(
-                      initialValue:
-                          addresses[index].postOffices
-                              .map((e) => e.name)
-                              .contains(addresses[index].selectedCity)
-                          ? addresses[index].selectedCity
-                          : null,
-                      hint: Text(
-                        "Select City",
-                        style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize: 14,
-                      ),
-
-                      dropdownColor: isDarkMode
-                          ? const Color(0xFF1E293B)
-                          : Colors.white,
-
-                      decoration: _inputDecoration(),
-                      items: addresses[index].postOffices
-                          .map(
-                            (po) => DropdownMenuItem<String>(
-                              value: po.name,
-                              child: Text(
-                                po.name,
-                                style: TextStyle(
-                                  color: isDarkMode
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          addresses[index].selectedCity = value;
-                          addresses[index].cityController.text = value ?? "";
-                        });
-                      },
-                    ),
-            ],
+          _textField(
+            label: "City",
+            controller: addresses[index].cityController,
           ),
+          // Column(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Text(
+          //       "City",
+          //       style: TextStyle(
+          //         fontWeight: FontWeight.w600,
+          //         color: isDarkMode ? Colors.white : Color(0xFF1A237E),
+          //       ),
+          //     ),
+          //     const SizedBox(height: 8),
+
+          //     addresses[index].isPincodeLoading
+          //         ? const CircularProgressIndicator()
+          //         : DropdownButtonFormField<String>(
+          //             initialValue:
+          //                 addresses[index].postOffices
+          //                     .map((e) => e.name)
+          //                     .contains(addresses[index].selectedCity)
+          //                 ? addresses[index].selectedCity
+          //                 : null,
+          //             hint: Text(
+          //               "Select City",
+          //               style: TextStyle(
+          //                 color: isDarkMode ? Colors.white : Colors.black,
+          //               ),
+          //             ),
+          //             style: TextStyle(
+          //               color: isDarkMode ? Colors.white : Colors.black,
+          //               fontSize: 14,
+          //             ),
+
+          //             dropdownColor: isDarkMode
+          //                 ? const Color(0xFF1E293B)
+          //                 : Colors.white,
+
+          //             decoration: _inputDecoration(),
+          //             items: addresses[index].postOffices
+          //                 .map(
+          //                   (po) => DropdownMenuItem<String>(
+          //                     value: po.name,
+          //                     child: Text(
+          //                       po.name,
+          //                       style: TextStyle(
+          //                         color: isDarkMode
+          //                             ? Colors.white
+          //                             : Colors.black,
+          //                       ),
+          //                     ),
+          //                   ),
+          //                 )
+          //                 .toList(),
+          //             onChanged: (value) {
+          //               setState(() {
+          //                 addresses[index].selectedCity = value;
+          //                 addresses[index].cityController.text = value ?? "";
+          //               });
+          //             },
+          //           ),
+          //   ],
+          // ),
         ],
       ),
     );
@@ -998,7 +1060,7 @@ class AddressModel {
   int? id;
 
   String addressType = "";
-
+String? ownershipType = "Owned";
   TextEditingController fullAddressController = TextEditingController();
   TextEditingController pincodeController = TextEditingController();
   TextEditingController stateController = TextEditingController();

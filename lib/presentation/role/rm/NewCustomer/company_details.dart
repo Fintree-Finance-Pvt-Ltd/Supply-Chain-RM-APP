@@ -745,7 +745,13 @@ final apiData = widget.draftData!["data"];
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: isFormComplete ? _goToApplicantDetails : null,
+                  onPressed: () {
+              if ( isMobileVerified ==true) {
+                savedraftapi() ;
+                  _goToApplicantDetails();
+              }
+            },
+                // onPressed: isFormComplete ? _goToApplicantDetails: null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.darkBlue,
                   foregroundColor: Colors.white,
@@ -754,6 +760,7 @@ final apiData = widget.draftData!["data"];
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
+                 
                 child: const Text(
                   "Continue",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -1475,6 +1482,56 @@ final apiData = widget.draftData!["data"];
   //     });
   //   }
   // }
+
+
+   Future<bool> savedraftapi() async {
+
+    try {
+      final token = await AuthService().getToken();
+
+      final response = await http.put(
+        Uri.parse("${ApiEndpoints.baseUrl}/customers/${widget.customerId}"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          if (customerId != null) "customerId": customerId,
+
+          "aadhaarNumber":  "",
+          "applicantAddress" : "",
+          "companyEmail":emailController.text.trim(),
+          "companyMobile":mobileController.text.trim(),
+          "companyName":companyNameController.text,
+          "companyPan":"",
+          "companyType": selectedCompanyType,
+          "email": emailController.text.trim(),
+          "gstNumber": gstController.text.trim(),
+          'mobile':"",
+          "name": "",
+          "pan":"",
+          "remarks":"",
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data["success"] == true) {
+        setState(() {
+          customerId = data["customerId"];
+        });
+
+        showTopToast(context, "Details Saved Successfully", success: true);
+        return true;
+      } else {
+        showTopToast(context, "Failed to save details", success: false);
+        return false;
+      }
+    } catch (e) {
+      showTopToast(context, "Failed to save details", success: false);
+      return false;
+    } 
+  }
 
   Future<bool> _verifyMobileOtp(String otp) async {
     final prefs = await SharedPreferences.getInstance();

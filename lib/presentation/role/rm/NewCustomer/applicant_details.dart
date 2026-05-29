@@ -41,6 +41,9 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
   final nameCtrl = TextEditingController();
   final panCtrl = TextEditingController();
   final mobileCtrl = TextEditingController();
+  final aadhaarCtrl = TextEditingController();
+  final aadhaarAddressCtrl = TextEditingController();
+
   final gmailCtrl = TextEditingController();
   final ImagePicker _picker = ImagePicker();
 
@@ -179,7 +182,8 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
             panCtrl.text = applicant["pan"] ?? "";
             mobileCtrl.text = applicant["mobile"] ?? "";
             gmailCtrl.text = applicant["email"] ?? "";
-
+              aadhaarCtrl.text = applicant["aadhaarNumber"] ?? "";
+              aadhaarAddressCtrl.text = applicant["aadhaarAddress"] ?? "";
             panOcrCompleted = panCtrl.text.isNotEmpty;
             panNumberVerified = panCtrl.text.isNotEmpty;
             mobileVerified = mobileCtrl.text.length == 10;
@@ -194,6 +198,48 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
     }
   }
 
+
+   Future<bool> savedraftapi() async {
+
+    try {
+      final token = await AuthService().getToken();
+
+      final response = await http.put(
+        Uri.parse("${ApiEndpoints.baseUrl}/customers/${widget.customerId}"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          if (customerId != null) "customerId": customerId,
+
+          "aadhaarNumber":  aadhaarCtrl.text.trim(),
+          "applicantAddress" : aadhaarAddressCtrl.text.trim(),
+          "email": emailController.text.trim(),
+          'mobile': mobileCtrl.text.trim(),
+          "pan":panCtrl.text.trim(),
+          "remarks":"",
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data["success"] == true) {
+        setState(() {
+          customerId = data["customerId"];
+        });
+
+        showTopToast(context, " Successfully", success: true);
+        return true;
+      } else {
+        showTopToast(context, "unsuccessful", success: false);
+        return false;
+      }
+    } catch (e) {
+      showTopToast(context, " Failed", success: false);
+      return false;
+    } 
+  }
   Future<void> _uploadDocument({
     required PlatformFile file,
     required String documentType,
@@ -374,7 +420,12 @@ class _ApplicantDetailsState extends State<ApplicantDetails> {
       width: double.infinity,
       height: 54,
       child: ElevatedButton(
-        onPressed: _goToApplicantDetails,
+        // onPressed: _goToApplicantDetails,
+         onPressed: () {
+                savedraftapi();
+                 _goToApplicantDetails();
+              
+            },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF1A237E),
           foregroundColor: Colors.white,
@@ -696,6 +747,8 @@ Future<bool> _sendEmailOtp() async {
                 ),
               ),
 
+          
+
               if (panNumberVerified && !mobileVerified)
                 ElevatedButton(
                   key: const ValueKey("mobileOtp"),
@@ -783,6 +836,65 @@ Future<bool> _sendEmailOtp() async {
                 ),
             ],
           ),
+
+///
+Divider(),
+        Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  controller: aadhaarCtrl,
+                  enabled: panNumberVerified,
+                  keyboardType: TextInputType.number,
+                  maxLength: 12,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    labelText: "Aadhaar Number",
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                    ),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+
+              //const SizedBox(width: 10),
+
+            
+            ],
+      ),
+
+      
+Divider(),
+        Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  controller: aadhaarAddressCtrl,
+                  enabled: panNumberVerified,
+                  keyboardType: TextInputType.text,
+                  maxLength: 500,
+                  //inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    labelText: "Aadhaar Address",
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
+                    ),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+
+            
+            ],
+      ),
+          
         ],
       ),
     );
