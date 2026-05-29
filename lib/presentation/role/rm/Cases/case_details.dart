@@ -209,18 +209,17 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
             (s) => s["status"]?.toString().toLowerCase().trim() != "approved",
           )
           .map((s) {
-            return {
-              "partner": s["partner"],
-              "sanctionAmount": s["sanctionAmount"],
-              "tenure": s["tenure"],
-              "interestRate": s["interestRate"],
-              "penalCharges": s["penalCharges"],
-              "processingFees": s["processingFees"],
-              "legalCharges": s["legalCharges"],
-              "serviceFeeCharges": s["serviceFeeCharges"],
-              "cashCollateral": s["cashCollateral"],
-              "conditions": s["conditions"] ?? "ok",
-            };
+           return {
+  "partner": s["partner"],
+  "sanctionAmount": s["sanctionAmount"],
+  "tenure": s["tenure"],
+  "interestRate": s["interestRate"],
+  "penalCharges": s["penalCharges"],
+  "processingFees": s["processingFees"],
+  "legalCharges": s["legalCharges"],
+  "serviceFee": s["serviceFee"], 
+  "conditions": s["conditions"] ?? "OK From RM",
+};
           })
           .toList();
 
@@ -804,7 +803,7 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -862,7 +861,7 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -1355,7 +1354,7 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
                 sanction["penalCharges"] ?? "",
                 sanction["processingFees"] ?? "",
                 sanction["legalCharges"] ?? "",
-                sanction["serviceFeeCharges"] ?? "",
+                sanction["serviceFee"] ?? "",
                 sanction["cashCollateral"] ?? "",
               ];
 
@@ -1426,7 +1425,7 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
                             ),
                             decoration: BoxDecoration(
                               color: isApproved
-                                  ? Colors.green.withOpacity(0.15)
+                                  ? Colors.green.withValues(alpha: 0.15)
                                   : isDarkMode
                                   ? const Color(0XFF0F172A)
                                   : const Color.fromARGB(255, 189, 209, 250),
@@ -1493,7 +1492,7 @@ class _FinalSanctionTermsSectionState extends State<FinalSanctionTermsSection> {
                                                 num.tryParse(value) ?? 0;
                                             break;
                                             case 6:
-                                            sanctionList[i]["serviceFeeCharges"] =
+                                            sanctionList[i]["serviceFee"] =
                                                 num.tryParse(value) ?? 0;
                                             break;
                                           case 7:

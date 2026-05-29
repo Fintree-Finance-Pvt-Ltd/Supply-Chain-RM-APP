@@ -491,6 +491,14 @@ class _CaseDetailsPageState extends State<CaseDetailsPage> {
           "interestRate": sanction["interestRate"] ?? 0,
           "penalCharges": sanction["penalCharges"] ?? 0,
           "processingFees": sanction["processingFees"] ?? 0,
+        "legalCharges":
+            sanction["legalCharges"]?.toString() ?? "0.00",
+
+        "serviceFee":
+            sanction["serviceFee"]?.toString() ??
+            sanction["serviceFeeCharges"]?.toString() ??
+            "0.00",
+
           "conditions": conditionsController.text.trim(),
         };
       }).toList();
