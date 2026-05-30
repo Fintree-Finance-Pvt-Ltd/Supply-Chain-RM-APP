@@ -128,6 +128,11 @@ final List<DocumentItem> allDocuments = [
     type: "partnership_deed",
     mandatory: false,
   ),
+   DocumentItem(
+    name: "CIBIL Consent ",
+    type: "cibil_consent",
+    mandatory: false,
+  ),
 ];
 
 /// =======================
@@ -180,6 +185,7 @@ final Map<String, List<String>> mandatoryDocsByCompanyType = {
     "Audited Financials (Last 3 Years)",
     "GSTR-3B (Latest 2 – Required)",
     "Bank Statement (Last 12 months)",
+    "CIBIL Consent ",
   ],
 
   "partnership": [
@@ -189,6 +195,7 @@ final Map<String, List<String>> mandatoryDocsByCompanyType = {
     "Partnership Deed / LLP Deed",
     "GSTR-3B (Latest 2 – Required)",
     "Company PAN",
+    "CIBIL Consent ",
   ],
 
   "llp": [
@@ -198,6 +205,7 @@ final Map<String, List<String>> mandatoryDocsByCompanyType = {
     "GSTR-3B (Latest 2 – Required)",
     "Bank Statement (Last 12 months)",
     "Company PAN",
+    "CIBIL Consent ",
   ],
 
   "huf": [
@@ -205,6 +213,7 @@ final Map<String, List<String>> mandatoryDocsByCompanyType = {
     "Audited Financials (Last 3 Years)",
     "GSTR-3B (Latest 2 – Required)",
     "Bank Statement (Last 12 months)",
+    "CIBIL Consent ",
   ],
 
   "pvt ltd /ltd": [
@@ -217,6 +226,7 @@ final Map<String, List<String>> mandatoryDocsByCompanyType = {
     "List of Directors & Shareholders",
     "Company PAN",
     "COI (Certificate of Incorporation)",
+    "CIBIL Consent ",
   ],
 };
 

@@ -8,7 +8,6 @@ import 'package:supply_chain/core/services/auth_service.dart';
 import 'package:supply_chain/core/routes/app_route.dart';
 import 'package:supply_chain/presentation/role/md/Cases/handled_cases_page.dart';
 import 'package:supply_chain/presentation/role/md/Cases/pending_approvals_page.dart';
-import 'package:supply_chain/presentation/role/md/Cases/rejected_cases_page.dart';
 import 'package:supply_chain/presentation/role/md/invoice/invoice_dashboard.dart';
 
 class MdDashboard extends StatefulWidget {
