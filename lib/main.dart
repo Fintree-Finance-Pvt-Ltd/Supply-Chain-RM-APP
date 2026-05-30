@@ -64,76 +64,78 @@
 //     );
 //   }
 // }
-import "package:flutter/material.dart";
-import "package:supply_chain/core/routes/app_route.dart";
-import "package:supply_chain/presentation/auth/session_screen.dart";
 
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
- 
+// import "package:flutter/material.dart";
+// import "package:supply_chain/core/routes/app_route.dart";
+// import "package:supply_chain/presentation/auth/session_screen.dart";
 
-  runApp(const supplychain());
-}
-class supplychain extends StatelessWidget {
-  const supplychain({super.key});
-
-
-  
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const SessionCheckScreen(), 
-      routes: AppRoutes.routes,
-    );
-  }
- 
-}
-
-
-// import 'package:flutter/material.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
-
-// import 'package:supply_chain/core/routes/app_route.dart';
-// import 'package:supply_chain/presentation/auth/session_screen.dart';
-// import 'package:supply_chain/core/services/notification_service.dart'; // 🔥 ADD THIS
-
-// ///  Background handler (must be top-level)
-// Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
-//   await Firebase.initializeApp();
-//   print("📩 Background message: ${message.notification?.title}");
-// }
 
 // Future<void> main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
+ 
 
-//   /// ✅ Initialize Firebase
-//   await Firebase.initializeApp();
-
-//   /// ✅ Background handler
-//   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
-
-//   ///  INIT NOTIFICATION SERVICE (VERY IMPORTANT)
-//   await NotificationService.initialize();
-
-//   runApp(const SupplyChain());
+//   runApp(const supplychain());
 // }
+// class supplychain extends StatelessWidget {
+//   const supplychain({super.key});
 
-// class SupplyChain extends StatelessWidget {
-//   const SupplyChain({super.key});
 
+  
 //   @override
 //   Widget build(BuildContext context) {
 //     return MaterialApp(
 //       debugShowCheckedModeBanner: false,
-
-//       ///  REQUIRED FOR NOTIFICATION CLICK NAVIGATION
-//       navigatorKey: NotificationService.navigatorKey,
-
-//       home: const SessionCheckScreen(),
+//       home: const SessionCheckScreen(), 
 //       routes: AppRoutes.routes,
 //     );
 //   }
+ 
 // }
+
+
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'package:supply_chain/core/routes/app_route.dart';
+import 'package:supply_chain/presentation/auth/session_screen.dart';
+import 'package:supply_chain/core/services/notification_service.dart'; // 🔥 ADD THIS
+
+///  Background handler (must be top-level)
+Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("📩 Background message: ${message.notification?.title}");
+}
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  /// ✅ Initialize Firebase
+  await Firebase.initializeApp();
+
+  /// ✅ Background handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
+
+  ///  INIT NOTIFICATION SERVICE (VERY IMPORTANT)
+  await NotificationService.initialize();
+
+  runApp(const SupplyChain());
+}
+
+class SupplyChain extends StatelessWidget {
+  const SupplyChain({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+
+      ///  REQUIRED FOR NOTIFICATION CLICK NAVIGATION
+      navigatorKey: NotificationService.navigatorKey,
+
+      home: const SessionCheckScreen(),
+      routes: AppRoutes.routes,
+    );
+  }
+}

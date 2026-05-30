@@ -1,10 +1,10 @@
 class ApiEndpoints {
-//  static const String baseUrl = "https://supplychain-prod.fintreelms.com/api";
+ //static const String baseUrl = "https://supplychain-prod.fintreelms.com/api";
 
-   static const String baseUrl = "http://localhost:4000/api";
+    static const String baseUrl = "http://localhost:3000/api";
 
   static const String USERS = "/users/signup";
-
+ 
 
 
   static const String login = "/auth/login";
