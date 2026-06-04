@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_endpoints.dart';
+import 'package:supply_chain/core/services/notification_service.dart';
 
 class AuthService {
   /// 🔐 LOGIN
@@ -68,6 +69,33 @@ class AuthService {
       await prefs.setString("userEmail", email);
 
       print("Stored Email: ${prefs.getString("userEmail")}");
+
+      // ?? GENERATE AND SEND FCM TOKEN TO BACKEND
+      try {
+        String? fcmToken = await NotificationService.generateFcmToken();
+        if (fcmToken != null) {
+          int? userId = data["user"]["id"];
+          String? role = data["user"]["role"];
+          
+          if (userId != null && role != null) {
+            await http.post(
+              Uri.parse("${ApiEndpoints.baseUrl}/notifications/save-fcm-token"),
+              headers: {
+                "Authorization": "Bearer ${data["token"]}",
+                "Content-Type": "application/json",
+              },
+              body: jsonEncode({
+                "id": userId,
+                "type": role.toLowerCase() == "customer" ? "customer" : "user",
+                "fcmToken": fcmToken,
+              }),
+            );
+            print("FCM Token sent successfully on login: $fcmToken");
+          }
+        }
+      } catch (e) {
+        print("Failed to send FCM token on login: $e");
+      }
 
       return data;
     } else {

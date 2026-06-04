@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
  
 // Your existing imports
 import 'package:supply_chain/core/constants/api_endpoints.dart';
@@ -71,6 +72,48 @@ class _RmDashboardState extends State<RmDashboard> {
       rmName = prefs.getString("rmName") ?? "User";
       rmEmail = prefs.getString("rmEmail") ?? "";
     });
+    _checkAndShowWelcomeNotification(prefs);
+  }
+
+  Future<void> _checkAndShowWelcomeNotification(SharedPreferences prefs) async {
+    bool hasShown = prefs.getBool("welcome_shown") ?? false;
+    if (!hasShown) {
+      await _showWelcomeNotification();
+      await prefs.setBool("welcome_shown", true);
+    }
+  }
+
+  Future<void> _showWelcomeNotification() async {
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+        
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    await flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings,
+    );
+
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'welcome_channel',
+      'Welcome Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      id: 0,
+      title: 'Login Successful ??',
+      body: 'Welcome back, $rmName! Ready to manage your tasks?',
+      notificationDetails: platformChannelSpecifics,
+    );
   }
  
   Future<void> fetchDashboardData() async {
